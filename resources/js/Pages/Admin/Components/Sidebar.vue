@@ -1,6 +1,7 @@
 <script setup lang="js">
 import AdminLayout from './AdminLayout.vue';
 import { Link } from '@inertiajs/vue3';
+
 </script>
 
 <template>
