@@ -29,6 +29,7 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        
         $product = new Product;
         $product->title = $request->title;
         $product->price = $request->price;
@@ -41,6 +42,7 @@ class ProductController extends Controller
         //check if product has images upload    
 
         if ($request->hasFile('product_images')) {
+            
             $productImages = $request->file('product_images');
             foreach ($productImages as $image) {
                 // Generate a unique name for the image using timestamp and random string
