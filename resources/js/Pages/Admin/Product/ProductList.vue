@@ -2,9 +2,9 @@
 import { usePage } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-
+import { Plus } from '@element-plus/icons-vue'
 defineProps({
-    products:Array
+    products: Array
 })
 
 const brands = usePage().props.brands;
@@ -151,13 +151,13 @@ const updateProduct = async () => {
     formData.append('category_id', category_id.value);
     formData.append("_method", 'PUT');
 
-    for (const image of productImages.value){
+    for (const image of productImages.value) {
         formData.append('product_images[]', image.raw);
     }
 
-    try{
-        await router.post('products/update/'+id.value, formData, {
-            onSuccess:(page)=>{
+    try {
+        await router.post('products/update/' + id.value, formData, {
+            onSuccess: (page) => {
                 dialogVisible.value = false;
                 resetFormData();
                 Swal.fire({
@@ -169,9 +169,43 @@ const updateProduct = async () => {
                 })
             }
         })
-    }catch(err){
+    } catch (err) {
         console.log(err)
     }
+}
+
+//delete product
+
+const deleteProduct = (product, index) => {
+    Swal.fire({
+        title: 'Are you Sure?',
+        text: "This action cannot be undo!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        cancelButtonText: 'no',
+        confirmButtonText: 'yes, delete!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            try {
+                router.delete('products/destroy/' + product.id, {
+                    onSuccess: (page) => {
+                        this.delete(product, index);
+                        Swal.fire({
+                            toast: true,
+                            icon: 'success',
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            title: page.props.flash.success
+                        })
+                    }
+                })
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    })
 }
 </script>
 
@@ -182,7 +216,7 @@ const updateProduct = async () => {
         <el-dialog v-model="dialogVisible" :title="editMode ? 'Edit Product' : 'Add Product'" width="30%"
             :before-close="handleClose">
             <!-- form start -->
-            <form class="max-w-md mx-auto" @submit.prevent="editMode ? updateProduct():AddProduct()">
+            <form class="max-w-md mx-auto" @submit.prevent="editMode ? updateProduct() : AddProduct()">
                 <div class="relative z-0 w-full mb-6 group">
                     <input v-model="title" type="text" name="floating_title" id="floating_title"
                         class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
