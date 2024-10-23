@@ -3,9 +3,14 @@ import { usePage } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-const products = usePage().props.products;
+defineProps({
+    products:Array
+})
+
 const brands = usePage().props.brands;
 const categories = usePage().props.categories;
+
+
 const isAddProduct = ref(false);
 const editMode = ref(false);
 const dialogVisible = ref(false);
