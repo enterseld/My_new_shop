@@ -56,6 +56,7 @@ const openAddModal = () => {
 
 
 const AddProduct = async () => {
+
     const formData = new FormData();
     formData.append('title', title.value);
     formData.append('price', price.value);
@@ -172,6 +173,7 @@ const updateProduct = async () => {
     } catch (err) {
         console.log(err)
     }
+    
 }
 
 //delete product
@@ -214,9 +216,9 @@ const deleteProduct = (product, index) => {
     <section class="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5">
         <!-- Dialogue for adding products or editing -->
         <el-dialog v-model="dialogVisible" :title="editMode ? 'Edit Product' : 'Add Product'" width="30%"
-            :before-close="handleClose">
+            :before-close="handleClose" @close="editMode ? resetFormData() : handleData">
             <!-- form start -->
-            <form class="max-w-md mx-auto" @submit.prevent="editMode ? updateProduct() : AddProduct()">
+            <form class="max-w-md mx-auto" @submit.prevent="editMode ? updateProduct() : AddProduct()" >
                 <div class="relative z-0 w-full mb-6 group">
                     <input v-model="title" type="text" name="floating_title" id="floating_title"
                         class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
