@@ -2,11 +2,21 @@
 import { computed } from 'vue';
 import UserLayout from './Layouts/UserLayout.vue';
 import { usePage } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 
-const carts = computed(()=>usePage().props.cart.data.items);
-const products = computed(()=>usePage().props.cart.data.products);
+const carts = computed(() => usePage().props.cart.data.items);
+const products = computed(() => usePage().props.cart.data.products);
 
-const total = computed(()=>usePage().props.cart.data.total); 
+const total = computed(() => usePage().props.cart.data.total);
+const itemId = (id) => carts.value.findIndex((item) => item.product_id == id);
+
+const update = (product, quantity) =>
+    router.patch(route('cart.update', product), {
+        quantity,
+    })
+
+const remove = (product) =>
+    router.delete(route('cart.delete', product));
 
 </script>
 <template>
@@ -41,17 +51,23 @@ const total = computed(()=>usePage().props.cart.data.total);
                             <tr v-for="product in products" :key="product.id"
                                 class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                 <td class="p-4">
-                                    <img src="/docs/images/products/apple-watch.png"
+                                    <img v-if="product.product_images.length > 0"
+                                        :src="`/${product.product_images[0].image}`"
+                                        class="w-16 md:w-32 max-w-full max-h-full" alt="Apple Watch">
+                                    <img v-else
+                                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
                                         class="w-16 md:w-32 max-w-full max-h-full" alt="Apple Watch">
                                 </td>
                                 <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                                    {{product.title}}
+                                    {{ product.title }}
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center">
-                                        <button
-                                            class="inline-flex items-center justify-center p-1 me-3 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                                            type="button">
+                                        <button @click.prevent="update(product, carts[itemId(product.id)].quantity - 1)"
+                                            :disabled="carts[itemId(product.id)].quantity <= 1"
+                                            :class="[carts[itemId(product.id)].quantity > 1 ? 'cursor-pointer text-purple-600' : 'cursor-not-allowed text-gray-300 dark:text-gray-500', 'inline-flex items-center justify-center p-1 me-3 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700']"
+                                            class="" type="button">
+
                                             <span class="sr-only">Quantity button</span>
                                             <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                                 fill="none" viewBox="0 0 18 2">
@@ -61,10 +77,11 @@ const total = computed(()=>usePage().props.cart.data.total);
                                         </button>
                                         <div>
                                             <input type="number" id="first_product"
+                                                v-model="carts[itemId(product.id)].quantity"
                                                 class="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                                 placeholder="1" required />
                                         </div>
-                                        <button
+                                        <button @click.prevent="update(product, carts[itemId(product.id)].quantity + 1)"
                                             class="inline-flex items-center justify-center h-6 w-6 p-1 ms-3 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
                                             type="button">
                                             <span class="sr-only">Quantity button</span>
@@ -77,14 +94,14 @@ const total = computed(()=>usePage().props.cart.data.total);
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                                    $599
+                                    ${{ product.price }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    <a href="#"
+                                    <a href="#" @click="remove(product)"
                                         class="font-medium text-red-600 dark:text-red-500 hover:underline">Remove</a>
                                 </td>
                             </tr>
-                          
+
                         </tbody>
                     </table>
 
@@ -92,7 +109,7 @@ const total = computed(()=>usePage().props.cart.data.total);
                 </div>
                 <div class="lg:w-1/3 md:w-1/2 bg-white flex flex-col md:ml-auto w-full md:py-8 mt-8 md:mt-0">
                     <h2 class="text-gray-900 text-lg mb-1 font-medium title-font">Summary</h2>
-                    <p class="leading-relaxed mb-5 text-gray-600">Total: 123грн</p>
+                    <p class="leading-relaxed mb-5 text-gray-600">Total: {{ total }} грн</p>
                     <h2 class="text-gray-900 text-lg mb-1 font-medium title-font">Shipping Adress</h2>
                     <p class="leading-relaxed mb-5 text-gray-600">1234</p>
                     <p class="leading-relaxed mb-5 text-gray-600">Or you can add one below</p>
