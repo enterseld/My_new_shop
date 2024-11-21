@@ -13,10 +13,12 @@ const itemId = (id) => carts.value.findIndex((item) => item.product_id == id);
 const update = (product, quantity) =>
     router.patch(route('cart.update', product), {
         quantity,
+        preserveState:true,
+        replace:true
     })
 
 const remove = (product) =>
-    router.delete(route('cart.delete', product));
+    router.delete(route('cart.delete', product), {preserveState:true, replace:true});
 
 </script>
 <template>
