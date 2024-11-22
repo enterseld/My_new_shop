@@ -62,6 +62,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 //routes for product list and filters
 Route::prefix('products')->controller(ProductListController::class)->group(function () {
     Route::get('/','index')->name('products.index');
+    Route::get('/products/{id}','showAndIndex')->name('product.show');
 });
 
 //end

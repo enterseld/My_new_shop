@@ -26,4 +26,16 @@ class ProductListController extends Controller
             'products' => ProductResource::collection($filterProducts),
         ]);
     }
+
+    public function showAndIndex($id){
+
+        $product = Product::with('category', 'brand', 'product_images')->findOrFail($id);
+        $products = Product::with('brand', 'category', 'product_images')->orderBy('id')->limit(4)->get();
+
+
+        return Inertia::render('User/ProductInfo',[
+            'product' => $product,
+            'products' => $products
+        ]);
+    }
 }
