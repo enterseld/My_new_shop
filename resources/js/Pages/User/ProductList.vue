@@ -37,16 +37,18 @@ const filterPrices = useForm({
 })
 
 const priceFilter = () => {
-    filterPrices.transform((data) => ({
-        ...data,
+    router.get('products', {
+        brands: selectedBrands.value,
+        categories: selectedCategories.value,
         prices: {
             from: filterPrices.prices[0],
             to: filterPrices.prices[1]
         }
-    })).get('products', {
+    },
+    {
         preserveState: true,
         replace: true
-    })
+    });
 }
 const mobileFiltersOpen = ref(false)
 
@@ -70,12 +72,16 @@ watch(selectedCategories, () => {
 function updateFilteredProducts(){
     router.get('products', {
         brands: selectedBrands.value,
-        categories: selectedCategories.value
+        categories: selectedCategories.value,
+        prices: {
+            from: filterPrices.prices[0],
+            to: filterPrices.prices[1]
+        }
     },
     {
         preserveState: true,
         replace: true
-    })
+    });
 }
 
 </script>
