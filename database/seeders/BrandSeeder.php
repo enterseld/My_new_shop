@@ -25,5 +25,13 @@ class BrandSeeder extends Seeder
             'name' => 'Adtns',
             'slug' => 'dell'
         ]);
+        Brand::create([
+            'name' => 'Mechanic',
+            'slug' => 'dell'
+        ]);
+        Brand::create([
+            'name' => 'Україна',
+            'slug' => 'dell'
+        ]);
     }
 }
