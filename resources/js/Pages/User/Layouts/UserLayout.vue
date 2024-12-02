@@ -16,9 +16,7 @@ onMounted(() => {
     <!--End-->
 
     <!--Main content-->
-    <!--Hero section-->
-    <Hero></Hero>
-    <!--End-->
+    
     <slot />
 
     <!--End-->

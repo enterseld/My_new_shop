@@ -57,15 +57,14 @@ class Product extends Model
 
     //filter logic for price or categories or brands 
 
-    public function  scopeFiltered(Builder $quary)  {
-        $quary
-        ->when(request('brands'), function (Builder $q)  {
+    public function scopeFiltered(Builder $quary)  {
+        $quary->when(request('brands'), function (Builder $q)  {
             $q->whereIn('brand_id',request('brands'));
-        })
-        ->when(request('categories'), function (Builder $q)  {
+
+        })->when(request('categories'), function (Builder $q)  {
             $q->whereIn('category_id',request('categories'));
-        })
-        ->when(request('prices'), function(Builder $q)  {
+            
+        })->when(request('prices'), function(Builder $q)  {
             $q->whereBetween('price',[
                 request('prices.from',0),
                 request('prices.to', 100000),

@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\User\CartController;
+use App\Http\Controllers\User\ProductListController;
 use App\Http\Controllers\User\UserController;
 use Inertia\Inertia;
 
@@ -22,6 +24,19 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+//end
+
+//add to cart
+
+Route::prefix('cart')->controller(CartController::class)->group(function (){
+    Route::get('view','view')->name('cart.view');
+    Route::post('store/{product}','store')->name('cart.store');
+    Route::patch('update/{product}','update')->name('cart.update');
+    Route::delete('delete/{product}','delete')->name('cart.delete');
+});
+//end
+
 
 //admin
 
@@ -42,6 +57,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::delete('/products/destroy/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
 });
 
+//end
 
+//routes for product list and filters
+Route::prefix('products')->controller(ProductListController::class)->group(function () {
+    Route::get('/','index')->name('products.index');
+    Route::get('/products/{id}','showAndIndex')->name('product.show');
+});
+
+//end
 
 require __DIR__.'/auth.php';
