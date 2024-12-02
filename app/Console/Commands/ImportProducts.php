@@ -44,9 +44,9 @@ class ImportProducts extends Command
             $newProduct->currency = (string)$product->currencyId;
             $newProduct->category_id = (string)$product->categoryId;
             $newProduct->vendor_code = (string)$product->vendorCode;
-            $newProduct->brand_id = array_search((string)$product->xpath("param[@name='Торгівельна марка']")[0], $brands);
+            $newProduct->brand_id = array_search((string)$product->xpath("param[@name='Торгівельна марка']")[0], $brands)+1;
             $newProduct->keywords_ua = (string)$product->keywords_ua;
-            $newProduct->description_ua = (string)$product->description_ua;
+            $newProduct->description = (string)$product->description_ua;
             $newProduct->disk_type = isset($product->xpath("param[@name='Вид диска']")[0]) ? (string)$product->xpath("param[@name='Вид диска']")[0] : null;
             $newProduct->work_materials = isset($product->xpath("param[@name='Робочий матеріал']")[0]) ? (string)$product->xpath("param[@name='Робочий матеріал']")[0] : null;
             $newProduct->compatibility = isset($product->xpath("param[@name='Сумісність із яким інструментом']")[0]) ? (string)$product->xpath("param[@name='Сумісність із яким інструментом']")[0] : null;
@@ -66,8 +66,10 @@ class ImportProducts extends Command
             $newProduct->end_type = isset($product->xpath("param[@name='Тип хвостовика']")[0]) ? (string)$product->xpath("param[@name='Тип хвостовика']")[0] : null;
             $newProduct->length = isset($product->xpath("param[@name='Довжина, мм']")[0]) ? (string)$product->xpath("param[@name='Довжина, мм']")[0] : null;
             //Mills...
-            $newProduct->number_of_segments = isset($product->xpath("param[@name='Кількість сегментів, шт']")[0]) ? (string)$product->xpath("param[@name=''Кількість сегментів, шт']")[0] : null;
+            $newProduct->number_of_segments = isset($product->xpath("param[@name='Кількість сегментів, шт']")[0]) ? (int)$product->xpath("param[@name='Кількість сегментів, шт']")[0] : null;
             $newProduct->inStock = (boolean)$product['available'] === "true";
+            $newProduct->quantity = 0;
+
             $newProduct->save();
             // Insert the product into the diamondDisks table
             foreach ($product->picture as $image) {

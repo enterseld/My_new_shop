@@ -1,5 +1,5 @@
 <script setup>
-import { Link, router } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 defineProps({
     products: Array
 })
@@ -32,16 +32,16 @@ const showProduct = (id) => {
         <div v-for="product in products" :key="product.id" class="group relative">
 
 
-            <div class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none  lg:h-80">
-                <img v-if="product.product_images.length > 0" :src="`/${product.product_images[0].image}`"
-                    :alt="product.imageAlt" class="h-full w-full object-cover object-center lg:h-full lg:w-full" />
+            <div class="w-full overflow-hidden rounded-md bg-gray-200">
+                <img v-if="product.product_images.length > 0" :src="product.product_images[0].image"
+                    :alt="product.imageAlt" class="h-full w-full object-contain object-center lg:h-full lg:w-full" />
                 <img v-else
                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                    :alt="product.imageAlt" class="h-full w-full object-cover object-center lg:h-full lg:w-full" />
+                    :alt="product.imageAlt" class="h-full w-full object-contain object-center lg:h-full lg:w-full" />
 
                 <!-- add to cart icon -->
                 <div
-                    class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer ">
+                    class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer">
 
                     <div class="bg-blue-700 p-2 rounded-full">
                         <a @click="addToCart(product)">
@@ -63,10 +63,7 @@ const showProduct = (id) => {
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-
                         </a>
-
-
                     </div>
                 </div>
                 <!-- end -->
