@@ -42,7 +42,12 @@ class ImportProducts extends Command
             $newProduct->published = 1;
             $newProduct->price = (float)$product->price;
             $newProduct->currency = (string)$product->currencyId;
-            $newProduct->category_id = (string)$product->categoryId;
+            if ((string)$product->categoryId == "0"){
+                $newProduct->category_id = "143";
+            }
+            else{
+                $newProduct->category_id = (string)$product->categoryId;
+            }
             $newProduct->vendor_code = (string)$product->vendorCode;
             $newProduct->brand_id = array_search((string)$product->xpath("param[@name='Торгівельна марка']")[0], $brands)+1;
             $newProduct->keywords_ua = (string)$product->keywords_ua;

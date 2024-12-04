@@ -11,7 +11,7 @@ const cart = computed(() => usePage().props.cart);
         <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
 
             <Link :href="route('user.home')">
-            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">V.shop</span>
+            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">T.shop</span>
             </Link>
             <div v-if="canLogin" class="flex items-center md:order-2">
                 <div class="mr-4">
