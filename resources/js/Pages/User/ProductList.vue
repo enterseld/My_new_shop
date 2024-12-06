@@ -45,17 +45,18 @@ const priceFilter = () => {
             to: filterPrices.prices[1]
         }
     },
-    {
-        preserveState: true,
-        replace: true
-    });
+        {
+            preserveState: true,
+            replace: true
+        });
 }
 const mobileFiltersOpen = ref(false)
 
 const props = defineProps({
     products: Array,
     brands: Array,
-    categories: Array
+    categories: Array,
+    pagination: Object
 })
 //filter brands and categories
 const selectedBrands = ref([])
@@ -69,24 +70,38 @@ watch(selectedCategories, () => {
 
 })
 
-function updateFilteredProducts(){
+function updateFilteredProducts(page = 1) {
     router.get('products', {
         brands: selectedBrands.value,
         categories: selectedCategories.value,
         prices: {
             from: filterPrices.prices[0],
             to: filterPrices.prices[1]
-        }
+        },
+        page
     },
-    {
-        preserveState: true,
-        replace: true
-    });
+
+        {
+            preserveState: true,
+            replace: true
+        });
 }
 
 </script>
 <template>
     <UserLayout>
+        <div class="pagination">
+            <button v-if="pagination.current_page > 1" @click="updateFilteredProducts(pagination.current_page - 1)">
+                Previous
+            </button>
+
+            <span>Page {{ pagination.current_page }} of {{ pagination.last_page }}</span>
+
+            <button v-if="pagination.current_page < pagination.last_page"
+                @click="updateFilteredProducts(pagination.current_page + 1)">
+                Next
+            </button>
+        </div>
         <div class="bg-white">
             <div>
                 <!-- Mobile filter dialog -->
@@ -258,7 +273,8 @@ function updateFilteredProducts(){
                                     <DisclosurePanel class="pt-6">
                                         <div class="space-y-4">
                                             <div v-for="brand in brands" :key="brand.id" class="flex items-center">
-                                                <input :id="`filter-${brand.id}`" :value="brand.id" type="checkbox" v-model="selectedBrands"
+                                                <input :id="`filter-${brand.id}`" :value="brand.id" type="checkbox"
+                                                    v-model="selectedBrands"
                                                     class="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
                                                 <label :for="`filter-${brand.id}`" class="ml-3 text-sm text-gray-600">{{
                                                     brand.name }}</label>
@@ -281,11 +297,14 @@ function updateFilteredProducts(){
                                     </h3>
                                     <DisclosurePanel class="pt-6">
                                         <div class="space-y-4">
-                                            <div v-for="category in categories" :key="category.id" class="flex items-center">
-                                                <input :id="`filter-${category.id+50}`" :value="category.id" type="checkbox" v-model="selectedCategories"
+                                            <div v-for="category in categories" :key="category.id"
+                                                class="flex items-center">
+                                                <input :id="`filter-${category.id + 50}`" :value="category.id"
+                                                    type="checkbox" v-model="selectedCategories"
                                                     class="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                                                <label :for="`filter-${category.id+50}`" class="ml-3 text-sm text-gray-600">{{
-                                                    category.name }}</label>
+                                                <label :for="`filter-${category.id + 50}`"
+                                                    class="ml-3 text-sm text-gray-600">{{
+                                                        category.name }}</label>
                                             </div>
                                         </div>
                                     </DisclosurePanel>
@@ -302,6 +321,7 @@ function updateFilteredProducts(){
                     </section>
                 </main>
             </div>
+
         </div>
 
     </UserLayout>
