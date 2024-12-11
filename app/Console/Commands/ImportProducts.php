@@ -39,7 +39,7 @@ class ImportProducts extends Command
             $newProduct = new Product();
             $newProduct->title = (string)$product->name_ua;
             $newProduct->measure = (string)$product->meashure;
-            $newProduct->published = 1;
+
             $newProduct->price = (float)$product->price;
             $newProduct->currency = (string)$product->currencyId;
             if ((string)$product->categoryId == "0"){
@@ -72,9 +72,9 @@ class ImportProducts extends Command
             $newProduct->length = isset($product->xpath("param[@name='Довжина, мм']")[0]) ? (string)$product->xpath("param[@name='Довжина, мм']")[0] : null;
             //Mills...
             $newProduct->number_of_segments = isset($product->xpath("param[@name='Кількість сегментів, шт']")[0]) ? (int)$product->xpath("param[@name='Кількість сегментів, шт']")[0] : null;
-            $newProduct->inStock = (boolean)$product['available'] === "true";
+            $newProduct->inStock = (string)$product['available'] == "true";
             $newProduct->quantity = 0;
-
+            $newProduct->published = $newProduct->inStock;
             $newProduct->save();
             // Insert the product into the diamondDisks table
             foreach ($product->picture as $image) {
