@@ -1,8 +1,9 @@
 <script setup>
+import Comments from './Components/Comments.vue';
 import Products from './Components/Products.vue';
 import UserLayout from './Layouts/UserLayout.vue';
-import { router } from '@inertiajs/vue3';
-import { onMounted, onUnmounted } from 'vue';
+import { router, } from '@inertiajs/vue3';
+import { onMounted, onUnmounted, ref } from 'vue';
 defineProps({
     product: Object,
     products: Array
@@ -26,14 +27,20 @@ const addToCart = (product) => {
 
 const handleScroll = () => {
     const gallery = document.getElementById("gallery");
-    const scrollY = window.scrollY; // Get the current scroll position
-    const maxOffset = 300; // Set the maximum offset in pixels
+    const section = document.getElementById("endScroll");
+    const scrollY = window.scrollY;
+    const sectionTop = section.offsetTop;
+    const maxOffset = section.offsetHeight - 460;
 
-    // Calculate the new position, capped at the maximum offset
-    const offset = Math.min(scrollY, maxOffset);
-
-    // Apply the offset as a transform
-    gallery.style.transform = `translateY(${offset}px)`;
+    if (scrollY >= sectionTop) {
+        const scrollOffset = scrollY - sectionTop;
+        const offset = Math.min(scrollOffset, maxOffset);
+        gallery.style.position = "relative";
+        gallery.style.top = `${Math.min(offset, maxOffset)}px`;
+    } else {
+        gallery.style.position = "relative";
+        gallery.style.top = "0px";
+    }
 };
 
 onMounted(() => {
@@ -49,52 +56,55 @@ onUnmounted(() => {
 <template>
     <UserLayout>
 
-        <section class="py-8 bg-white md:py-16 dark:bg-gray-900 antialiased">
+        <section id="endScroll" class="py-8 bg-white md:py-16 dark:bg-gray-900 antialiased overflow-hidden">
             <div class="max-w-screen-xl px-4 mx-auto 2xl:px-0">
                 <div class="lg:grid lg:grid-cols-2 lg:gap-8 xl:gap-16">
-                    <div id="gallery" class="relative w-full" data-carousel="slide">
+                    <div id="gallery"
+                        class="relative w-full transition-transform duration-100 ease-out will-change-transform"
+                        data-carousel="slide">
                         <!-- Carousel wrapper -->
                         <div class="relative h-56 overflow-hidden rounded-lg md:h-96 border-2">
                             <!-- Item 1 -->
                             <div class="hidden duration-700 ease-in-out" data-carousel-item
-                                v-for="image in product.product_images" >
-                                <img v-if="product.product_images.length > 0"
-                                    :src="image.image" :alt="product.imageAlt"
+                                v-for="image in product.product_images">
+                                <img v-if="product.product_images.length > 0" :src="image.image" :alt="product.imageAlt"
                                     class="h-full w-full object-cover object-center lg:h-full lg:w-full " />
                                 <img v-else
                                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
                                     :alt="product.imageAlt"
-                                    class="h-full w-full object-cover object-center lg:h-full lg:w-full" />
+                                    class="absolute h-full w-full object-cover object-center lg:h-full lg:w-full" />
                             </div>
                             <!-- Slider controls -->
                             <div v-if="product.product_images.length > 1">
-                            <button type="button" 
-                                class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-                                data-carousel-prev>
-                                <span
-                                    class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-gray/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-                                    <svg class="w-4 h-4 text-black dark:text-gray-800 rtl:rotate-180" aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="M5 1 1 5l4 4" />
-                                    </svg>
-                                    <span class="sr-only">Previous</span>
-                                </span>
-                            </button>
-                            <button type="button" 
-                                class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-                                data-carousel-next>
-                                <span
-                                    class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-                                    <svg class="w-4 h-4 text-black dark:text-gray-800 rtl:rotate-180" aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="m1 9 4-4-4-4" />
-                                    </svg>
-                                    <span class="sr-only">Next</span>
-                                </span>
-                            </button>
-                        </div>
+                                <button type="button"
+                                    class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+                                    data-carousel-prev>
+                                    <span
+                                        class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-gray/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+                                        <svg class="w-4 h-4 text-black dark:text-gray-800 rtl:rotate-180"
+                                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 6 10">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                stroke-width="2" d="M5 1 1 5l4 4" />
+                                        </svg>
+                                        <span class="sr-only">Previous</span>
+                                    </span>
+                                </button>
+                                <button type="button"
+                                    class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+                                    data-carousel-next>
+                                    <span
+                                        class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+                                        <svg class="w-4 h-4 text-black dark:text-gray-800 rtl:rotate-180"
+                                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 6 10">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                stroke-width="2" d="m1 9 4-4-4-4" />
+                                        </svg>
+                                        <span class="sr-only">Next</span>
+                                    </span>
+                                </button>
+                            </div>
                         </div>
 
                     </div>
@@ -180,11 +190,30 @@ onUnmounted(() => {
                                             in ea officia proident. Irure nostrud pariatur mollit ad adipisicing
                                             reprehenderit deserunt qui eu.</dd>
                                     </div>
+                                    <div class="px-4 py-6">
+                                        <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
+                                            Discussion</h2>
+                                    </div>
+                                    
+                                    <form class="mb-6">
+                                        <div
+                                            class="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                                            <label for="comment" class="sr-only">Your comment</label>
+                                            <textarea id="comment" rows="6"
+                                                class="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
+                                                placeholder="Write a comment..." required></textarea>
+                                        </div>
+                                        <button type="submit"
+                                            class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
+                                            Post comment
+                                        </button>
+                                    </form>
 
+                                    <Comments :products="products"></Comments>
+                                    
                                 </dl>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
