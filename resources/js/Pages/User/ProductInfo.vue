@@ -2,8 +2,8 @@
 import Comments from './Components/Comments.vue';
 import Products from './Components/Products.vue';
 import UserLayout from './Layouts/UserLayout.vue';
-import { router, } from '@inertiajs/vue3';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { router, usePage } from '@inertiajs/vue3';
+import { onMounted, onUnmounted } from 'vue';
 defineProps({
     product: Object,
     products: Array
@@ -24,7 +24,7 @@ const addToCart = (product) => {
         }
     })
 }
-
+const auth = usePage().props.auth;
 const handleScroll = () => {
     const gallery = document.getElementById("gallery");
     const section = document.getElementById("endScroll");
@@ -192,25 +192,50 @@ onUnmounted(() => {
                                     </div>
                                     <div class="px-4 py-6">
                                         <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
-                                            Discussion</h2>
+                                            Коментарі</h2>
                                     </div>
-                                    
-                                    <form class="mb-6">
-                                        <div
-                                            class="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-                                            <label for="comment" class="sr-only">Your comment</label>
-                                            <textarea id="comment" rows="6"
-                                                class="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
-                                                placeholder="Write a comment..." required></textarea>
-                                        </div>
-                                        <button type="submit"
-                                            class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
-                                            Post comment
-                                        </button>
-                                    </form>
-
-                                    <Comments :products="products"></Comments>
-                                    
+                                    <div class="max-w-2xl mx-auto px-4">
+                                        <form v-if="auth.user" class="mb-6">
+                                            <div
+                                                class="py-2 px-4 mb-4 mt-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                                                <label for="comment" class="sr-only">Your comment</label>
+                                                <textarea id="comment" rows="6"
+                                                    class="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
+                                                    placeholder="Напишіть ваш коментар..." required></textarea>
+                                            </div>
+                                            <button type="submit" data-popover-target="popover-default"
+                                                class="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                                                >
+                                                Опублікувати
+                                            </button>
+                                        </form>
+                                        <form v-else class="mb-6">
+                                            <div
+                                                class="py-2 px-4 mb-4 mt-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                                                <label for="comment" class="sr-only">Your comment</label>
+                                                <textarea id="comment" rows="6"
+                                                    class="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-black dark:placeholder-gray-400 dark:bg-gray-800"
+                                                    placeholder="Write a comment..." required></textarea>
+                                            </div>
+                                            <button type="submit" data-popover-target="popover-default"
+                                                class="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                                                disabled>
+                                                Опублікувати
+                                            </button>
+                                            <div data-popover id="popover-default" role="tooltip"
+                                                class="absolute z-10 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800">
+                                                <div
+                                                    class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+                                                    <h3 class="font-semibold text-gray-900 dark:text-white">Повідомлення!</h3>
+                                                </div>
+                                                <div class="px-3 py-2">
+                                                    <p>Залишати коментарі та оцінки можуть тільки зареєстровані користувачі.</p>
+                                                </div>
+                                                <div data-popper-arrow></div>
+                                            </div>
+                                        </form>
+                                        <Comments :product="product"></Comments>
+                                    </div>
                                 </dl>
                             </div>
                         </div>

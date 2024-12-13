@@ -2,13 +2,13 @@
 import { router } from '@inertiajs/vue3';
 
 defineProps({
-    products: Array
+    product: Object
 })
 </script>
 <template>
 
 
-        <div class="max-w-2xl mx-auto px-4">
+        
             
             
             <div class="p-6 text-base bg-white rounded-lg dark:bg-gray-900">
@@ -109,7 +109,7 @@ defineProps({
                     </button>
                 </div>
             </article>
-        </div>
+       
 
 
 </template>
