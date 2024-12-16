@@ -18,21 +18,24 @@ class CommentsSeeder extends Seeder
             
             'comment' => 'daafvacv',
             'rating' => '4',
-            'product_id' => '1'
+            'product_id' => '1',
+            'user_name' => 'admin'
 
         ]);
         ProductComments::create([
             
             'comment' => 'testdaafvacvafavascz',
             'rating' => '3',
-            'product_id' => '1'
+            'product_id' => '1',
+            'user_name' => 'admin'
 
         ]);
         CommentsReplies::create([
             
             'reply' => 'testdaafvacvafavascz',
 
-            'product_comments_id' => '2'
+            'product_comments_id' => '1',
+            'user_name' => 'admin'
 
         ]);
     }

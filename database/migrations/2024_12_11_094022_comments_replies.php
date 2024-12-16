@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('reply');
             $table->unsignedBigInteger('product_comments_id');
+            $table->string('user_name');
             // Define the foreign key relationship and cascading delete
             $table->foreign('product_comments_id')
                 ->references('id')

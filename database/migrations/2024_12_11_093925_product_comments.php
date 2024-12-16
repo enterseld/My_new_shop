@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('comment');
             $table->unsignedBigInteger('rating');
             $table->unsignedBigInteger('product_id');
+            $table->string('user_name');
             // Define the foreign key relationship and cascading delete
             $table->foreign('product_id')
                 ->references('id')
@@ -23,6 +24,8 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->timestamps();
         });
+
+        
     }
 
     /**
