@@ -9,7 +9,6 @@ import { onMounted, onUnmounted, ref, computed } from 'vue';
 defineProps({
     product: Object,
     products: Array,
-    users: Array
 })
 
 const auth = usePage().props.auth;
@@ -30,11 +29,16 @@ const addToCart = (product) => {
         }
     })
 }
-let selectedRating = ref(0);
+let selectedRating = ref(1);
+let commentText = ref(0);
 const starsContainer = ref(null);
+
 const selectRating = (rating) => {
+    const textArea = document.getElementById('comment');
     selectedRating.value = rating;
-    console.log(selectedRating);
+
+    commentText.value = textArea.value.trim();
+
     // Directly manipulating the DOM
     const stars = starsContainer.value.querySelectorAll('svg');
     stars.forEach((star, i) => {
@@ -46,6 +50,28 @@ const selectRating = (rating) => {
     });
 };
 
+const sendComment = async (commentText, rating, product) => {
+    const formData = new FormData();
+    formData.append('comment', commentText);
+    formData.append('rating', rating);
+    formData.append('user_name', auth.user.name);
+    formData.append('product_id', product.id);
+    try {
+        await router.post('/comment/store', formData, {
+            onSuccess: page => {
+                Swal.fire({
+                    toast: true,
+                    icon: 'success',
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    title: page.props.flash.success
+                })
+            },
+        })
+    } catch (err) {
+        console.log(err)
+    }
+};
 
 const handleScroll = () => {
     const gallery = document.getElementById("gallery");
@@ -240,10 +266,15 @@ onUnmounted(() => {
                                                             d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
                                                             clip-rule="evenodd"></path>
                                                     </svg>
+                                                    <div class="inline-flex ml-2 mt-1 bg-white">{{ selectedRating }} з 5
+                                                    </div>
+
                                                 </div>
-                                                <button type="submit" data-popover-target="popover-default"
+
+                                                <button type="submit"
                                                     class="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-                                                    disabled>
+                                                    @click="sendComment(commentText, selectedRating, product)">
+
                                                     Опублікувати
                                                 </button>
                                             </div>
@@ -252,8 +283,8 @@ onUnmounted(() => {
 
                                             <div
                                                 class="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-                                                <label for="comment" class="sr-only">Your comment</label>
-                                                <textarea id="comment" rows="6"
+                                                <label for="notcomment" class="sr-only">Your comment</label>
+                                                <textarea id="notcomment" rows="6"
                                                     class="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-black dark:placeholder-gray-400 dark:bg-gray-800"
                                                     placeholder="Write a comment..." required></textarea>
                                             </div>
@@ -280,64 +311,7 @@ onUnmounted(() => {
                                         </form>
                                         <div v-for="comment in product.product_comments"
                                             class=" text-base bg-white rounded-lg dark:bg-gray-900">
-                                            <footer class="flex justify-between items-center mb-2">
-                                                <div class="flex items-center">
-                                                    <p
-                                                        class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                            viewBox="0 0 24 24" stroke-width="1.5"
-                                                            class="w-7 h-7 rounded-full bg-white" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                                                        </svg>{{ comment.user_name }}
-
-                                                    </p>
-                                                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                                                        <time pubdate datetime="2022-02-08"
-                                                            title="February 8th, 2022">{{
-                                                                comment.created_at.split('T')[0] }}</time>
-
-                                                    </p>
-
-                                                </div>
-
-                                            </footer>
-                                            <p
-                                                class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
-                                                <svg v-for="stars in comment.rating" xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 24 24" fill="currentColor"
-                                                    class="w-4 h-4 text-gray-400 text-yellow-400">
-                                                    <path fill-rule="evenodd"
-                                                        d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
-                                                        clip-rule="evenodd"></path>
-                                                </svg>
-
-                                                <svg v-for="stars in 5 - comment.rating"
-                                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                    fill="currentColor" class="w-4 h-4 text-gray-400 ">
-                                                    <path fill-rule="evenodd"
-                                                        d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
-                                                        clip-rule="evenodd"></path>
-                                                </svg>
-
-                                            </p>
-
-                                            <p class="text-gray-500 dark:text-gray-400">{{ comment.comment }}</p>
-                                            <div class="flex items-center mt-4 space-x-4">
-                                                <button type="button"
-                                                    class="flex items-center text-sm text-gray-500 hover:underline dark:text-gray-400 font-medium">
-                                                    <svg class="mr-1.5 w-3.5 h-3.5" aria-hidden="true"
-                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 20 18">
-                                                        <path stroke="currentColor" stroke-linecap="round"
-                                                            stroke-linejoin="round" stroke-width="2"
-                                                            d="M5 5h5M5 8h2m6-3h2m-5 3h6m2-7H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3v5l5-5h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z" />
-                                                    </svg>
-                                                    Reply
-                                                </button>
-                                            </div>
-                                            <div v-for="reply in comment.comments_replies"
-                                                class="p-6 mb-3 ml-6 lg:ml-12 text-base bg-white rounded-lg dark:bg-gray-900">
+                                            <div v-if="comment.published == 1">
                                                 <footer class="flex justify-between items-center mb-2">
                                                     <div class="flex items-center">
                                                         <p
@@ -349,16 +323,77 @@ onUnmounted(() => {
                                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                                     d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                                                             </svg>{{ comment.user_name }}
-                                                        </p>
-                                                        <p class="text-sm text-gray-600 dark:text-gray-400"><time
-                                                                pubdate datetime="2022-02-12"
-                                                                title="February 12th, 2022">{{
-                                                                    reply.created_at.split('T')[0] }}</time>
-                                                        </p>
-                                                    </div>
-                                                </footer>
-                                                <p class="text-gray-500 dark:text-gray-400">{{ reply.reply }}</p>
 
+                                                        </p>
+                                                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                                                            <time pubdate datetime="2022-02-08"
+                                                                title="February 8th, 2022">{{
+                                                                    comment.created_at.split('T')[0] }}</time>
+
+                                                        </p>
+
+                                                    </div>
+
+                                                </footer>
+                                                <p
+                                                    class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
+                                                    <svg v-for="stars in comment.rating"
+                                                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                        fill="currentColor"
+                                                        class="w-4 h-4 text-gray-400 text-yellow-400">
+                                                        <path fill-rule="evenodd"
+                                                            d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                                                            clip-rule="evenodd"></path>
+                                                    </svg>
+
+                                                    <svg v-for="stars in 5 - comment.rating"
+                                                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                        fill="currentColor" class="w-4 h-4 text-gray-400 ">
+                                                        <path fill-rule="evenodd"
+                                                            d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                                                            clip-rule="evenodd"></path>
+                                                    </svg>
+
+                                                </p>
+
+                                                <p class="text-gray-500 dark:text-gray-400">{{ comment.comment }}</p>
+                                                <div class="flex items-center mt-2 mb-4 space-x-4">
+                                                    <button type="button"
+                                                        class="flex items-center text-sm text-gray-500 hover:underline dark:text-gray-400 font-medium">
+                                                        <svg class="mr-1.5 w-3.5 h-3.5" aria-hidden="true"
+                                                            xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 20 18">
+                                                            <path stroke="currentColor" stroke-linecap="round"
+                                                                stroke-linejoin="round" stroke-width="2"
+                                                                d="M5 5h5M5 8h2m6-3h2m-5 3h6m2-7H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3v5l5-5h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z" />
+                                                        </svg>
+                                                        Reply
+                                                    </button>
+                                                </div>
+                                                <div v-for="reply in comment.comments_replies"
+                                                    class="p-1 mb-3 ml-6 lg:ml-12 text-base bg-white rounded-lg dark:bg-gray-900">
+                                                    <footer class="flex justify-between items-center mb-2">
+                                                        <div class="flex items-center">
+                                                            <p
+                                                                class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                    viewBox="0 0 24 24" stroke-width="1.5"
+                                                                    class="w-7 h-7 rounded-full bg-white"
+                                                                    stroke="currentColor">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                                                </svg>{{ comment.user_name }}
+                                                            </p>
+                                                            <p class="text-sm text-gray-600 dark:text-gray-400"><time
+                                                                    pubdate datetime="2022-02-12"
+                                                                    title="February 12th, 2022">{{
+                                                                        reply.created_at.split('T')[0] }}</time>
+                                                            </p>
+                                                        </div>
+                                                    </footer>
+                                                    <p class="text-gray-500 dark:text-gray-400">{{ reply.reply }}</p>
+
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

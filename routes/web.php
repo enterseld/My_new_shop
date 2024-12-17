@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\User\CartController;
+use App\Http\Controllers\User\CommentsController;
 use App\Http\Controllers\User\ProductListController;
 use App\Http\Controllers\User\UserController;
 use Inertia\Inertia;
@@ -37,6 +38,7 @@ Route::prefix('cart')->controller(CartController::class)->group(function (){
 });
 //end
 
+Route::post('/comment/store', [CommentsController::class, 'store'])->name('comments.store');
 
 //admin
 
