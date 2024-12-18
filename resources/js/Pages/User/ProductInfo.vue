@@ -3,15 +3,17 @@
 
 import Products from './Components/Products.vue';
 import UserLayout from './Layouts/UserLayout.vue';
-import { router, usePage } from '@inertiajs/vue3';
+import { router, usePage, Link } from '@inertiajs/vue3';
 import { onMounted, onUnmounted, ref, computed } from 'vue';
 
 defineProps({
     product: Object,
-    products: Array,
+    products: Object,
 })
 
 const auth = usePage().props.auth;
+const inputText = ref(""); // Using ref for reactive data
+const isButtonDisabled = computed(() => !inputText.value.trim());
 
 
 const addToCart = (product) => {
@@ -32,23 +34,6 @@ const addToCart = (product) => {
 let selectedRating = ref(1);
 let commentText = ref(0);
 const starsContainer = ref(null);
-
-const selectRating = (rating) => {
-    const textArea = document.getElementById('comment');
-    selectedRating.value = rating;
-
-    commentText.value = textArea.value.trim();
-
-    // Directly manipulating the DOM
-    const stars = starsContainer.value.querySelectorAll('svg');
-    stars.forEach((star, i) => {
-        if (i < rating) {
-            star.classList.add('text-yellow-400');
-        } else {
-            star.classList.remove('text-yellow-400');
-        }
-    });
-};
 
 const sendComment = async (commentText, rating, product) => {
     const formData = new FormData();
@@ -73,6 +58,49 @@ const sendComment = async (commentText, rating, product) => {
     }
 };
 
+const sendReply = async (comment_id, index) => {
+    const formData = new FormData();
+    const textarea = document.getElementById("reply-" + index); 
+    const reply = textarea.value.trim();
+    
+    formData.append('reply', reply);
+    formData.append('comment_id', comment_id);
+    formData.append('user_name', auth.user.name);
+    
+    try {
+        await router.post('/reply/store', formData, {
+            onSuccess: page => {
+                Swal.fire({
+                    toast: true,
+                    icon: 'success',
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    title: page.props.flash.success
+                })
+            },
+        })
+    } catch (err) {
+        console.log(err)
+    }
+};
+
+const selectRating = (rating) => {
+    const textArea = document.getElementById('comment');
+    selectedRating.value = rating;
+
+    commentText.value = textArea.value.trim();
+
+    // Directly manipulating the DOM
+    const stars = starsContainer.value.querySelectorAll('svg');
+    stars.forEach((star, i) => {
+        if (i < rating) {
+            star.classList.add('text-yellow-400');
+        } else {
+            star.classList.remove('text-yellow-400');
+        }
+    });
+};
+
 const handleScroll = () => {
     const gallery = document.getElementById("gallery");
     const section = document.getElementById("endScroll");
@@ -90,6 +118,24 @@ const handleScroll = () => {
         gallery.style.top = "0px";
     }
 };
+
+const toggleVisibility = (event) => {
+    const divId = event.target.id;
+    const lastSymbol = divId.slice(-1);
+    const div = "div-" + lastSymbol;
+    const textarea = document.getElementById(div);
+
+    if (textarea.classList.contains('hidden')) {
+        textarea.classList.remove('hidden');
+        textarea.classList.add('visible');
+    } else if (textarea.classList.contains('visible')) {
+        textarea.classList.remove('visible');
+        textarea.classList.add('hidden');
+    }
+};
+
+
+
 
 onMounted(() => {
     document.addEventListener("scroll", handleScroll);
@@ -242,13 +288,13 @@ onUnmounted(() => {
                                         <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
                                             Коментарі</h2>
                                     </div>
-                                    <div class="max-w-2xl mx-auto px-4">
+                                    <div class="max-w-2xl mx-auto px-4 py-4">
                                         <form v-if="auth.user" class="mb-6">
 
                                             <div
                                                 class="py-2 px-4 mb-4 mt-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
                                                 <label for="comment" class="sr-only">Your comment</label>
-                                                <textarea id="comment" rows="6"
+                                                <textarea id="comment" rows="6" v-model="inputText"
                                                     class="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
                                                     placeholder="Напишіть ваш коментар..." required></textarea>
                                             </div>
@@ -271,7 +317,7 @@ onUnmounted(() => {
 
                                                 </div>
 
-                                                <button type="submit"
+                                                <button type="submit" :disabled="isButtonDisabled"
                                                     class="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                                                     @click="sendComment(commentText, selectedRating, product)">
 
@@ -309,7 +355,7 @@ onUnmounted(() => {
                                                 <div data-popper-arrow></div>
                                             </div>
                                         </form>
-                                        <div v-for="comment in product.product_comments"
+                                        <div v-for="(comment, index) in product.product_comments" :key="index"
                                             class=" text-base bg-white rounded-lg dark:bg-gray-900">
                                             <div v-if="comment.published == 1">
                                                 <footer class="flex justify-between items-center mb-2">
@@ -357,8 +403,9 @@ onUnmounted(() => {
                                                 </p>
 
                                                 <p class="text-gray-500 dark:text-gray-400">{{ comment.comment }}</p>
-                                                <div class="flex items-center mt-2 mb-4 space-x-4">
-                                                    <button type="button"
+                                                <div class="flex display-flex mt-2 mb-4 space-x-4">
+                                                    <button :id="'button-' + index" type="button" v-if="auth.user"
+                                                        @click="toggleVisibility($event)"
                                                         class="flex items-center text-sm text-gray-500 hover:underline dark:text-gray-400 font-medium">
                                                         <svg class="mr-1.5 w-3.5 h-3.5" aria-hidden="true"
                                                             xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -369,9 +416,12 @@ onUnmounted(() => {
                                                         </svg>
                                                         Reply
                                                     </button>
+
                                                 </div>
+
                                                 <div v-for="reply in comment.comments_replies"
                                                     class="p-1 mb-3 ml-6 lg:ml-12 text-base bg-white rounded-lg dark:bg-gray-900">
+                                                    <div v-if="reply.published == 1">
                                                     <footer class="flex justify-between items-center mb-2">
                                                         <div class="flex items-center">
                                                             <p
@@ -393,6 +443,20 @@ onUnmounted(() => {
                                                     </footer>
                                                     <p class="text-gray-500 dark:text-gray-400">{{ reply.reply }}</p>
 
+                                                </div>
+                                            </div>
+                                                <div :id="'div-' + index"
+                                                    class="hidden py-2 px-4 mb-4 mt-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+
+                                                    <textarea rows="6" :id="'reply-' + index"
+                                                        class=" px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-black dark:placeholder-gray-400 dark:bg-gray-800"
+                                                        placeholder="Write a reply..." required></textarea>
+                                                    <button type="submit" @click="sendReply(comment.id, index)"
+                                                        class="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                                                        >
+                                                        Опублікувати
+                                                    </button>
+                                                    
                                                 </div>
                                             </div>
                                         </div>
