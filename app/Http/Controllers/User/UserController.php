@@ -12,8 +12,10 @@ class UserController extends Controller
 {
     public function index(){
         $products = Product::with('brand', 'category', 'product_images')->orderBy('id')->limit(8)->get();
+        $allProducts = Product::with('product_images')->orderBy('id')->get();
         return Inertia::render('User/Index', [
             'products' => $products,
+            'allProducts' => $allProducts,
             'canLogin' => app('router')->has('login'),
             'canRegister' => app('router')->has('register'),
             'laravelVersion' => Application::VERSION,
