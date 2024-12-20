@@ -17,7 +17,7 @@ class ProductListController extends Controller
     {
         $products = Product::with('category', 'brand', 'product_images', 'product_comments');
         $filterProducts = $products->filtered()->where('published', '!=', 0)->paginate(16)->withQueryString();
-
+        $allProducts = Product::with('product_images')->orderBy('id')->get();
         $categories = Category::get();
         $brands = Brand::get();
 
@@ -25,6 +25,7 @@ class ProductListController extends Controller
 
             'categories' => $categories,
             'brands' => $brands,
+            'allProducts' => $allProducts,
             'products' => ProductResource::collection($filterProducts),
             'pagination' => [
                 'current_page' => $filterProducts->currentPage(),
@@ -40,9 +41,10 @@ class ProductListController extends Controller
 
         $product = Product::with('category', 'brand', 'product_images', 'product_comments.comments_replies')->findOrFail($id);
         $products = Product::with('brand', 'category', 'product_images')->orderBy('id')->limit(4)->get();
-
+        $allProducts = Product::with('product_images')->orderBy('id')->get();
 
         return Inertia::render('User/ProductInfo', [
+            'allProducts' => $allProducts,
             'product' => $product,
             'products' => $products
         ]);
