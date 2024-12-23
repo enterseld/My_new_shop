@@ -188,34 +188,28 @@ let filteredProducts = computed(() =>
                                         <ComboboxButton v-for="person in filteredProducts.slice(0, 20)" :key="person.id"
                                             :value="person" v-slot="{ selected, active }">
                                             <Link :href="route('product.show', person.id)">
-                    <li class="flex w-full overflow-hidden flex-col items-center relative cursor-default select-none p-2 border-2 mb-1 mr-2 rounded"
-                        :class="{
-                            'bg-teal-600 text-white': active,
-                            'text-gray-900': !active,
-                        }">
-                        <!-- Title: Ensure it takes full width -->
-                        <p class="mt-1 w-full" :class="{ 'font-medium': selected, 'font-normal': !selected }">
-                            {{ person.title }}
-                        </p>
-                        <!-- Image: Let the image scale without affecting the width -->
-                        <img v-if="person.product_images.length > 0" :src="person.product_images[0].image"
-                            class="w-16 md:w-32 max-w-full max-h-full" alt="Apple Watch">
+                                                <li class="flex w-full shadow-inner m-1 overflow-hidden flex-col items-center relative cursor-default select-none p-2 border-2 mb-1 mr-2 rounded"
+                                                    :class="{
+                                                        'bg-teal-600 text-white': active,
+                                                        'text-gray-900': !active,
+                                                    }">
+                                                    <!-- Title: Ensure it takes full width -->
+                                                    <p class="mt-1 w-full" :class="{ 'font-medium': selected, 'font-normal': !selected }">
+                                                        {{ person.title }}
+                                                    </p>
+                                                    <!-- Image: Let the image scale without affecting the width -->
+                                                    <img v-if="person.product_images.length > 0" :src="person.product_images[0].image"
+                                                        class="w-16 md:w-32 max-w-full max-h-full" alt="Apple Watch">
+                                                                            </li>
+                                            </Link>
+                                        </ComboboxButton>
+                                    </ComboboxOptions>
+                                </TransitionRoot>
+                            </div>
+                        </Combobox>
                     </li>
-                    </Link>
-
-                    </ComboboxButton>
-
-                    </ComboboxOptions>
-                    </TransitionRoot>
-
+                </ul>
             </div>
-
-            </Combobox>
-            </li>
-
-            </ul>
-
-        </div>
         </div>
 
 
