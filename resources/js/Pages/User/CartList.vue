@@ -24,7 +24,7 @@ const remove = (product) =>
 <template>
 
     <UserLayout>
-        <section class="text-gray-600 body-font relative">
+        <section class="bg-white text-gray-600 body-font relative mx-auto max-w-1xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-screen-1xl lg:px-8">
             <div
                 class="container px-5 py-3 mx-auto flex flex-wrap lg:flex-col lg:space-y-4 xl:flex-row xl:space-y-0 xl:space-x-4 justify-center ">
 

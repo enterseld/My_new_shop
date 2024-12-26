@@ -91,8 +91,8 @@ function updateFilteredProducts(page = 1) {
 <template>
     <UserLayout>
 
-        <div class="bg-white">
-            <div>
+        <div class="bg-white mx-auto max-w-fit px-4 py-16 sm:px-6 sm:py-24 lg:max-w-screen-2xl lg:px-8">
+            
                 <!-- Mobile filter dialog -->
                 <TransitionRoot as="template" :show="mobileFiltersOpen">
                     <Dialog class="relative z-40 lg:hidden" @close="mobileFiltersOpen = false">
@@ -161,7 +161,7 @@ function updateFilteredProducts(page = 1) {
                     </Dialog>
                 </TransitionRoot>
 
-                <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <main class="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
                     <div class="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
                         <h1 class="text-4xl font-bold tracking-tight text-gray-900">New Arrivals</h1>
 
@@ -345,7 +345,7 @@ function updateFilteredProducts(page = 1) {
                 </main>
             </div>
 
-        </div>
+        
 
     </UserLayout>
 </template>

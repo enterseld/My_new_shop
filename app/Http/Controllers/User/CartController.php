@@ -15,21 +15,25 @@ class CartController extends Controller
 {
     public function view(Request $request, Product $product)
     {
+        $allProducts = Product::with('product_images')->orderBy('id')->get();
         $user = $request->user();
         if ($user) {
             $cartItems = CartItem::where('user_id', $user->id)->get();
             $userAdress = UserAddress::where('user_id', $user->id)->where('isMain', 1)->first();
+            
             if ($cartItems->count() > 0) {
+                
                 return Inertia::render('User/CartList', [
                     'cartItems' => $cartItems,
-                    'userAdress' => $userAdress
+                    'userAdress' => $userAdress,
+                    'allProducts' => $allProducts
                 ]);
             }
         } else {
             $cartItems = Cart::getCookieCartItems();
             if (count($cartItems) > 0) {
                 $cartItems = new CartResource(Cart::getProductsAndCartItems());
-                return Inertia::render('User/CartList', ['cartItems' => $cartItems]);
+                return Inertia::render('User/CartList', ['cartItems' => $cartItems, 'allProducts' => $allProducts]);
             } else {
                 return redirect()->back();
             }
