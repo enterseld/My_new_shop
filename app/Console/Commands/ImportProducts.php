@@ -11,7 +11,7 @@ use SimpleXMLElement;
 
 class ImportProducts extends Command
 {
-    protected $signature = 'import:products {xmlFile}';
+    protected $signature = 'deleteDatabaseAndImport:products {xmlFile}';
 
     protected $description = 'Import products and pictures from XML file';
 
