@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Product;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,10 +18,12 @@ class ProfileController extends Controller
      * Display the user's profile form.
      */
     public function edit(Request $request): Response
-    {
+    {   
+        $allProducts = Product::with('product_images')->orderBy('id')->get();
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
+            'allProducts' => $allProducts,
         ]);
     }
 
@@ -30,13 +33,13 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
-
+        
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
-
+        
         $request->user()->save();
-
+        dd($request);
         return Redirect::route('profile.edit');
     }
 

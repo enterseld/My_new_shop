@@ -11,7 +11,6 @@ import {
 import { CheckIcon } from '@heroicons/vue/20/solid'
 
 const canLogin = usePage().props.canLogin;
-const canRegister = usePage().props.canRegister;
 const auth = usePage().props.auth;
 const allProducts = usePage().props.allProducts;
 const cart = computed(() => usePage().props.cart);
@@ -106,7 +105,9 @@ let filteredProducts = computed(() =>
                     class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600"
                     id="user-dropdown">
                     <div class="px-4 py-3">
+                        <Link :href="route('profile.edit')">
                         <span class="block text-sm text-gray-900 dark:text-white">{{ auth.user.name }}</span>
+                        </Link>
                         <span class="block text-sm  text-gray-500 truncate dark:text-gray-400">{{ auth.user.email
                             }}</span>
                     </div>
