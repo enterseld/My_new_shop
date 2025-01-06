@@ -4,6 +4,10 @@ import UserLayout from './Layouts/UserLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 
+defineProps({
+    cities: Object
+})
+
 const carts = computed(() => usePage().props.cart.data.items);
 const products = computed(() => usePage().props.cart.data.products);
 

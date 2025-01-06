@@ -8,15 +8,28 @@ use App\Http\Resources\CartResource;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\UserAddress;
+use App\Providers\NovaPostService as ServicesNovaPostService;
+
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CartController extends Controller
 {
+    protected $novaPoshtaService;
+
+    public function __construct(ServicesNovaPostService $novaPoshtaService)
+    {
+        $this->novaPoshtaService = $novaPoshtaService;
+    }
+
     public function view(Request $request, Product $product)
     {
+        $response = $this->novaPoshtaService->makeRequest('Address', 'getCities');
+        $cities = $response['data'] ?? [];
+
         $allProducts = Product::with('product_images')->orderBy('id')->get();
         $user = $request->user();
+
         if ($user) {
             $cartItems = CartItem::where('user_id', $user->id)->get();
             $userAdress = UserAddress::where('user_id', $user->id)->where('isMain', 1)->first();
@@ -26,14 +39,15 @@ class CartController extends Controller
                 return Inertia::render('User/CartList', [
                     'cartItems' => $cartItems,
                     'userAdress' => $userAdress,
-                    'allProducts' => $allProducts
+                    'allProducts' => $allProducts,
+                    'cities' => $response,
                 ]);
             }
         } else {
             $cartItems = Cart::getCookieCartItems();
             if (count($cartItems) > 0) {
                 $cartItems = new CartResource(Cart::getProductsAndCartItems());
-                return Inertia::render('User/CartList', ['cartItems' => $cartItems, 'allProducts' => $allProducts]);
+                return Inertia::render('User/CartList', ['cartItems' => $cartItems, 'allProducts' => $allProducts, 'cities' => $cities, ]);
             } else {
                 return redirect()->back();
             }
