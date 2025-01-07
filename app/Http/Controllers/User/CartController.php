@@ -24,8 +24,9 @@ class CartController extends Controller
 
     public function view(Request $request, Product $product)
     {
-        $response = $this->novaPoshtaService->makeRequest('Address', 'getCities');
-        $cities = $response['data'] ?? [];
+       
+
+        
 
         $allProducts = Product::with('product_images')->orderBy('id')->get();
         $user = $request->user();
@@ -33,25 +34,52 @@ class CartController extends Controller
         if ($user) {
             $cartItems = CartItem::where('user_id', $user->id)->get();
             $userAdress = UserAddress::where('user_id', $user->id)->where('isMain', 1)->first();
-            
+
             if ($cartItems->count() > 0) {
-                
+
                 return Inertia::render('User/CartList', [
                     'cartItems' => $cartItems,
                     'userAdress' => $userAdress,
                     'allProducts' => $allProducts,
-                    'cities' => $response,
                 ]);
             }
         } else {
             $cartItems = Cart::getCookieCartItems();
             if (count($cartItems) > 0) {
                 $cartItems = new CartResource(Cart::getProductsAndCartItems());
-                return Inertia::render('User/CartList', ['cartItems' => $cartItems, 'allProducts' => $allProducts, 'cities' => $cities, ]);
+                return Inertia::render('User/CartList', [
+                    'cartItems' => $cartItems,
+                    'allProducts' => $allProducts,
+                ]);
             } else {
                 return redirect()->back();
             }
         }
+    }
+
+    public function getCities(Request $request, string $findBy)
+    {   
+        
+        $response = $this->novaPoshtaService->makeRequest('Address', 'getCities', $findBy);
+        $cities = $response['data'] ?? [];
+        
+        // Отримати лише назви міст
+        $cityNames = array_map(function ($city, $index) {
+            return [
+                'id' => $index, // You can use any unique identifier (e.g., a database ID, or $index)
+                'title' => $city['Description']
+            ];
+        }, $cities, array_keys($cities));
+
+        return response()->json(['cities' => $cityNames]);
+    }
+
+    public function getWarehouses(Request $request)
+    {
+        $cityName = $request->input('cityName');
+        #$warehouses = $this->novaPoshtaService->getWarehouses($cityName);
+
+        #return response()->json(['warehouses' => $warehouses]);
     }
 
     public function store(Request $request, Product $product)
@@ -113,7 +141,7 @@ class CartController extends Controller
         }
         return redirect()->back();
     }
-    
+
 
     public function delete(Request $request, Product $product)
     {

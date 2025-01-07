@@ -8,20 +8,11 @@ import {
     ComboboxOption,
     ComboboxButton,
 } from '@headlessui/vue'
-import { CheckIcon } from '@heroicons/vue/20/solid'
 
 const canLogin = usePage().props.canLogin;
 const auth = usePage().props.auth;
 const allProducts = usePage().props.allProducts;
 const cart = computed(() => usePage().props.cart);
-
-const showProduct = (id) => {
-    console.log('111')
-    router.get(route('product.show', id))
-
-}
-
-
 
 let selected = ref(allProducts[0])
 let query = ref('')

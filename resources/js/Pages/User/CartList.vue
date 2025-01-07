@@ -1,16 +1,19 @@
 <script setup>
-import { computed } from 'vue';
 import UserLayout from './Layouts/UserLayout.vue';
-import { usePage } from '@inertiajs/vue3';
-import { router } from '@inertiajs/vue3';
+import axios from 'axios';
+import { Link, usePage, router } from '@inertiajs/vue3';
+import { ref, computed } from 'vue'
+import {
+    Combobox,
+    ComboboxInput,
+    ComboboxOptions,
+    ComboboxOption,
+    ComboboxButton
+} from '@headlessui/vue'
 
-defineProps({
-    cities: Object
-})
 
 const carts = computed(() => usePage().props.cart.data.items);
 const products = computed(() => usePage().props.cart.data.products);
-
 const total = computed(() => usePage().props.cart.data.total);
 const itemId = (id) => carts.value.findIndex((item) => item.product_id == id);
 
@@ -24,103 +27,138 @@ const update = (product, quantity) =>
 const remove = (product) =>
     router.delete(route('cart.delete', product), { preserveState: true, replace: true });
 
+let filteredCities = ref([]);
+let selected = ref("");
+let query = ref("А");
+const updateSelectedValue = (value) => {
+    selected = value;
+}
+
+let loadCities = computed(() => {
+    axios
+        .get(`/getCities/${query.value}`)
+        .then((response) => {
+            // Map the response data to match the Combobox items
+            filteredCities.value = response.data.cities;
+
+        })
+        .catch((error) => {
+            console.error('Error loading cities:', error);
+        });
+});
+let seeSearch = computed(() => {
+    console.log(query.value.toLowerCase().replace(/\s+/g, ''));
+});
+
+const fetchWarehouses = async () => {
+    if (selectedCity.value) {
+        try {
+            const response = await axios.post('/warehouses', { cityName: selectedCity.value });
+            warehouses.value = response.data.warehouses;
+        } catch (error) {
+            console.error('Помилка при завантаженні відділень:', error);
+        }
+    } else {
+        warehouses.value = [];
+    }
+};
+
+
 </script>
 <template>
 
     <UserLayout>
-        <section class="bg-white text-gray-600 body-font relative mx-auto max-w-1xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-screen-1xl lg:px-8">
+        <section
+            class="bg-white text-gray-600 body-font relative mx-auto max-w-1xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-screen-1xl lg:px-8">
             <div
                 class="container px-5 py-3 mx-auto flex flex-wrap lg:flex-col lg:space-y-4 xl:flex-row xl:space-y-0 xl:space-x-4 justify-center ">
 
-                    <!--List of cart items-->
-                    <div class="overflow-x-auto">
-                        <table
-                            class="w-full text-xs md:text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 justify-center">
-                            <thead
-                                class="text-[10px] md:text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                
-                                <tr>
-                                    <th scope="col" class="px-16 py-3 text-center w-2/11">
-                                        <span class="sr-only">Image</span>
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-center w-2/11">
-                                        Product
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-center w-2/11">
-                                        Qty
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-center w-2/11">
-                                        Price
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-center w-2/11">
-                                        Action
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="product in products" :key="product.id"
-                                    class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <td class="p-4">
-                                        <img v-if="product.product_images.length > 0"
-                                            :src="product.product_images[0].image"
-                                            class="w-16 md:w-32 max-w-full max-h-full" alt="Apple Watch">
-                                        <img v-else
-                                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                            class="w-16 md:w-32 max-w-full max-h-full" alt="Apple Watch">
-                                    </td>
-                                    <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                                        {{ product.title }}
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center">
-                                            <button
-                                                @click.prevent="update(product, carts[itemId(product.id)].quantity - 1)"
-                                                :disabled="carts[itemId(product.id)].quantity <= 1"
-                                                :class="[carts[itemId(product.id)].quantity > 1 ? 'cursor-pointer text-purple-600' : 'cursor-not-allowed text-gray-300 dark:text-gray-500', 'inline-flex items-center justify-center p-1 me-3 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700']"
-                                                class="" type="button">
+                <!--List of cart items-->
+                <div class="overflow-x-auto">
+                    <table
+                        class="w-full text-xs md:text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 justify-center">
+                        <thead
+                            class="text-[10px] md:text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
-                                                <span class="sr-only">Quantity button</span>
-                                                <svg class="w-3 h-3" aria-hidden="true"
-                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 2">
-                                                    <path stroke="currentColor" stroke-linecap="round"
-                                                        stroke-linejoin="round" stroke-width="2" d="M1 1h16" />
-                                                </svg>
-                                            </button>
-                                            <div>
-                                                <input type="number" id="first_product"
-                                                    v-model="carts[itemId(product.id)].quantity"
-                                                    class="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                    placeholder="1" required />
-                                            </div>
-                                            <button
-                                                @click.prevent="update(product, carts[itemId(product.id)].quantity + 1)"
-                                                class="inline-flex items-center justify-center h-6 w-6 p-1 ms-3 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                                                type="button">
-                                                <span class="sr-only">Quantity button</span>
-                                                <svg class="w-3 h-3" aria-hidden="true"
-                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                                                    <path stroke="currentColor" stroke-linecap="round"
-                                                        stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16" />
-                                                </svg>
-                                            </button>
+                            <tr>
+                                <th scope="col" class="px-16 py-3 text-center w-2/11">
+                                    <span class="sr-only">Image</span>
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-center w-2/11">
+                                    Product
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-center w-2/11">
+                                    Qty
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-center w-2/11">
+                                    Price
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-center w-2/11">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="product in products" :key="product.id"
+                                class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                <td class="p-4">
+                                    <img v-if="product.product_images.length > 0" :src="product.product_images[0].image"
+                                        class="w-16 md:w-32 max-w-full max-h-full" alt="Apple Watch">
+                                    <img v-else
+                                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
+                                        class="w-16 md:w-32 max-w-full max-h-full" alt="Apple Watch">
+                                </td>
+                                <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                                    {{ product.title }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <button @click.prevent="update(product, carts[itemId(product.id)].quantity - 1)"
+                                            :disabled="carts[itemId(product.id)].quantity <= 1"
+                                            :class="[carts[itemId(product.id)].quantity > 1 ? 'cursor-pointer text-purple-600' : 'cursor-not-allowed text-gray-300 dark:text-gray-500', 'inline-flex items-center justify-center p-1 me-3 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700']"
+                                            class="" type="button">
+
+                                            <span class="sr-only">Quantity button</span>
+                                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                                fill="none" viewBox="0 0 18 2">
+                                                <path stroke="currentColor" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="2" d="M1 1h16" />
+                                            </svg>
+                                        </button>
+                                        <div>
+                                            <input type="number" id="first_product"
+                                                v-model="carts[itemId(product.id)].quantity"
+                                                class="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                placeholder="1" required />
                                         </div>
-                                    </td>
-                                    <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                                        ${{ product.price }}
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <a href="#" @click="remove(product)"
-                                            class="font-medium text-red-600 dark:text-red-500 hover:underline">Remove</a>
-                                    </td>
-                                </tr>
+                                        <button @click.prevent="update(product, carts[itemId(product.id)].quantity + 1)"
+                                            class="inline-flex items-center justify-center h-6 w-6 p-1 ms-3 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                                            type="button">
+                                            <span class="sr-only">Quantity button</span>
+                                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                                fill="none" viewBox="0 0 18 18">
+                                                <path stroke="currentColor" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                                    ${{ product.price }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <a href="#" @click="remove(product)"
+                                        class="font-medium text-red-600 dark:text-red-500 hover:underline">Remove</a>
+                                </td>
+                            </tr>
 
-                            </tbody>
-                        </table>
-                    </div>
-
+                        </tbody>
+                    </table>
                 </div>
 
-                <div
+            </div>
+
+            <div
                 class="container px-5  mx-auto flex flex-wrap justify-center lg:flex-col lg:space-y-4 xl:flex-row xl:space-y-0 xl:space-x-4">
                 <div
                     class="lg:w-2/3 md:w-2/3 bg-white flex-col ml-50 md:py-8 mt-8 ml-20 md:mt-0 w-full sm:mt-4 lg:inline-block xl:block ">
@@ -154,6 +192,51 @@ const remove = (product) =>
                         <input type="text" id="email" name="countrycode"
                             class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
                     </div>
+                    <div>
+                        <Combobox v-model="selected" @focus="loadCities">
+                            <div class="relative mt-1">
+                                <div
+                                    class="relative pe-20 flex items-center w-full cursor-default overflow-hidden rounded-lg text-left border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
+                                    
+                                    <ComboboxInput
+                                        class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
+                                        :displayValue="(city) => city.title" @change="query = $event.target.value"
+                                        placeholder="Пошук по сайту..." />
+                                    <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2 z-20">
+                                        <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                    </ComboboxButton>
+                                </div>
+                                <TransitionRoot leave="transition ease-in duration-100" leaveFrom="opacity-100"
+                                    leaveTo="opacity-0" @after-leave="query = ''">
+                                    <ComboboxOptions 
+                                        class="absolute mt-1 z-20 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                                        <div v-if="filteredCities.length === 0 && query !== ''"
+                                            class="relative cursor-default select-none px-4 py-2 text-gray-700">
+                                            Nothing found.
+                                        </div>
+                                        <ComboboxOption v-for="city in filteredCities" as="template" :key="city.id"
+                                            :value="city" v-slot="{ selected, active }">
+                                            <li class="relative cursor-default select-none py-2 pl-10 pr-4" :class="{
+                                                'bg-teal-600 text-white': active,
+                                                'text-gray-900': !active,
+                                            }">
+                                                <span class="block truncate"
+                                                    :class="{ 'font-medium': selected, 'font-normal': !selected }">
+                                                    {{ city.title }}
+                                                </span>
+                                                <span v-if="selected"
+                                                    class="absolute inset-y-0 left-0 flex items-center pl-3"
+                                                    :class="{ 'text-white': active, 'text-teal-600': !active }">
+                                                    <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                                </span>
+                                            </li>
+                                        </ComboboxOption>
+                                    </ComboboxOptions>
+                                </TransitionRoot>
+                            </div>
+                        </Combobox>
+
+                    </div>
                     <div class="relative mb-4">
                         <label for="email" class="leading-7 text-sm text-gray-600">Address type</label>
                         <input type="text" id="email" name="type"
@@ -165,7 +248,7 @@ const remove = (product) =>
                 </div>
 
             </div>
-        
+
         </section>
 
     </UserLayout>

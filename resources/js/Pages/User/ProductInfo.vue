@@ -32,10 +32,12 @@ const addToCart = (product) => {
     })
 }
 let selectedRating = ref(1);
-let commentText = ref(0);
+let commentText = ref("");
 const starsContainer = ref(null);
 
 const sendComment = async (commentText, rating, product) => {
+    const textArea = document.getElementById('comment');
+    commentText.value = textArea.value.trim();
     const formData = new FormData();
     formData.append('comment', commentText);
     formData.append('rating', rating);
@@ -87,9 +89,6 @@ const sendReply = async (comment_id, index) => {
 const selectRating = (rating) => {
     const textArea = document.getElementById('comment');
     selectedRating.value = rating;
-
-    commentText.value = textArea.value.trim();
-
     // Directly manipulating the DOM
     const stars = starsContainer.value.querySelectorAll('svg');
     stars.forEach((star, i) => {
