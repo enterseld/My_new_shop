@@ -24,10 +24,6 @@ class CartController extends Controller
 
     public function view(Request $request, Product $product)
     {
-       
-
-        
-
         $allProducts = Product::with('product_images')->orderBy('id')->get();
         $user = $request->user();
 
@@ -60,7 +56,7 @@ class CartController extends Controller
     public function getCities(Request $request, string $findBy)
     {   
         
-        $response = $this->novaPoshtaService->makeRequest('Address', 'getCities', $findBy);
+        $response = $this->novaPoshtaService->makeRequestCities('Address', 'getCities', $findBy);
         $cities = $response['data'] ?? [];
         
         // Отримати лише назви міст
@@ -74,12 +70,26 @@ class CartController extends Controller
         return response()->json(['cities' => $cityNames]);
     }
 
-    public function getWarehouses(Request $request)
-    {
-        $cityName = $request->input('cityName');
-        #$warehouses = $this->novaPoshtaService->getWarehouses($cityName);
+    public function getWarehouses(Request $request, string $city, string $findBy)
+    {   
+        if($city == "0"){
+            $response = $this->novaPoshtaService->makeRequestAllWarehouses('Address', 'getWarehouses', $findBy);
+            $warehouses = $response['data'] ?? [];
+        }
+        else{
+            $response = $this->novaPoshtaService->makeRequestWarehouses('Address', 'getWarehouses', $city, $findBy);
+            $warehouses = $response['data'] ?? [];
+        }
+        // Отримати лише назви відділень
+        $warehouseNames = array_map(function ($warehouse, $index) {
+            return [
+                'id' => $index, 
+                'title' => $warehouse['Description']
+            ];
+        }, $warehouses, array_keys($warehouses));
 
-        #return response()->json(['warehouses' => $warehouses]);
+        return response()->json(['warehouses' => $warehouseNames]);
+        
     }
 
     public function store(Request $request, Product $product)

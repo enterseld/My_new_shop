@@ -71,5 +71,6 @@ Route::prefix('products')->controller(ProductListController::class)->group(funct
 //routes for nova poshta
 Route::get('/warehouses', [CartController::class, 'getWarehouses']);
 Route::get('/getCities/{findBy}', [CartController::class, 'getCities']);
+Route::get('/getWarehouses/{City}/{findBy}', [CartController::class, 'getWarehouses']);
 //end
 require __DIR__.'/auth.php';

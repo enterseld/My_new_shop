@@ -16,12 +16,57 @@ class NovaPostService
         $this->apiUrl = config('novaposhta.api_url');
     }
 
-    public function makeRequest(string $modelName, string $calledMethod, string $findBy)
+    public function makeRequestCities(string $modelName, string $calledMethod, string $findBy)
     {
         $methodProperties = new stdClass();
-        $methodProperties->Limit = "5";
+        $methodProperties->Limit = "15";
         $methodProperties->FindByString = $findBy;
 
+        
+    
+        $response = Http::withOptions(['verify' => false])->post($this->apiUrl, [
+            'apiKey' => $this->apiKey,
+            'modelName' => $modelName,
+            'calledMethod' => $calledMethod,
+            'methodProperties' => (array)$methodProperties,
+        ]);
+
+        return $response->json();
+    }
+
+    public function makeRequestWarehouses(string $modelName, string $calledMethod, string $city, string $findBy)
+    {
+        $methodProperties = new stdClass();
+        $methodProperties->Limit = "15";
+        $methodProperties->CityName = $city;
+        if($findBy != "0"){
+            $methodProperties->FindByString = $findBy;
+            $response = Http::withOptions(['verify' => false])->post($this->apiUrl, [
+                'apiKey' => $this->apiKey,
+                'modelName' => $modelName,
+                'calledMethod' => $calledMethod,
+                'methodProperties' => (array)$methodProperties,
+            ]);
+
+            return $response->json();
+        }
+        else{
+            $response = Http::withOptions(['verify' => false])->post($this->apiUrl, [
+                'apiKey' => $this->apiKey,
+                'modelName' => $modelName,
+                'calledMethod' => $calledMethod,
+                'methodProperties' => (array)$methodProperties,
+            ]);
+
+            return $response->json();
+        }
+    }
+
+    public function makeRequestAllWarehouses(string $modelName, string $calledMethod, string $findBy)
+    {
+        $methodProperties = new stdClass();
+        $methodProperties->Limit = "20";
+        $methodProperties->FindByString = $findBy;
         
     
         $response = Http::withOptions(['verify' => false])->post($this->apiUrl, [
