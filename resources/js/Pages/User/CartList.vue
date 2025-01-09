@@ -33,7 +33,7 @@ let query = ref("А");
 
 let filteredWarehouses = ref([]);
 let selectedWarehouse = ref("");
-let queryWarehouse = ref("К");
+let queryWarehouse = ref("0");
 
 
 let loadCities = computed(() => {
@@ -82,8 +82,12 @@ let loadWarehouses = computed(() => {
 });
 
 let handleChange = () => {
-    console.log(selectedWarehouse.value.title);
-    selectedWarehouse.value.title = "";
+    if(selectedWarehouse.value.title){
+        selectedWarehouse.value.title = "";
+    }
+    else{
+        selectedWarehouse = ref("");
+    }
 };
 
 </script>
@@ -265,7 +269,7 @@ let handleChange = () => {
                             </Combobox>
                         </div>
                         <div>
-                            <Combobox v-model="selectedWarehouse" @update:modelValue="loadWarehouses">
+                            <Combobox v-model="selectedWarehouse" @focus="loadWarehouses">
                                 <div class="relative mt-1">
                                     <div
                                         class="relative pe-20 flex items-center w-full cursor-default overflow-hidden rounded-lg text-left border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
