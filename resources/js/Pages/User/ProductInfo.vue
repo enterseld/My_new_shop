@@ -62,13 +62,13 @@ const sendComment = async (commentText, rating, product) => {
 
 const sendReply = async (comment_id, index) => {
     const formData = new FormData();
-    const textarea = document.getElementById("reply-" + index); 
+    const textarea = document.getElementById("reply-" + index);
     const reply = textarea.value.trim();
-    
+
     formData.append('reply', reply);
     formData.append('comment_id', comment_id);
     formData.append('user_name', auth.user.name);
-    
+
     try {
         await router.post('/reply/store', formData, {
             onSuccess: page => {
@@ -149,7 +149,8 @@ onUnmounted(() => {
 <template>
     <UserLayout>
 
-        <section id="endScroll" class="bg-white mx-auto max-w-1xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-screen-2xl lg:px-8">
+        <section id="endScroll"
+            class="bg-white mx-auto max-w-1xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-screen-2xl lg:px-8">
             <div class="max-w-screen-xl px-4 mx-auto 2xl:px-0">
                 <div class="lg:grid lg:grid-cols-2 lg:gap-8 xl:gap-16">
                     <div id="gallery"
@@ -211,10 +212,13 @@ onUnmounted(() => {
                                 {{ product.price }} грн.
                             </p>
 
-                            <div class="flex items-center gap-2 mt-2 sm:mt-0">
-                            </div>
-                        </div>
 
+                        </div>
+                        <div class="flex items-center gap-2 mt-4 sm:mt-4">
+                            <p class="text-xl  text-gray-500 sm:text-xl dark:text-white underline">
+                                Код товару: {{ product.vendor_code }}
+                            </p>
+                        </div>
                         <div class="mt-6 sm:gap-4 sm:items-center sm:flex sm:mt-8">
                             <a href="#" title=""
                                 class="flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
@@ -248,7 +252,7 @@ onUnmounted(() => {
                         <div>
                             <div class="px-4 sm:px-0">
                                 <h3 class="text-base/7 font-semibold text-gray-900">Характеристики</h3>
-                                <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Personal details and application.</p>
+                                <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">Деталі та особливості.</p>
                             </div>
                             <div class="mt-6 border-t border-gray-100">
                                 <dl class="divide-y divide-gray-100">
@@ -258,31 +262,92 @@ onUnmounted(() => {
                                             {{ product.brand.name }}
                                         </dd>
                                     </div>
-                                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                                        <dt class="text-sm/6 font-medium text-gray-900">Категорія</dt>
+                                    <div v-if="product.disk_type"
+                                        class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                                        <dt class="text-sm/6 font-medium text-gray-900">Тип диску</dt>
                                         <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-                                            {{ product.category.name }}
+                                            {{ product.disk_type }}</dd>
+                                    </div>
+                                    <div v-if="product.work_materials"
+                                        class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                                        <dt class="text-sm/6 font-medium text-gray-900">Робочий матеріал</dt>
+                                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                            {{ product.work_materials }}</dd>
+                                    </div>
+                                    <div v-if="product.type_of_segments"
+                                        class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                                        <dt class="text-sm/6 font-medium text-gray-900">Тип сегмента</dt>
+                                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                            {{ product.type_of_segments }}</dd>
+                                    </div>
+                                    <div v-if="product.diameter_of_disk"
+                                        class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                                        <dt class="text-sm/6 font-medium text-gray-900">
+                                            <div>Діаметр</div>
+                                            <div v-if="product.diameter_of_fit">та посадочний отвір</div>
+                                        </dt>
+                                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+
+                                            <div v-if="product.diameter_of_fit">{{ product.diameter_of_disk }}мм x {{
+                                                product.diameter_of_fit }}мм </div>
+                                            <div v-else>{{ product.diameter_of_disk }}мм</div>
                                         </dd>
                                     </div>
-                                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                                        <dt class="text-sm/6 font-medium text-gray-900">Email address</dt>
+
+                                    <div v-if="product.diamond_layer_height || product.diamond_layer_width"
+                                        class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                                        <dt class="text-sm/6 font-medium text-gray-900">
+                                            <div>Алмазне напилення</div>
+                                        </dt>
+                                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0"></dd>
+                                        <dt class="text-sm/6 font-medium text-gray-900">
+
+                                            <div v-if="product.diamond_layer_height" class="text-sm/6 font-medium text-gray-600">Висота </div>
+                                            <div v-if="product.diamond_layer_width" class="text-sm/6 font-medium text-gray-600">Ширина </div>
+
+                                        </dt>
                                         <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-                                            margotfoster@example.com</dd>
+                                            <div> </div>
+                                            <div v-if="product.diamond_layer_height">{{ product.diamond_layer_height }}мм</div>
+                                            <div v-if="product.diamond_layer_width">{{ product.diamond_layer_width }}мм</div>
+                                        </dd>
                                     </div>
-                                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                                        <dt class="text-sm/6 font-medium text-gray-900">Salary expectation</dt>
-                                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">$120,000</dd>
+                                    <div v-if="product.end_type"
+                                        class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                                        <dt class="text-sm/6 font-medium text-gray-900">Тип</dt>
+                                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                            {{ product.end_type }}</dd>
                                     </div>
-                                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                                        <dt class="text-sm/6 font-medium text-gray-900">About</dt>
-                                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">Fugiat ipsum
-                                            ipsum
-                                            deserunt culpa aute sint do nostrud anim incididunt cillum culpa consequat.
-                                            Excepteur qui ipsum aliquip consequat sint. Sit id mollit nulla mollit
-                                            nostrud
-                                            in ea officia proident. Irure nostrud pariatur mollit ad adipisicing
-                                            reprehenderit deserunt qui eu.</dd>
+
+
+                                    <div v-if="product.drill_diameter || product.length"
+                                        class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                                        <dt class="text-sm/6 font-medium text-gray-900">
+                                            <div>Розміри</div>
+                                        </dt>
+                                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0"></dd>
+                                        <dt class="text-sm/6 font-medium text-gray-900">
+
+                                            <div v-if="product.drill_diameter" class="text-sm/6 font-medium text-gray-600">Діаметр </div>
+                                            <div v-if="product.length" class="text-sm/6 font-medium text-gray-600">Довжина </div>
+
+                                        </dt>
+                                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                            <div> </div>
+                                            <div v-if="product.drill_diameter">{{ product.drill_diameter }}мм</div>
+                                            <div v-if="product.length">{{ product.length }}мм</div>
+                                        </dd>
                                     </div>
+
+                                    <div v-if="product.number_of_segments"
+                                        class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                                        <dt class="text-sm/6 font-medium text-gray-900">Кількість сегментів</dt>
+                                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                            {{ product.number_of_segments }}шт</dd>
+                                    </div>
+                                    
+
+
                                     <div class="px-4 py-6">
                                         <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
                                             Коментарі</h2>
@@ -421,29 +486,31 @@ onUnmounted(() => {
                                                 <div v-for="reply in comment.comments_replies"
                                                     class="p-1 mb-3 ml-6 lg:ml-12 text-base bg-white rounded-lg dark:bg-gray-900">
                                                     <div v-if="reply.published == 1">
-                                                    <footer class="flex justify-between items-center mb-2">
-                                                        <div class="flex items-center">
-                                                            <p
-                                                                class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                    viewBox="0 0 24 24" stroke-width="1.5"
-                                                                    class="w-7 h-7 rounded-full bg-white"
-                                                                    stroke="currentColor">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                                                                </svg>{{ comment.user_name }}
-                                                            </p>
-                                                            <p class="text-sm text-gray-600 dark:text-gray-400"><time
-                                                                    pubdate datetime="2022-02-12"
-                                                                    title="February 12th, 2022">{{
-                                                                        reply.created_at.split('T')[0] }}</time>
-                                                            </p>
-                                                        </div>
-                                                    </footer>
-                                                    <p class="text-gray-500 dark:text-gray-400">{{ reply.reply }}</p>
+                                                        <footer class="flex justify-between items-center mb-2">
+                                                            <div class="flex items-center">
+                                                                <p
+                                                                    class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                        viewBox="0 0 24 24" stroke-width="1.5"
+                                                                        class="w-7 h-7 rounded-full bg-white"
+                                                                        stroke="currentColor">
+                                                                        <path stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                                                    </svg>{{ comment.user_name }}
+                                                                </p>
+                                                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                                                    <time pubdate datetime="2022-02-12"
+                                                                        title="February 12th, 2022">{{
+                                                                            reply.created_at.split('T')[0] }}</time>
+                                                                </p>
+                                                            </div>
+                                                        </footer>
+                                                        <p class="text-gray-500 dark:text-gray-400">{{ reply.reply }}
+                                                        </p>
 
+                                                    </div>
                                                 </div>
-                                            </div>
                                                 <div :id="'div-' + index"
                                                     class="hidden py-2 px-4 mb-4 mt-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
 
@@ -451,11 +518,10 @@ onUnmounted(() => {
                                                         class=" px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-black dark:placeholder-gray-400 dark:bg-gray-800"
                                                         placeholder="Write a reply..." required></textarea>
                                                     <button type="submit" @click="sendReply(comment.id, index)"
-                                                        class="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-                                                        >
+                                                        class="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
                                                         Опублікувати
                                                     </button>
-                                                    
+
                                                 </div>
                                             </div>
                                         </div>
