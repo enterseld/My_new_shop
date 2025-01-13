@@ -45,10 +45,8 @@ return new class extends Migration
             $table->string('length',30)->nullable();
             $table->integer('number_of_segments')->nullable();
             $table->integer('quantity');
-
             $table->foreignIdFor(User::class, 'created_by')->nullable();
             $table->foreignIdFor(User::class, 'updated_by')->nullable();
-
             $table->foreignIdFor(Brand::class, 'brand_id')->nullable();
             $table->foreignIdFor(Category::class, 'category_id')->nullable();
             $table->softDeletes();

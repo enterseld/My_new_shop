@@ -18,9 +18,9 @@ const user = usePage().props.auth.user;
 
 const form = useForm({
     name: user.name,
-    first_name: user.first_name,
-    last_name: user.last_name,
-    middle_name: user.middle_name,
+    firstName: user.first_name,
+    lastName: user.last_name,
+    middleName: user.middle_name,
     email: user.email,
 });
 </script>
@@ -29,11 +29,11 @@ const form = useForm({
     <section>
         <header>
             <h2 class="text-lg font-medium text-gray-900">
-                Інформація профіля
+                Електронна пошта
             </h2>
 
             <p class="mt-1 text-sm text-gray-600">
-                Можете оновити свою інформацію
+                Можете оновити свою пошту
             </p>
         </header>
 
@@ -42,82 +42,30 @@ const form = useForm({
             class="mt-6 space-y-6"
         >
             <div>
-                <InputLabel for="name" value="Логін" />
+                <InputLabel for="email" value="Email" />
 
                 <TextInput
-                    id="name"
-                    type="text"
+                    id="email"
+                    type="email"
                     class="mt-1 block w-full"
-                    v-model="form.name"
+                    v-model="form.email"
                     required
-                    autofocus
-                    autocomplete="name"
+                    autocomplete="username"
                 />
 
-                <InputError class="mt-2" :message="form.errors.name" />
+                <InputError class="mt-2" :message="form.errors.email" />
             </div>
-            <div>
-                <InputLabel for="first_name" value="Ім'я" />
-
-                <TextInput
-                    id="first_name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.first_name"
-                    required
-                    autofocus
-                    autocomplete="first_name"
-                />
-
-                <InputError class="mt-2" :message="form.errors.firstName" />
-            </div>
-            <div>
-                <InputLabel for="last_name" value="Прізвище" />
-
-                <TextInput
-                    id="last_name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.last_name"
-                    required
-                    autofocus
-                    autocomplete="last_name"
-                />
-
-                <InputError class="mt-2" :message="form.errors.lastName" />
-            </div>
-            <div>
-                <InputLabel for="middle_name" value="По-батькові" />
-
-                <TextInput
-                    id="middle_name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.middle_name"
-                    required
-                    autofocus
-                    autocomplete="middle_name"
-                />
-
-                <InputError class="mt-2" :message="form.errors.middle_name" />
-            </div>
-        </form>
-        <!---->
-        <form
-            @submit.prevent="form.patch(route('profile.update'))" 
-            class="mt-6 space-y-6"
-        >        
 
             <div v-if="mustVerifyEmail && user.email_verified_at === null">
                 <p class="mt-2 text-sm text-gray-800">
-                    Підтвердіть свою електронну пошту
+                    Your email address is unverified.
                     <Link
                         :href="route('verification.send')"
                         method="post"
                         as="button"
                         class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
-                        Надіслати посилання ще раз.
+                        Click here to re-send the verification email.
                     </Link>
                 </p>
 
@@ -125,7 +73,7 @@ const form = useForm({
                     v-show="status === 'verification-link-sent'"
                     class="mt-2 text-sm font-medium text-green-600"
                 >
-                    Нове посилання надіслано вам на пошту.
+                    A new verification link has been sent to your email address.
                 </div>
             </div>
 

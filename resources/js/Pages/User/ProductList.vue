@@ -45,17 +45,18 @@ const priceFilter = () => {
             to: filterPrices.prices[1]
         }
     },
-    {
-        preserveState: true,
-        replace: true
-    });
+        {
+            preserveState: true,
+            replace: true
+        });
 }
 const mobileFiltersOpen = ref(false)
 
 const props = defineProps({
     products: Array,
     brands: Array,
-    categories: Array
+    categories: Array,
+    pagination: Object
 })
 //filter brands and categories
 const selectedBrands = ref([])
@@ -69,26 +70,29 @@ watch(selectedCategories, () => {
 
 })
 
-function updateFilteredProducts(){
+function updateFilteredProducts(page = 1) {
     router.get('products', {
         brands: selectedBrands.value,
         categories: selectedCategories.value,
         prices: {
             from: filterPrices.prices[0],
             to: filterPrices.prices[1]
-        }
+        },
+        page
     },
-    {
-        preserveState: true,
-        replace: true
-    });
+
+        {
+            preserveState: true,
+            replace: true
+        });
 }
 
 </script>
 <template>
     <UserLayout>
-        <div class="bg-white">
-            <div>
+
+        <div class="bg-white mx-auto max-w-fit px-4 py-16 sm:px-6 sm:py-24 lg:max-w-screen-2xl lg:px-8">
+            
                 <!-- Mobile filter dialog -->
                 <TransitionRoot as="template" :show="mobileFiltersOpen">
                     <Dialog class="relative z-40 lg:hidden" @close="mobileFiltersOpen = false">
@@ -157,7 +161,7 @@ function updateFilteredProducts(){
                     </Dialog>
                 </TransitionRoot>
 
-                <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <main class="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
                     <div class="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
                         <h1 class="text-4xl font-bold tracking-tight text-gray-900">New Arrivals</h1>
 
@@ -207,6 +211,8 @@ function updateFilteredProducts(){
                     </div>
 
                     <section aria-labelledby="products-heading" class="pb-24 pt-6">
+                        
+                        
                         <h2 id="products-heading" class="sr-only">Products</h2>
 
                         <div class="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
@@ -258,7 +264,8 @@ function updateFilteredProducts(){
                                     <DisclosurePanel class="pt-6">
                                         <div class="space-y-4">
                                             <div v-for="brand in brands" :key="brand.id" class="flex items-center">
-                                                <input :id="`filter-${brand.id}`" :value="brand.id" type="checkbox" v-model="selectedBrands"
+                                                <input :id="`filter-${brand.id}`" :value="brand.id" type="checkbox"
+                                                    v-model="selectedBrands"
                                                     class="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
                                                 <label :for="`filter-${brand.id}`" class="ml-3 text-sm text-gray-600">{{
                                                     brand.name }}</label>
@@ -281,11 +288,14 @@ function updateFilteredProducts(){
                                     </h3>
                                     <DisclosurePanel class="pt-6">
                                         <div class="space-y-4">
-                                            <div v-for="category in categories" :key="category.id" class="flex items-center">
-                                                <input :id="`filter-${category.id+50}`" :value="category.id" type="checkbox" v-model="selectedCategories"
+                                            <div v-for="category in categories" :key="category.id"
+                                                class="flex items-center">
+                                                <input :id="`filter-${category.id + 50}`" :value="category.id"
+                                                    type="checkbox" v-model="selectedCategories"
                                                     class="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                                                <label :for="`filter-${category.id+50}`" class="ml-3 text-sm text-gray-600">{{
-                                                    category.name }}</label>
+                                                <label :for="`filter-${category.id + 50}`"
+                                                    class="ml-3 text-sm text-gray-600">{{
+                                                        category.name }}</label>
                                             </div>
                                         </div>
                                     </DisclosurePanel>
@@ -299,10 +309,43 @@ function updateFilteredProducts(){
                                 <Products :products="products.data"></Products>
                             </div>
                         </div>
+
+                        <div class="flex justify-center items-center mt-10">
+                            <div></div> <!-- Empty div for alignment placeholder -->
+
+                            <div class="flex pl-2 py-1 border-2 rounded-lg">
+                                <button type="button" v-if="pagination.current_page > 1"
+                                    @click="updateFilteredProducts(pagination.current_page - 1)"
+                                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                    <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
+                                        <path stroke="white" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13" />
+                                    </svg>
+                                    <span class="sr-only">Icon description</span>
+                                </button>
+                                <div class="pagination justify-center flex-wrap mx-auto mr-2 mt-1.5">
+                                    <span class="text-center">Сторінка {{ pagination.current_page }} із {{
+                                        pagination.last_page }}</span>
+                                </div>
+                                <button type="button" v-if="pagination.current_page < pagination.last_page"
+                                    @click="updateFilteredProducts(pagination.current_page + 1)"
+                                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                    <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
+                                        <path stroke="white" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1" />
+                                    </svg>
+                                    <span class="sr-only">Next</span>
+                                </button>
+                            </div>
+                        </div>
+
                     </section>
                 </main>
             </div>
-        </div>
+
+        
 
     </UserLayout>
 </template>

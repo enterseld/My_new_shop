@@ -7,7 +7,9 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\User\CartController;
+use App\Http\Controllers\User\CommentsController;
 use App\Http\Controllers\User\ProductListController;
+use App\Http\Controllers\User\ReplyController;
 use App\Http\Controllers\User\UserController;
 use Inertia\Inertia;
 
@@ -15,11 +17,9 @@ use Inertia\Inertia;
 // user
 Route::get('/', [UserController::class, 'index'])->name('user.home');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [UserController::class, 'index'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -37,7 +37,8 @@ Route::prefix('cart')->controller(CartController::class)->group(function (){
 });
 //end
 
-
+Route::post('/comment/store', [CommentsController::class, 'store'])->name('comments.store');
+Route::post('/reply/store', [ReplyController::class, 'store'])->name('reply.store');
 //admin
 
 Route::group(['prefix' => 'admin', 'middleware' => 'redirectAdmin'], function () {
@@ -62,9 +63,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 //routes for product list and filters
 Route::prefix('products')->controller(ProductListController::class)->group(function () {
     Route::get('/','index')->name('products.index');
-    Route::get('/products/{id}','showAndIndex')->name('product.show');
+    Route::get('/{id}','showAndIndex')->name('product.show');
 });
 
 //end
 
+//routes for nova poshta
+Route::get('/warehouses', [CartController::class, 'getWarehouses']);
+Route::get('/getCities/{findBy}', [CartController::class, 'getCities']);
+Route::get('/getWarehouses/{City}/{findBy}', [CartController::class, 'getWarehouses']);
+//end
 require __DIR__.'/auth.php';

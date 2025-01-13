@@ -302,7 +302,7 @@ const deleteProduct = (product, index) => {
 
                     <div v-for="(pimage, index) in product_images" :key="pimage.id" class="relative w-32 h-32 ">
 
-                        <img class="w-24 h-20 rounded" :src="'/' + pimage.image" alt="">
+                        <img class="w-24 h-20 rounded" :src="pimage.image" alt="">
 
                         <span
                             class="absolute top-0 right-8 transform -translate-y-1/2 w-3.5 h-3.5 bg-red-400 border-2 border-white dark:border-gray-800 rounded-full">
@@ -462,8 +462,8 @@ const deleteProduct = (product, index) => {
                         <tbody>
                             <tr v-for="product in products" :key="products.id" class="border-b dark:border-gray-700">
                                 <th scope="row"
-                                    class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{
-                                        product.title }}</th>
+                                    class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    {{ product.title.length > 30 ? product.title.substring(0, 30) + '...' : product.title }}</th>
                                 <td class="px-4 py-3">{{ product.category.name }}</td>
                                 <td class="px-4 py-3">{{ product.brand.name }}</td>
                                 <td class="px-4 py-3">{{ product.quantity }}</td>

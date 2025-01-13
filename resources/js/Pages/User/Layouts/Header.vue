@@ -1,19 +1,54 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
+import {
+    Combobox,
+    ComboboxInput,
+    ComboboxOptions,
+    ComboboxOption,
+    ComboboxButton,
+} from '@headlessui/vue'
+
 const canLogin = usePage().props.canLogin;
-const canRegister = usePage().props.canRegister;
 const auth = usePage().props.auth;
+const allProducts = usePage().props.allProducts;
 const cart = computed(() => usePage().props.cart);
+
+let selected = ref(allProducts[0])
+let query = ref('')
+
+let filteredProducts = computed(() =>
+    query.value === ''
+        ? allProducts
+        : allProducts.filter((product) => {
+            const searchQuery = query.value.toLowerCase().replace(/\s+/g, '');
+            const titleMatches = product.title
+                .toLowerCase()
+                .replace(/\s+/g, '')
+                .includes(searchQuery);
+            const vendorCodeMatches = product.vendor_code
+                .toString()
+                .includes(searchQuery);
+            return titleMatches || vendorCodeMatches;
+        })
+);
+
 </script>
 <template>
     <nav class="bg-white border-gray-200 dark:bg-gray-900">
         <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <div class="flex flex-row">
+                <Link :href="route('user.home')" class="flex items-center mr-2">
+                <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">T.shop</span>
+                </Link>
 
-            <Link :href="route('user.home')">
-            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">V.shop</span>
-            </Link>
-            <div v-if="canLogin" class="flex items-center md:order-2">
+            </div>
+
+
+
+
+            <div v-if="canLogin" class="flex flex-row items-center md:order-3 p-1">
+
                 <div class="mr-4">
 
                     <Link :href="route('cart.view')"
@@ -46,13 +81,11 @@ const cart = computed(() => usePage().props.cart);
                     </svg>
 
                 </button>
-                <div v-else>
+                <div v-else class="w-full">
                     <Link :href="route('login')" type="button"
                         class="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
                     Login</Link>
-                    <Link :href="route('register')" v-if="canRegister" type="button"
-                        class="text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
-                    Register</Link>
+
 
                 </div>
 
@@ -63,7 +96,9 @@ const cart = computed(() => usePage().props.cart);
                     class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600"
                     id="user-dropdown">
                     <div class="px-4 py-3">
+                        <Link :href="route('profile.edit')">
                         <span class="block text-sm text-gray-900 dark:text-white">{{ auth.user.name }}</span>
+                        </Link>
                         <span class="block text-sm  text-gray-500 truncate dark:text-gray-400">{{ auth.user.email
                             }}</span>
                     </div>
@@ -93,33 +128,83 @@ const cart = computed(() => usePage().props.cart);
                             d="M1 1h15M1 7h15M1 13h15" />
                     </svg>
                 </button>
+
             </div>
+
             <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-user">
                 <ul
-                    class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                    <li>
+                    class="flex flex-col  font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                    <li class="flex items-center">
                         <a href="#"
                             class="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500"
                             aria-current="page">Home</a>
                     </li>
-                    <li>
-                        <a href="#"
-                            class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">About</a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Services</a>
-                    </li>
-                    <li>
+                    <li class="flex items-center">
                         <a href="#"
                             class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Pricing</a>
                     </li>
-                    <li>
+                    <li class="flex items-center">
                         <a href="#"
                             class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Contact</a>
+                    </li>
+                    <li>
+                        <Combobox v-model="selected">
+                            <div class="relative mt-1">
+
+                                <div
+                                    class="relative pe-20 flex items-center w-full cursor-default overflow-hidden rounded-lg text-left border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                    </svg>
+                                    <ComboboxInput
+                                        class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
+                                        :displayValue="(person) => person.name" @change="query = $event.target.value"
+                                        placeholder="Пошук по сайту..." />
+
+
+                                    <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2 z-20">
+                                        <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                    </ComboboxButton>
+                                </div>
+                                <TransitionRoot leave="transition ease-in duration-100" leaveFrom="opacity-100"
+                                    leaveTo="opacity-0" @after-leave="query = ''">
+                                    <ComboboxOptions
+                                        class="absolute mt-1 z-20 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                                        <div v-if="filteredProducts.length === 0 && query !== ''"
+                                            class="relative cursor-default select-none px-4 py-2 text-gray-700">
+                                            Nothing found.
+                                        </div>
+
+                                        <ComboboxButton v-for="person in filteredProducts.slice(0, 20)" :key="person.id"
+                                            :value="person" v-slot="{ selected, active }">
+                                            <Link :href="route('product.show', person.id)">
+                                                <li class="flex w-full shadow-inner m-1 overflow-hidden flex-col items-center relative cursor-default select-none p-2 border-2 mb-1 mr-2 rounded"
+                                                    :class="{
+                                                        'bg-teal-600 text-white': active,
+                                                        'text-gray-900': !active,
+                                                    }">
+                                                    <!-- Title: Ensure it takes full width -->
+                                                    <p class="mt-1 w-full" :class="{ 'font-medium': selected, 'font-normal': !selected }">
+                                                        {{ person.title }}
+                                                    </p>
+                                                    <!-- Image: Let the image scale without affecting the width -->
+                                                    <img v-if="person.product_images.length > 0" :src="person.product_images[0].image"
+                                                        class="w-16 md:w-32 max-w-full max-h-full" alt="Apple Watch">
+                                                                            </li>
+                                            </Link>
+                                        </ComboboxButton>
+                                    </ComboboxOptions>
+                                </TransitionRoot>
+                            </div>
+                        </Combobox>
                     </li>
                 </ul>
             </div>
         </div>
+
+
+
     </nav>
 </template>

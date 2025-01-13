@@ -8,32 +8,88 @@ use App\Http\Resources\CartResource;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\UserAddress;
+use App\Providers\NovaPostService as ServicesNovaPostService;
+
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CartController extends Controller
 {
+    protected $novaPoshtaService;
+
+    public function __construct(ServicesNovaPostService $novaPoshtaService)
+    {
+        $this->novaPoshtaService = $novaPoshtaService;
+    }
+
     public function view(Request $request, Product $product)
     {
+        $allProducts = Product::with('product_images')->orderBy('id')->get();
         $user = $request->user();
+
         if ($user) {
             $cartItems = CartItem::where('user_id', $user->id)->get();
             $userAdress = UserAddress::where('user_id', $user->id)->where('isMain', 1)->first();
+
             if ($cartItems->count() > 0) {
+
                 return Inertia::render('User/CartList', [
                     'cartItems' => $cartItems,
-                    'userAdress' => $userAdress
+                    'userAdress' => $userAdress,
+                    'allProducts' => $allProducts,
                 ]);
             }
         } else {
             $cartItems = Cart::getCookieCartItems();
             if (count($cartItems) > 0) {
                 $cartItems = new CartResource(Cart::getProductsAndCartItems());
-                return Inertia::render('User/CartList', ['cartItems' => $cartItems]);
+                return Inertia::render('User/CartList', [
+                    'cartItems' => $cartItems,
+                    'allProducts' => $allProducts,
+                ]);
             } else {
                 return redirect()->back();
             }
         }
+    }
+
+    public function getCities(Request $request, string $findBy)
+    {   
+        
+        $response = $this->novaPoshtaService->makeRequestCities('Address', 'getCities', $findBy);
+        $cities = $response['data'] ?? [];
+        
+        // Отримати лише назви міст
+        $cityNames = array_map(function ($city, $index) {
+            return [
+                'id' => $index, // You can use any unique identifier (e.g., a database ID, or $index)
+                'title' => $city['Description']
+            ];
+        }, $cities, array_keys($cities));
+
+        return response()->json(['cities' => $cityNames]);
+    }
+
+    public function getWarehouses(Request $request, string $city, string $findBy)
+    {   
+        if($city == "0"){
+            $response = $this->novaPoshtaService->makeRequestAllWarehouses('Address', 'getWarehouses', $findBy);
+            $warehouses = $response['data'] ?? [];
+        }
+        else{
+            $response = $this->novaPoshtaService->makeRequestWarehouses('Address', 'getWarehouses', $city, $findBy);
+            $warehouses = $response['data'] ?? [];
+        }
+        // Отримати лише назви відділень
+        $warehouseNames = array_map(function ($warehouse, $index) {
+            return [
+                'id' => $index, 
+                'title' => $warehouse['Description']
+            ];
+        }, $warehouses, array_keys($warehouses));
+
+        return response()->json(['warehouses' => $warehouseNames]);
+        
     }
 
     public function store(Request $request, Product $product)
@@ -95,7 +151,7 @@ class CartController extends Controller
         }
         return redirect()->back();
     }
-    
+
 
     public function delete(Request $request, Product $product)
     {
