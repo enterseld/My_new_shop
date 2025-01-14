@@ -23,10 +23,11 @@ onMounted(() => {
     background-position: center;
     background-repeat: no-repeat;">
     <slot />
-    </div>
+    
     <!--End-->
 
     <!--Footer-->
-    <Footer></Footer>
+    <Footer class="mx-auto max-w-screen-lg px-4 pt-16 sm:px-6 sm:pt-24 lg:max-w-screen-2xl lg:px-8"></Footer>
     <!--End-->
+    </div>
 </template>
