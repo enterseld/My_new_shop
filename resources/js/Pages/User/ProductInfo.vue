@@ -232,7 +232,7 @@ onUnmounted(() => {
                                 Add to favorites
                             </a>
 
-                            <a @click="addToCart(product)"
+                            <a v-if = "product.inStock" @click="addToCart(product)"
                                 class="flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                                 role="button">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -242,6 +242,28 @@ onUnmounted(() => {
                                 </svg>
                                 Add to cart
                             </a>
+                            <a v-if = "!product.inStock"
+                                class="disabled flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                                role="button" data-popover-target="popover-out-of-stock">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                </svg>
+                                Немає в наявності   
+                            </a>
+                            <div data-popover id="popover-out-of-stock" role="tooltip"
+                                                class="absolute z-10 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800">
+                                                <div
+                                                    class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+                                                    <h3 class="font-semibold text-gray-900 dark:text-white">
+                                                        Повідомлення!</h3>
+                                                </div>
+                                                <div class="px-3 py-2">
+                                                    <p>Якщо ви бажаєте замовити товар, якого немає в наявності, напишіть нам на електронну пошту. Доставка в разі такого замовлення буде відбуватися довше.</p>
+                                                </div>
+                                                <div data-popper-arrow></div>
+                                            </div>
                         </div>
 
                         <hr class="my-6 md:my-8 border-gray-200 dark:border-gray-800" />

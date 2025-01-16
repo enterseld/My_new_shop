@@ -170,7 +170,7 @@ let handleChange = () => {
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                                    ${{ product.price }}
+                                    {{ product.price }} грн.
                                 </td>
                                 <td class="px-6 py-4">
                                     <a href="#" @click="remove(product)"
