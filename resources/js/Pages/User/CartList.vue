@@ -2,7 +2,7 @@
 import UserLayout from './Layouts/UserLayout.vue';
 import axios from 'axios';
 import { Link, usePage, router } from '@inertiajs/vue3';
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import {
     Combobox,
     ComboboxInput,
@@ -27,75 +27,97 @@ const update = (product, quantity) =>
 const remove = (product) =>
     router.delete(route('cart.delete', product), { preserveState: true, replace: true });
 
+
 let filteredCities = ref([]);
 let selected = ref("0");
-let query = ref("А");
+let query = ref("");
 
 let filteredWarehouses = ref([]);
 let selectedWarehouse = ref("");
 let queryWarehouse = ref("0");
 
+let cities = ref([]);
+let warehouses = ref([]);
 
 let loadCities = computed(() => {
     selectedWarehouse = ref("");
+
+    filteredCities.value = query.value === ''
+        ? cities
+        : cities.value.filter((product) => {
+            const searchQuery = query.value.toLowerCase().replace(/\s+/g, '');
+
+            // Remove text inside parentheses
+            const titleWithoutBrackets = product.title
+                .toLowerCase()
+                .replace(/\s+/g, '') // Remove spaces
+                .replace(/\(.*?\)/g, ''); // Remove anything inside parentheses
+
+            return titleWithoutBrackets.includes(searchQuery);
+        });
+        console.log(selected.value.title);
+        loadAllWarehouses();
+    
+});
+
+const loadAllWarehouses  = () => {
+        axios
+            .get(`/getWarehouses/${selected.value.title}/0`)
+            .then((response) => {
+                // Map the response data to match the Combobox items
+                warehouses.value = response.data.warehouses;
+
+            })
+            .catch((error) => {
+                console.error('Error loading cities:', error);
+        });
+};
+
+let loadWarehouses = computed(() => {
+    filteredWarehouses.value = queryWarehouse.value === ''
+        ? warehouses
+        : warehouses.value.filter((product) => {
+            const searchQuery = queryWarehouse.value.toLowerCase().replace(/\s+/g, '');
+
+            // Remove text inside parentheses
+            const titleWithoutBrackets = product.title
+                .toLowerCase()
+                .replace(/\s+/g, '') // Remove spaces
+                .replace(/\(.*?\)/g, ''); // Remove anything inside parentheses
+
+            return titleWithoutBrackets.includes(searchQuery);
+        });
+        console.log(selectedWarehouse.value.title);
+});
+
+let handleChange = () => {
+    if (selectedWarehouse.value.title) {
+        selectedWarehouse.value.title = "";
+    }
+    else {
+        selectedWarehouse = ref("");
+    }
+};
+onMounted(() => {
     axios
-        .get(`/getCities/${query.value}`)
+        .get(`/getCities/0`)
         .then((response) => {
             // Map the response data to match the Combobox items
-            filteredCities.value = response.data.cities;
+            cities.value = response.data.cities;
 
         })
         .catch((error) => {
             console.error('Error loading cities:', error);
         });
 
+
 });
-
-let loadWarehouses = computed(() => {
-    if (selected.value.title) {
-        if (!queryWarehouse.value) {
-            queryWarehouse.value = "0";
-        }
-        axios
-            .get(`/getWarehouses/${selected.value.title}/${queryWarehouse.value}`)
-            .then((response) => {
-                // Map the response data to match the Combobox items
-                filteredWarehouses.value = response.data.warehouses;
-
-            })
-            .catch((error) => {
-                console.error('Error loading cities:', error);
-            });
-    }
-    else {
-        axios
-            .get(`/getWarehouses/${selected.value}/${queryWarehouse.value}`)
-            .then((response) => {
-                // Map the response data to match the Combobox items
-                filteredWarehouses.value = response.data.warehouses;
-
-            })
-            .catch((error) => {
-                console.error('Error loading cities:', error);
-            });
-    }
-});
-
-let handleChange = () => {
-    if(selectedWarehouse.value.title){
-        selectedWarehouse.value.title = "";
-    }
-    else{
-        selectedWarehouse = ref("");
-    }
-};
-
 </script>
 <template>
 
     <UserLayout>
         <section
-            class="bg-white text-gray-600 body-font relative mx-auto max-w-1xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-screen-1xl lg:px-8">
+            class="bg-white text-gray-600 body-font relative mx-auto max-w-1xl px-4 py-6 sm:px-6 sm:py-24 lg:max-w-screen-1xl lg:px-8">
             <div
                 class="container px-5 py-3 mx-auto flex flex-wrap lg:flex-col lg:space-y-4 xl:flex-row xl:space-y-0 xl:space-x-4 justify-center ">
 
@@ -187,132 +209,112 @@ let handleChange = () => {
             <div
                 class="container px-5  mx-auto flex flex-wrap justify-center lg:flex-col lg:space-y-4 xl:flex-row xl:space-y-0 xl:space-x-4">
                 <div
-                    class="lg:w-2/3 md:w-2/3 bg-white flex-col ml-50 md:py-8 mt-8 ml-20 md:mt-0 w-full sm:mt-4 lg:inline-block xl:block ">
+                    class="lg:w-2/3 md:w-2/3 bg-white flex-col ml-50 md:py-8 mt-8 ml-5 md:mt-0 w-full sm:mt-4 lg:inline-block xl:block ">
                     <h2 class="text-gray-900 text-lg mb-1 font-medium title-font mx-auto">Summary</h2>
                     <p class="leading-relaxed mb-5 text-gray-600">Total: {{ total }} грн</p>
-                    <h2 class="text-gray-900 text-lg mb-1 font-medium title-font">Shipping Address</h2>
-                    <p class="leading-relaxed mb-5 text-gray-600">1234</p>
-                    <p class="leading-relaxed mb-5 text-gray-600">Or you can add one below</p>
-                    <div class="relative mb-4">
-                        <label for="name" class="leading-7 text-sm text-gray-600">Address</label>
-                        <input type="text" id="name" name="address1"
-                            class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
-                    </div>
-                    <div class="relative mb-4">
-                        <label for="email" class="leading-7 text-sm text-gray-600">City</label>
-                        <input type="text" id="email" name="city"
-                            class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
-                    </div>
-                    <div class="relative mb-4">
-                        <label for="email" class="leading-7 text-sm text-gray-600">State</label>
-                        <input type="text" id="email" name="state"
-                            class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
-                    </div>
-                    <div class="relative mb-4">
-                        <label for="email" class="leading-7 text-sm text-gray-600">Zipcode</label>
-                        <input type="text" id="email" name="zipcode"
-                            class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
-                    </div>
-                    <div class="relative mb-4">
-                        <label for="email" class="leading-7 text-sm text-gray-600">Country Code</label>
-                        <input type="text" id="email" name="countrycode"
-                            class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
-                    </div>
-                    <div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                         <div>
-                            <Combobox v-model="selected" @focus="loadCities">
-                                <div class="relative mt-1">
-                                    <div
-                                        class="relative pe-20 flex items-center w-full cursor-default overflow-hidden rounded-lg text-left border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
+                            <div class="">
+                                <Combobox v-model="selected" @focus="loadCities">
+                                    <div class="relative mt-1">
+                                        <div
+                                            class="relative flex items-center w-full cursor-default overflow-hidden rounded-lg text-left border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
 
-                                        <ComboboxInput
-                                            class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
-                                            :displayValue="(city) => city.title" @change="query = $event.target.value;"
-                                            placeholder="Почніть вводити місто..." />
+                                            <ComboboxInput
+                                                class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
+                                                :displayValue="(city) => city.title"
+                                                @change="query = $event.target.value;"
+                                                placeholder="Почніть вводити місто..." />
 
-                                        <div class="absolute inset-y-0 right-0 flex items-center pr-2 z-20"
-                                            @click="handleChange">
-                                            <ComboboxButton>
-                                                <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                            <div class="absolute inset-y-0 right-0 flex items-center pr-2 z-20"
+                                                @click="handleChange">
+                                                <ComboboxButton>
+                                                    <ChevronUpDownIcon class="h-5 w-5 text-gray-400"
+                                                        aria-hidden="true" />
+                                                </ComboboxButton>
+                                            </div>
+
+                                        </div>
+                                        <TransitionRoot leave="transition ease-in duration-100" leaveFrom="opacity-100"
+                                            leaveTo="opacity-0" @after-leave="query = ''">
+                                            <ComboboxOptions
+                                                class="absolute mt-1 z-20 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                                                <div v-if="filteredCities.length === 0 && query !== ''"
+                                                    class="relative cursor-default select-none px-4 py-2 text-gray-700">
+                                                    Nothing found.
+                                                </div>
+                                                <ComboboxOption v-for="city in filteredCities.slice(0, 20)"
+                                                    as="template" :key="city.id" :value="city"
+                                                    v-slot="{ selected, active }">
+                                                    <li class="relative cursor-default select-none py-2 pl-10 pr-4"
+                                                        :class="{
+                                                            'bg-teal-600 text-white': active,
+                                                            'text-gray-900': !active,
+                                                        }">
+                                                        <span class="block truncate"
+                                                            :class="{ 'font-medium': selected, 'font-normal': !selected }">
+                                                            {{ city.title }}
+                                                        </span>
+                                                        <span v-if="selected"
+                                                            class="absolute inset-y-0 left-0 flex items-center pl-3"
+                                                            :class="{ 'text-white': active, 'text-teal-600': !active }">
+                                                            <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                                        </span>
+                                                    </li>
+                                                </ComboboxOption>
+                                            </ComboboxOptions>
+                                        </TransitionRoot>
+                                    </div>
+                                </Combobox>
+                            </div>
+                            <div>
+                                <Combobox v-model="selectedWarehouse" @focus="loadWarehouses">
+                                    <div class="relative mt-1">
+                                        <div
+                                            class="relative flex items-center w-full cursor-default overflow-hidden rounded-lg text-left border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
+
+                                            <ComboboxInput
+                                                class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
+                                                :displayValue="(warehouse) => warehouse.title"
+                                                @change="queryWarehouse = $event.target.value"
+                                                placeholder="Почніть вводити назву чи номер відділення..." />
+                                            <ComboboxButton
+                                                class="absolute inset-y-0 right-0 flex items-center pr-2 z-20">
+                                                <ChevronUpDownIcon class="h-5 w-5 text-gray-400" />
                                             </ComboboxButton>
                                         </div>
-                                        
+                                        <TransitionRoot leave="transition ease-in duration-100" leaveFrom="opacity-100"
+                                            leaveTo="opacity-0" @after-leave="queryWarehouse = ''">
+                                            <ComboboxOptions
+                                                class="absolute mt-1 z-20 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                                                <div v-if="filteredWarehouses.length === 0 && queryWarehouse !== ''"
+                                                    class="relative cursor-default select-none px-4 py-2 text-gray-700">
+                                                    Nothing found.
+                                                </div>
+                                                <ComboboxOption v-for="warehouse in filteredWarehouses.slice(0, 20)" as="template"
+                                                    :key="warehouse.id" :value="warehouse"
+                                                    v-slot="{ selectedWarehouse, active }">
+                                                    <li class="relative cursor-default select-none py-2 pl-10 pr-4"
+                                                        :class="{
+                                                            'bg-teal-600 text-white': active,
+                                                            'text-gray-900': !active,
+                                                        }">
+                                                        <span class="block truncate"
+                                                            :class="{ 'font-medium': selectedWarehouse, 'font-normal': !selectedWarehouse }">
+                                                            {{ warehouse.title }}
+                                                        </span>
+                                                        <span v-if="selectedWarehouse"
+                                                            class="absolute inset-y-0 left-0 flex items-center pl-3"
+                                                            :class="{ 'text-white': active, 'text-teal-600': !active }">
+                                                            <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                                        </span>
+                                                    </li>
+                                                </ComboboxOption>
+                                            </ComboboxOptions>
+                                        </TransitionRoot>
                                     </div>
-                                    <TransitionRoot leave="transition ease-in duration-100" leaveFrom="opacity-100"
-                                        leaveTo="opacity-0" @after-leave="query = ''">
-                                        <ComboboxOptions
-                                            class="absolute mt-1 z-20 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
-                                            <div v-if="filteredCities.length === 0 && query !== ''"
-                                                class="relative cursor-default select-none px-4 py-2 text-gray-700">
-                                                Nothing found.
-                                            </div>
-                                            <ComboboxOption v-for="city in filteredCities" as="template" :key="city.id"
-                                                :value="city" v-slot="{ selected, active }">
-                                                <li class="relative cursor-default select-none py-2 pl-10 pr-4" :class="{
-                                                    'bg-teal-600 text-white': active,
-                                                    'text-gray-900': !active,
-                                                }">
-                                                    <span class="block truncate"
-                                                        :class="{ 'font-medium': selected, 'font-normal': !selected }">
-                                                        {{ city.title }}
-                                                    </span>
-                                                    <span v-if="selected"
-                                                        class="absolute inset-y-0 left-0 flex items-center pl-3"
-                                                        :class="{ 'text-white': active, 'text-teal-600': !active }">
-                                                        <CheckIcon class="h-5 w-5" aria-hidden="true" />
-                                                    </span>
-                                                </li>
-                                            </ComboboxOption>
-                                        </ComboboxOptions>
-                                    </TransitionRoot>
-                                </div>
-                            </Combobox>
-                        </div>
-                        <div>
-                            <Combobox v-model="selectedWarehouse" @focus="loadWarehouses">
-                                <div class="relative mt-1">
-                                    <div
-                                        class="relative pe-20 flex items-center w-full cursor-default overflow-hidden rounded-lg text-left border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
-
-                                        <ComboboxInput
-                                            class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
-                                            :displayValue="(warehouse) => warehouse.title"
-                                            @change="queryWarehouse = $event.target.value"
-                                            placeholder="Почніть вводити назву чи номер відділення..." />
-                                        <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2 z-20">
-                                            <ChevronUpDownIcon class="h-5 w-5 text-gray-400" />
-                                        </ComboboxButton>
-                                    </div>
-                                    <TransitionRoot leave="transition ease-in duration-100" leaveFrom="opacity-100"
-                                        leaveTo="opacity-0" @after-leave="queryWarehouse = ''">
-                                        <ComboboxOptions
-                                            class="absolute mt-1 z-20 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
-                                            <div v-if="filteredWarehouses.length === 0 && queryWarehouse !== ''"
-                                                class="relative cursor-default select-none px-4 py-2 text-gray-700">
-                                                Nothing found.
-                                            </div>
-                                            <ComboboxOption v-for="warehouse in filteredWarehouses" as="template"
-                                                :key="warehouse.id" :value="warehouse"
-                                                v-slot="{ selectedWarehouse, active }">
-                                                <li class="relative cursor-default select-none py-2 pl-10 pr-4" :class="{
-                                                    'bg-teal-600 text-white': active,
-                                                    'text-gray-900': !active,
-                                                }">
-                                                    <span class="block truncate"
-                                                        :class="{ 'font-medium': selectedWarehouse, 'font-normal': !selectedWarehouse }">
-                                                        {{ warehouse.title }}
-                                                    </span>
-                                                    <span v-if="selectedWarehouse"
-                                                        class="absolute inset-y-0 left-0 flex items-center pl-3"
-                                                        :class="{ 'text-white': active, 'text-teal-600': !active }">
-                                                        <CheckIcon class="h-5 w-5" aria-hidden="true" />
-                                                    </span>
-                                                </li>
-                                            </ComboboxOption>
-                                        </ComboboxOptions>
-                                    </TransitionRoot>
-                                </div>
-                            </Combobox>
+                                </Combobox>
+                            </div>
                         </div>
                     </div>
                     <div class="relative mb-4">

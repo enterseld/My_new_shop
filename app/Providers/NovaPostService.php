@@ -19,7 +19,7 @@ class NovaPostService
     public function makeRequestCities(string $modelName, string $calledMethod, string $findBy)
     {
         $methodProperties = new stdClass();
-        $methodProperties->Limit = "15";
+        
         $methodProperties->FindByString = $findBy;
 
         
@@ -37,7 +37,7 @@ class NovaPostService
     public function makeRequestWarehouses(string $modelName, string $calledMethod, string $city, string $findBy)
     {
         $methodProperties = new stdClass();
-        $methodProperties->Limit = "5";
+        
         $methodProperties->CityName = $city;
         if($findBy != "0"){
             $methodProperties->FindByString = $findBy;
