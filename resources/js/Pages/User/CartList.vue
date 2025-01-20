@@ -55,21 +55,21 @@ let loadCities = computed(() => {
 
             return titleWithoutBrackets.includes(searchQuery);
         });
-        console.log(selected.value.title);
-        loadAllWarehouses();
-    
+    console.log(selected.value.title);
+    loadAllWarehouses();
+
 });
 
-const loadAllWarehouses  = () => {
-        axios
-            .get(`/getWarehouses/${selected.value.title}/0`)
-            .then((response) => {
-                // Map the response data to match the Combobox items
-                warehouses.value = response.data.warehouses;
+const loadAllWarehouses = () => {
+    axios
+        .get(`/getWarehouses/${selected.value.title}/0`)
+        .then((response) => {
+            // Map the response data to match the Combobox items
+            warehouses.value = response.data.warehouses;
 
-            })
-            .catch((error) => {
-                console.error('Error loading cities:', error);
+        })
+        .catch((error) => {
+            console.error('Error loading cities:', error);
         });
 };
 
@@ -87,7 +87,7 @@ let loadWarehouses = computed(() => {
 
             return titleWithoutBrackets.includes(searchQuery);
         });
-        console.log(selectedWarehouse.value.title);
+    console.log(selectedWarehouse.value.title);
 });
 
 let handleChange = () => {
@@ -212,9 +212,10 @@ onMounted(() => {
                     class="lg:w-2/3 md:w-2/3 bg-white flex-col ml-50 md:py-8 mt-8 ml-5 md:mt-0 w-full sm:mt-4 lg:inline-block xl:block ">
                     <h2 class="text-gray-900 text-lg mb-1 font-medium title-font mx-auto">Summary</h2>
                     <p class="leading-relaxed mb-5 text-gray-600">Total: {{ total }} грн</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                        <div>
-                            <div class="">
+
+                    <div>
+                        <div class="flex flex-wrap -mx-3 mb-6">
+                            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                                 <Combobox v-model="selected" @focus="loadCities">
                                     <div class="relative mt-1">
                                         <div
@@ -251,7 +252,7 @@ onMounted(() => {
                                                             'bg-teal-600 text-white': active,
                                                             'text-gray-900': !active,
                                                         }">
-                                                        <span class="block truncate"
+                                                        <span class="block "
                                                             :class="{ 'font-medium': selected, 'font-normal': !selected }">
                                                             {{ city.title }}
                                                         </span>
@@ -267,7 +268,7 @@ onMounted(() => {
                                     </div>
                                 </Combobox>
                             </div>
-                            <div>
+                            <div class="w-full md:w-2/3 px-3">
                                 <Combobox v-model="selectedWarehouse" @focus="loadWarehouses">
                                     <div class="relative mt-1">
                                         <div
@@ -286,20 +287,20 @@ onMounted(() => {
                                         <TransitionRoot leave="transition ease-in duration-100" leaveFrom="opacity-100"
                                             leaveTo="opacity-0" @after-leave="queryWarehouse = ''">
                                             <ComboboxOptions
-                                                class="absolute mt-1 z-20 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                                                className="absolute mt-1 z-20 max-h-60 w-full overflow-x-auto whitespace-nowrap rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
                                                 <div v-if="filteredWarehouses.length === 0 && queryWarehouse !== ''"
                                                     class="relative cursor-default select-none px-4 py-2 text-gray-700">
                                                     Nothing found.
                                                 </div>
-                                                <ComboboxOption v-for="warehouse in filteredWarehouses.slice(0, 20)" as="template"
-                                                    :key="warehouse.id" :value="warehouse"
+                                                <ComboboxOption v-for="warehouse in filteredWarehouses.slice(0, 20)"
+                                                    as="template" :key="warehouse.id" :value="warehouse"
                                                     v-slot="{ selectedWarehouse, active }">
                                                     <li class="relative cursor-default select-none py-2 pl-10 pr-4"
                                                         :class="{
                                                             'bg-teal-600 text-white': active,
                                                             'text-gray-900': !active,
                                                         }">
-                                                        <span class="block truncate"
+                                                        <span class="block "
                                                             :class="{ 'font-medium': selectedWarehouse, 'font-normal': !selectedWarehouse }">
                                                             {{ warehouse.title }}
                                                         </span>
@@ -316,7 +317,9 @@ onMounted(() => {
                                 </Combobox>
                             </div>
                         </div>
+
                     </div>
+
                     <div class="relative mb-4">
                         <label for="email" class="leading-7 text-sm text-gray-600">Address type</label>
                         <input type="text" id="email" name="type"
