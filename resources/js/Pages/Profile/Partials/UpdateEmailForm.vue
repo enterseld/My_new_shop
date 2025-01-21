@@ -4,6 +4,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { watch } from 'vue';
 
 defineProps({
     mustVerifyEmail: {
@@ -18,11 +19,16 @@ const user = usePage().props.auth.user;
 
 const form = useForm({
     name: user.name,
-    firstName: user.first_name,
-    lastName: user.last_name,
-    middleName: user.middle_name,
+    first_name: user.first_name ?? '',
+    last_name: user.last_name ?? '',
+    middle_name: user.middle_name ?? '',
     email: user.email,
 });
+
+watch(form, (newVal) => {
+    console.log("Form changed:", newVal);
+});
+
 </script>
 
 <template>
