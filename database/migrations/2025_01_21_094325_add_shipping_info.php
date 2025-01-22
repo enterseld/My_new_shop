@@ -15,8 +15,8 @@ return new class extends Migration
             $table->string('mobile_phone')->default("")->after('session_id');
             $table->string('shipping_city')->default("")->after('mobile_phone');
             $table->string('shipping_warehouse')->default("")->after('shipping_city');
-            $table->dropForeign(['user_address_id']);
-            $table->dropColumn('user_address_id');
+            $table->dropForeign(['user_adress_id']);
+            $table->dropColumn('user_adress_id');
         });
         
     }

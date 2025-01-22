@@ -6,8 +6,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\User\AdressesController;
 use App\Http\Controllers\User\CartController;
 use App\Http\Controllers\User\CommentsController;
+use App\Http\Controllers\User\OrdersController;
 use App\Http\Controllers\User\ProductListController;
 use App\Http\Controllers\User\ReplyController;
 use App\Http\Controllers\User\UserController;
@@ -72,5 +74,8 @@ Route::prefix('products')->controller(ProductListController::class)->group(funct
 Route::get('/warehouses', [CartController::class, 'getWarehouses']);
 Route::get('/getCities/{findBy}', [CartController::class, 'getCities']);
 Route::get('/getWarehouses/{City}/{findBy}', [CartController::class, 'getWarehouses']);
+
+Route::post('/orders/store', [OrdersController::class, 'store']);
+Route::post('/adresses/store', [AdressesController::class, 'store']);
 //end
 require __DIR__.'/auth.php';

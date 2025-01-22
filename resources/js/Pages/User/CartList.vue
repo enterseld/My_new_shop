@@ -24,8 +24,7 @@ const update = (product, quantity) =>
         replace: true
     })
 
-const remove = (product) =>
-    router.delete(route('cart.delete', product), { preserveState: true, replace: true });
+const remove = (product) => router.delete(route('cart.delete', product), { preserveState: true, replace: true });
 
 
 let filteredCities = ref([]);
@@ -98,6 +97,52 @@ let handleChange = () => {
         selectedWarehouse = ref("");
     }
 };
+
+let phone_number = ref("");
+
+let sendOrder = async () => {
+
+    const formOrder = new FormData();
+    formOrder.append('total_price', total.value);
+    formOrder.append('mobile_phone', phone_number.value);
+    formOrder.append('shipping_city', selected.value.title);
+    formOrder.append('shipping_warehouse', selectedWarehouse.value.title);
+    formOrder.append('user_id', usePage().props.auth.user.id);
+   const formAdress = new FormData();
+    formAdress.append('shipping_city', selected.value.title);
+    formAdress.append('shipping_warehouse', selectedWarehouse.value.title);
+    formAdress.append('user_id', usePage().props.auth.user.id);
+    try{
+        router.post('/orders/store', formOrder, {
+            onSuccess: page => {
+                router.post('/adresses/store', formAdress, {
+                    onSuccess: page => {
+                        console.log('Address stored successfully');
+                    },
+                })
+            },
+        })
+    }
+    catch (err) {
+        console.log('An error occurred:', err);
+    }
+};
+
+let sendAdress = () => {
+    const formAdress = new FormData();
+    formAdress.append('shipping_city', selected.value.title);
+    formAdress.append('shipping_warehouse', selectedWarehouse.value.title);
+    formAdress.append('user_id', usePage().props.auth.user.id);
+    try {
+        router.post('/adresses/store', formAdress, {
+            onSuccess: page => {
+            },
+        })
+    } catch (err) {
+        console.log(err)
+    }
+    
+}
 onMounted(() => {
     axios
         .get(`/getCities/0`)
@@ -112,6 +157,8 @@ onMounted(() => {
 
 
 });
+
+
 </script>
 <template>
 
@@ -321,12 +368,14 @@ onMounted(() => {
                     </div>
 
                     <div class="relative mb-4">
-                        <label for="email" class="leading-7 text-sm text-gray-600">Address type</label>
-                        <input type="text" id="email" name="type"
+                        <label for="phone_number" class="leading-7 text-sm text-gray-600">Номер телефону</label>
+                        <input type="text" id="phone_number" name="type" v-model="phone_number"
                             class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
                     </div>
-                    <button
-                        class="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg">Checkout</button>
+                    <button type="submit" class="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg"
+                        @click="sendOrder()">
+                        Checkout
+                    </button>
                     <p class="text-xs text-gray-500 mt-3">Continue shopping</p>
                 </div>
 
