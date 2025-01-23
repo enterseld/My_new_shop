@@ -108,7 +108,10 @@ let sendOrder = async () => {
     formOrder.append('shipping_city', selected.value.title);
     formOrder.append('shipping_warehouse', selectedWarehouse.value.title);
     formOrder.append('user_id', usePage().props.auth.user.id);
-   const formAdress = new FormData();
+
+    formOrder.append('products', JSON.stringify(usePage().props.cart.data.items));
+
+    const formAdress = new FormData();
     formAdress.append('shipping_city', selected.value.title);
     formAdress.append('shipping_warehouse', selectedWarehouse.value.title);
     formAdress.append('user_id', usePage().props.auth.user.id);
@@ -118,6 +121,7 @@ let sendOrder = async () => {
                 router.post('/adresses/store', formAdress, {
                     onSuccess: page => {
                         console.log('Address stored successfully');
+                        
                     },
                 })
             },
@@ -128,21 +132,7 @@ let sendOrder = async () => {
     }
 };
 
-let sendAdress = () => {
-    const formAdress = new FormData();
-    formAdress.append('shipping_city', selected.value.title);
-    formAdress.append('shipping_warehouse', selectedWarehouse.value.title);
-    formAdress.append('user_id', usePage().props.auth.user.id);
-    try {
-        router.post('/adresses/store', formAdress, {
-            onSuccess: page => {
-            },
-        })
-    } catch (err) {
-        console.log(err)
-    }
-    
-}
+
 onMounted(() => {
     axios
         .get(`/getCities/0`)

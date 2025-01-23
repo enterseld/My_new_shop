@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\CartItem;
 use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 
 class OrdersController extends Controller
 {
     public function store(Request $request)
     {   
+        $products = json_decode($request->products, true);
 
         $order = new Order();
         $order->total_price = $request->total_price;
@@ -21,7 +24,21 @@ class OrdersController extends Controller
         $order->created_by = $request->user_id;
         $order->updated_by = $request->user_id;
         $order->save();
+        
 
-        return redirect()->back()->with('success', 'Order sent successfully!');
+        foreach ($products as $product) {
+            
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $product['product_id'],
+                
+                'quantity' => $product['quantity'],
+                
+                'unit_price' => "200",
+            ]);
+        }
+        CartItem::where(['user_id' => $request->user_id])->delete();
+
+        return redirect()->route('user.home');
     }
 }
