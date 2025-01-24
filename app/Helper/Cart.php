@@ -39,6 +39,9 @@ class Cart
     {
         Cookie::queue('cart_items', json_encode($cartItems), 60 * 24 * 30);
     }
+    public static function deleteCookieCartItems(){
+        Cookie::queue(Cookie::forget('cart_items'));
+    }
 
     public static function saveCookieCartItems()
     {

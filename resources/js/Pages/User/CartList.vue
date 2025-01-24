@@ -12,6 +12,7 @@ import {
 } from '@headlessui/vue'
 import { ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 
+const auth = usePage().props.auth;
 const carts = computed(() => usePage().props.cart.data.items);
 const products = computed(() => usePage().props.cart.data.products);
 const total = computed(() => usePage().props.cart.data.total);
@@ -54,7 +55,7 @@ let loadCities = computed(() => {
 
             return titleWithoutBrackets.includes(searchQuery);
         });
-    console.log(selected.value.title);
+
     loadAllWarehouses();
 
 });
@@ -86,7 +87,7 @@ let loadWarehouses = computed(() => {
 
             return titleWithoutBrackets.includes(searchQuery);
         });
-    console.log(selectedWarehouse.value.title);
+
 });
 
 let handleChange = () => {
@@ -99,36 +100,74 @@ let handleChange = () => {
 };
 
 let phone_number = ref("");
+let first_name = ref("");
+let last_name = ref("");
+let middle_name = ref("");
+let email = ref("");
+if (auth.user) {
+    first_name.value = auth.user.first_name;
+    last_name.value = auth.user.last_name;
+    middle_name.value = auth.user.middle_name;
+}
+
+
 
 let sendOrder = async () => {
+    if (auth.user) {
+        const formOrder = new FormData();
+        formOrder.append('first_name', first_name.value);
+        formOrder.append('last_name', last_name.value);
+        formOrder.append('middle_name', middle_name.value);
+        formOrder.append('total_price', total.value);
+        formOrder.append('mobile_phone', phone_number.value);
+        formOrder.append('shipping_city', selected.value.title);
+        formOrder.append('shipping_warehouse', selectedWarehouse.value.title);
+        formOrder.append('user_id', usePage().props.auth.user.id);
 
-    const formOrder = new FormData();
-    formOrder.append('total_price', total.value);
-    formOrder.append('mobile_phone', phone_number.value);
-    formOrder.append('shipping_city', selected.value.title);
-    formOrder.append('shipping_warehouse', selectedWarehouse.value.title);
-    formOrder.append('user_id', usePage().props.auth.user.id);
+        formOrder.append('products', JSON.stringify(usePage().props.cart.data.items));
 
-    formOrder.append('products', JSON.stringify(usePage().props.cart.data.items));
+        const formAdress = new FormData();
+        formAdress.append('shipping_city', selected.value.title);
+        formAdress.append('shipping_warehouse', selectedWarehouse.value.title);
+        formAdress.append('user_id', usePage().props.auth.user.id);
+        try {
+            router.post('/orders/store', formOrder, {
+                onSuccess: page => {
+                    router.post('/adresses/store', formAdress, {
+                        onSuccess: page => {
+                            console.log('Address stored successfully');
 
-    const formAdress = new FormData();
-    formAdress.append('shipping_city', selected.value.title);
-    formAdress.append('shipping_warehouse', selectedWarehouse.value.title);
-    formAdress.append('user_id', usePage().props.auth.user.id);
-    try{
-        router.post('/orders/store', formOrder, {
-            onSuccess: page => {
-                router.post('/adresses/store', formAdress, {
-                    onSuccess: page => {
-                        console.log('Address stored successfully');
-                        
-                    },
-                })
-            },
-        })
+                        },
+                    })
+                },
+            })
+        }
+        catch (err) {
+            console.log('An error occurred:', err);
+        }
     }
-    catch (err) {
-        console.log('An error occurred:', err);
+    else{
+        const formOrder = new FormData();
+        formOrder.append('first_name', first_name.value);
+        formOrder.append('last_name', last_name.value);
+        formOrder.append('middle_name', middle_name.value);
+        formOrder.append('email', email.value);
+        formOrder.append('total_price', total.value);
+        formOrder.append('mobile_phone', phone_number.value);
+        formOrder.append('shipping_city', selected.value.title);
+        formOrder.append('shipping_warehouse', selectedWarehouse.value.title);
+        formOrder.append('user_id', 0);
+
+        formOrder.append('products', JSON.stringify(usePage().props.cart.data.items));
+        try {
+            router.post('/orders/store', formOrder, {
+                onSuccess: page => {
+                },
+            })
+        }
+        catch (err) {
+            console.log('An error occurred:', err);
+        }
     }
 };
 
@@ -249,7 +288,38 @@ onMounted(() => {
                     class="lg:w-2/3 md:w-2/3 bg-white flex-col ml-50 md:py-8 mt-8 ml-5 md:mt-0 w-full sm:mt-4 lg:inline-block xl:block ">
                     <h2 class="text-gray-900 text-lg mb-1 font-medium title-font mx-auto">Summary</h2>
                     <p class="leading-relaxed mb-5 text-gray-600">Total: {{ total }} грн</p>
+                    <div class="flex flex-wrap -mx-3 mb-2">
+                        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                                for="grid-city">
 
+                            </label>
+                            <input v-model="first_name"
+                                class="bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                                id="grid-city" type="text" placeholder="Ім'я">
+                        </div>
+                        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                                for="grid-state">
+
+                            </label>
+                            <div class="relative">
+                                <input v-model="last_name"
+                                    class="bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                                    id="grid-city" type="text" placeholder="Прізвище">
+
+                            </div>
+                        </div>
+                        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                                for="grid-zip">
+
+                            </label>
+                            <input v-model="middle_name"
+                                class="bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                                id="grid-zip" type="text" placeholder="По-батькові">
+                        </div>
+                    </div>
                     <div>
                         <div class="flex flex-wrap -mx-3 mb-6">
                             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
@@ -362,7 +432,8 @@ onMounted(() => {
                         <input type="text" id="phone_number" name="type" v-model="phone_number"
                             class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
                     </div>
-                    <button type="submit" class="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg"
+                    <button type="submit"
+                        class="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg"
                         @click="sendOrder()">
                         Checkout
                     </button>

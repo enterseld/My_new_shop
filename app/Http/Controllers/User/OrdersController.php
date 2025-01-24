@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Helper\Cart;
 use App\Http\Controllers\Controller;
 use App\Models\CartItem;
 use App\Models\Order;
@@ -15,6 +16,12 @@ class OrdersController extends Controller
         $products = json_decode($request->products, true);
 
         $order = new Order();
+        $order->first_name = $request->first_name;
+        $order->last_name = $request->last_name;
+        $order->middle_name = $request->middle_name;
+        if($request->email){
+            $order->email = $request->email;
+        }
         $order->total_price = $request->total_price;
         $order->status = "Open";
         $order->session_id = "1";
@@ -37,8 +44,9 @@ class OrdersController extends Controller
                 'unit_price' => "200",
             ]);
         }
-        CartItem::where(['user_id' => $request->user_id])->delete();
 
+        CartItem::where(['user_id' => $request->user_id])->delete();
+        Cart::deleteCookieCartItems();
         return redirect()->route('user.home');
     }
 }

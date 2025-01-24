@@ -13,12 +13,6 @@ return new class extends Migration
     {
         Schema::table('user_adresses', function (Blueprint $table) {
             $table->string('warehouse')->default("")->after('city');
-            $table->dropColumn('type');
-            $table->dropColumn('address1');
-            $table->dropColumn('address2');
-            $table->dropColumn('state');
-            $table->dropColumn('zipcode');
-            $table->dropColumn('country_code');
         });
     }
 
