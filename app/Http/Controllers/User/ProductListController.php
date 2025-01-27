@@ -20,9 +20,8 @@ class ProductListController extends Controller
         $allProducts = Product::with('product_images')->orderBy('id')->get();
         $categories = Category::get();
         $brands = Brand::get();
-
+        
         return Inertia::render('User/ProductList', [
-
             'categories' => $categories,
             'brands' => $brands,
             'allProducts' => $allProducts,
