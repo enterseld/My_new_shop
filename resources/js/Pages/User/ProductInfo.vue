@@ -12,8 +12,8 @@ defineProps({
 })
 
 const auth = usePage().props.auth;
-const inputText = ref(""); // Using ref for reactive data
-const isButtonDisabled = computed(() => !inputText.value.trim());
+const comment = ref(""); // Using ref for reactive data
+const isButtonDisabled = computed(() => !comment.value.trim());
 
 
 const addToCart = (product) => {
@@ -36,10 +36,9 @@ let commentText = ref("");
 const starsContainer = ref(null);
 
 const sendComment = async (commentText, rating, product) => {
-    const textArea = document.getElementById('comment');
-    commentText.value = textArea.value.trim();
+    console.log(comment.value);
     const formData = new FormData();
-    formData.append('comment', commentText);
+    formData.append('comment', comment.value);
     formData.append('rating', rating);
     formData.append('user_name', auth.user.name);
     formData.append('product_id', product.id);
@@ -380,7 +379,7 @@ onUnmounted(() => {
                                             <div
                                                 class="py-2 px-4 mb-4 mt-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
                                                 <label for="comment" class="sr-only">Your comment</label>
-                                                <textarea id="comment" rows="6" v-model="inputText"
+                                                <textarea v-model="comment" rows="6"
                                                     class="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
                                                     placeholder="Напишіть ваш коментар..." required></textarea>
                                             </div>
