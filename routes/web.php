@@ -4,7 +4,9 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminCommentsController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminRepliesController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\User\AdressesController;
 use App\Http\Controllers\User\CartController;
@@ -40,6 +42,10 @@ Route::prefix('cart')->controller(CartController::class)->group(function (){
 //end
 
 Route::post('/comment/store', [CommentsController::class, 'store'])->name('comments.store');
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/comments', [AdminCommentsController::class, 'index'])->name('admin.comments.index');
+    Route::patch('/comments/update/{id}', [AdminCommentsController::class, 'update'])->name('admin.comments.update');
+});
 Route::post('/reply/store', [ReplyController::class, 'store'])->name('reply.store');
 //admin
 

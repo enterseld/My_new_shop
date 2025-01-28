@@ -4,11 +4,17 @@ namespace App\Http\Controllers\User;
 
 use App\Helper\ProductHelper;
 use App\Http\Controllers\Controller;
+use App\Models\CommentsReplies;
 use App\Models\ProductComments;
+
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CommentsController extends Controller
 {
+
+    
+
     public function store(Request $request)
     {   
 
@@ -19,7 +25,7 @@ class CommentsController extends Controller
         $comment->user_name = $request->user_name;
         $comment->save();
 
-        $rating = ProductComments::sum("rating")/ProductComments::count("rating");
+        $rating = ProductComments::sum("rating")->where("published", "==", "1")/ProductComments::count("rating")->where("published", "==", "1");
 
         ProductHelper::setRating($request, $comment->product_id, $rating);
 
