@@ -113,12 +113,25 @@ if (auth.user) {
 
 
 let sendOrder = async () => {
+    if (!validate()) {
+        if(auth.user)
+        Swal.fire({
+            text: "Будь ласка, введіть правильний номер телефону та ПІБ",
+            icon: "warning"
+        })
+        else Swal.fire({
+            text: "Будь ласка, введіть правильний номер телефону, email та ПІБ",
+            icon: "warning"
+        })
+        return; // Stop execution of outerFunction if validation fails
+    }
     if (auth.user) {
         const formOrder = new FormData();
         formOrder.append('first_name', first_name.value);
         formOrder.append('last_name', last_name.value);
         formOrder.append('middle_name', middle_name.value);
         formOrder.append('total_price', total.value);
+        formOrder.append('email', usePage().props.auth.user.email);
         formOrder.append('mobile_phone', phone_number.value);
         formOrder.append('shipping_city', selected.value.title);
         formOrder.append('shipping_warehouse', selectedWarehouse.value.title);
@@ -146,7 +159,7 @@ let sendOrder = async () => {
             console.log('An error occurred:', err);
         }
     }
-    else{
+    else {
         const formOrder = new FormData();
         formOrder.append('first_name', first_name.value);
         formOrder.append('last_name', last_name.value);
@@ -169,8 +182,23 @@ let sendOrder = async () => {
             console.log('An error occurred:', err);
         }
     }
+
+
 };
 
+let validate = () => {
+    let patternPhone1 = /^\+?\d{1,3}\d{9}$/;
+    let patternPhone2 = /^\d{10}$/; 
+    let patternEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if ((patternPhone1.test(phone_number.value) || patternPhone2.test(phone_number.value)) && (patternEmail.test(email.value) || auth.user) && first_name.value!="" && last_name.value!="" && middle_name.value!=""){
+
+        return true;
+    }
+    else{
+        console.log("not passed")
+        return false;
+    }
+}
 
 onMounted(() => {
     axios
@@ -205,20 +233,20 @@ onMounted(() => {
                             class="text-[10px] md:text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
                             <tr>
-                                <th scope="col" class="px-16 py-3 text-center w-2/11">
+                                <th scope="col" class="px-16 py-3 text-center w-2/11 ">
                                     <span class="sr-only">Image</span>
                                 </th>
-                                <th scope="col" class="px-6 py-3 text-center w-2/11">
-                                    Product
+                                <th scope="col" class="px-6 py-3 text-center w-2/11 font-medium">
+                                    Продукт
                                 </th>
-                                <th scope="col" class="px-6 py-3 text-center w-2/11">
-                                    Qty
+                                <th scope="col" class="px-6 py-3 text-center w-2/11 font-medium">
+                                    Кількість
                                 </th>
-                                <th scope="col" class="px-6 py-3 text-center w-2/11">
-                                    Price
+                                <th scope="col" class="px-6 py-3 text-center w-2/11 font-medium">
+                                    Ціна
                                 </th>
-                                <th scope="col" class="px-6 py-3 text-center w-2/11">
-                                    Action
+                                <th scope="col" class="px-6 py-3 text-center w-2/11 font-medium">
+                                    Дії
                                 </th>
                             </tr>
                         </thead>
@@ -272,7 +300,7 @@ onMounted(() => {
                                 </td>
                                 <td class="px-6 py-4">
                                     <a href="#" @click="remove(product)"
-                                        class="font-medium text-red-600 dark:text-red-500 hover:underline">Remove</a>
+                                        class="font-medium text-red-600 dark:text-red-500 hover:underline">Прибрати</a>
                                 </td>
                             </tr>
 
@@ -285,7 +313,7 @@ onMounted(() => {
             <div
                 class="container px-5  mx-auto flex flex-wrap justify-center lg:flex-col lg:space-y-4 xl:flex-row xl:space-y-0 xl:space-x-4">
                 <div
-                    class="lg:w-2/3 md:w-2/3 bg-white flex-col ml-50 md:py-8 mt-8 ml-5 md:mt-0 w-full sm:mt-4 lg:inline-block xl:block ">
+                    class="lg:w-2/3 md:w-4/4 bg-white flex-col ml-50 md:py-8 mt-8 ml-5 md:mt-0 w-full sm:mt-4 lg:inline-block xl:block ">
                     <h2 class="text-gray-900 text-lg mb-1 font-medium title-font mx-auto">Summary</h2>
                     <p class="leading-relaxed mb-5 text-gray-600">Total: {{ total }} грн</p>
                     <div class="flex flex-wrap -mx-3 mb-2">
@@ -426,11 +454,16 @@ onMounted(() => {
                         </div>
 
                     </div>
-
+                    
+                    <div class="relative mb-4" v-if = "!auth.user">
+                        <label for="phone_number" class="leading-7 text-sm text-gray-600">Електронна пошта</label>
+                        <input type="text" id="phone_number" name="type" v-model="email"
+                            class="w-full font-sm bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
+                    </div>
                     <div class="relative mb-4">
                         <label for="phone_number" class="leading-7 text-sm text-gray-600">Номер телефону</label>
-                        <input type="text" id="phone_number" name="type" v-model="phone_number"
-                            class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
+                        <input type="text" id="phone_number" name="type" v-model="phone_number" placeholder="+380953456789 або 0951234567"
+                            class="w-full font-sm bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
                     </div>
                     <button type="submit"
                         class="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg"
