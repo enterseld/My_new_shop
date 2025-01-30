@@ -11,10 +11,12 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\User\AdressesController;
 use App\Http\Controllers\User\CartController;
 use App\Http\Controllers\User\CommentsController;
+use App\Http\Controllers\User\FavoriteProductsController;
 use App\Http\Controllers\User\OrdersController;
 use App\Http\Controllers\User\ProductListController;
 use App\Http\Controllers\User\ReplyController;
 use App\Http\Controllers\User\UserController;
+use App\Models\FavoriteProducts;
 use Inertia\Inertia;
 
 
@@ -80,8 +82,11 @@ Route::prefix('products')->controller(ProductListController::class)->group(funct
 Route::get('/warehouses', [CartController::class, 'getWarehouses']);
 Route::get('/getCities/{findBy}', [CartController::class, 'getCities']);
 Route::get('/getWarehouses/{City}/{findBy}', [CartController::class, 'getWarehouses']);
-
+//end
 Route::post('/orders/store', [OrdersController::class, 'store']);
 Route::post('/adresses/store', [AdressesController::class, 'store']);
-//end
+
+Route::get('/user/{id}/favorites', [FavoriteProductsController::class, 'index']);
+Route::post('/user/favorites/store', [FavoriteProductsController::class, 'store']);
+Route::post('/user/favorites/delete', [FavoriteProductsController::class, 'delete']);
 require __DIR__.'/auth.php';
