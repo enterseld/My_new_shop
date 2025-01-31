@@ -136,6 +136,7 @@ const toggleVisibility = (event) => {
 const user_id = usePage().props.auth.user.id;
 const isFavorite = ref(false);
 console.log(isFavorite.value)
+
 const isUserInFavorites = async () => {
     try {
         const response = await axios.get(`/user/${user_id}/favorites`);

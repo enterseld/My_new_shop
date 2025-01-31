@@ -1,8 +1,10 @@
 <script setup>
 import { router, usePage } from '@inertiajs/vue3';
 defineProps({
-    products: Array
+    favorites: Array
 })
+
+
 
 const addToCart = (product) => {
     router.post(route('cart.store', product), {
@@ -19,7 +21,7 @@ const addToCart = (product) => {
         }
     })
 }
-console.log(usePage().props.products)
+console.log(usePage().props.favorites)
 const showProduct = (id) => {
     router.get(route('product.show', id))
 }
@@ -29,7 +31,7 @@ const showProduct = (id) => {
 <template>
 
     <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 ">
-        <div v-for="product in products" :key="product.id"
+        <div v-for="product in favorites" :key="product.id"
             class="h-auto group relative justify-between border-bottom-2 border-2  rounded-lg">
 
 

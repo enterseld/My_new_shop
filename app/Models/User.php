@@ -58,7 +58,7 @@ class User extends Authenticatable implements MustVerifyEmail
     }
     public function favorites()
     {
-    return $this->belongsToMany(Product::class, 'favorite_products', 'user_id', 'product_id');
+        return $this->belongsToMany(Product::class, 'favorite_products', 'user_id', 'product_id')
+            ->with(['category', 'brand', 'product_images', 'product_comments']);
     }
-
 }
