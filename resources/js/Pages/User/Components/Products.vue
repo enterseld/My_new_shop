@@ -30,31 +30,34 @@ const showProduct = (id) => {
 
     <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 ">
         <div v-for="product in products" :key="product.id"
-            class="h-auto group relative justify-between border-bottom-2 border-2  rounded-lg">
-
-
-            <div @click="showProduct(product.id)" class="w-full overflow-hidden bg-gray-200 border-2 ">
+            class="relative m-2 flex w-full max-w-xs flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md"@click="showProduct(product.id)">
+            <a 
+                class="relative mx-3 mt-3 flex h-60 overflow-hidden rounded-xl justify-center">
                 <img v-if="product.product_images.length > 0" :src="product.product_images[0].image"
-                    :alt="product.imageAlt" class="h-full w-full object-contain object-center lg:h-full lg:w-full" />
+                    class="object-cover"
+                    src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8c25lYWtlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"
+                    :alt="product.imageAlt" />
                 <img v-else
                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                    :alt="product.imageAlt" class="h-full w-full object-contain object-center lg:h-full lg:w-full" />
-            </div>
-
-            <div class="flex justify-center border-1 m-2  ">
-
-                <div class="m-auto w-full relative justify-center">
-                    <h3 @click="showProduct(product.id)" class="text-sm text-gray-700 text-center">
-                        <span aria-hidden="true" class="" />
-                        {{ product.title }}
-                    </h3>
-
-
-                    <p @click="showProduct(product.id)" class="text-sm font-medium ml-2 text-gray-900 flex ">{{
-                        product.price }}грн</p>
-                    <p @click="showProduct(product.id)" class="text-sm font-medium ml-2 text-gray-900 flex ">{{
-                        product.price }}грн </p>
-                    <div class="font-medium ml-2 text-gray-900 justify-center">
+                    :alt="product.imageAlt" class="object-cover" />
+                <span
+                    class="absolute top-0 left-0 m-2 rounded-full bg-black px-2 text-center text-sm font-medium text-white"></span>
+            </a>
+            <div class="mt-4 px-5 pb-5">
+                <a>
+                    <h5 class="text-base tracking-tight text-slate-900">{{ product.title }}</h5>
+                </a>
+                <p class="text-sm  text-gray-500 sm:text-sm dark:text-white underline ">
+                    Код товару: {{ product.vendor_code }}
+                </p>
+                <div class="mt-1 flex items-center justify-between">
+                    <p>
+                        <span class="text-xl font-bold text-slate-900">{{ product.price }}грн</span>
+                        <span class="text-sm text-slate-900 line-through"></span>
+                    </p>
+                    
+                </div>
+                <div class="flex items-center mb-4 mt-2">
                         <p class="text-sm font-medium ml-2 text-gray-900 flex flex-wrap">
                             <svg v-for="stars in Math.ceil(product.rating)" xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-gray-400 text-yellow-400">
@@ -70,27 +73,31 @@ const showProduct = (id) => {
                                     clip-rule="evenodd"></path>
                             </svg>
                         </p>
+                        <span v-if="product.rating != '0'"
+                            class="mr-2 ml-3 rounded bg-yellow-200 px-2.5 py-0.5 text-xs font-semibold">{{
+                            product.rating }}</span>
                     </div>
-                    <p class="text-sm  text-gray-500 sm:text-sm dark:text-white underline ml-2">
-                        Код товару: {{ product.vendor_code }}
-                    </p>
-                    <p class="text-sm font-medium ml-2 text-gray-900 flex "></p>
-
-                    <div v-if="product.published != 0" class="mt-2 flex justify-center">
-                        <button type="button" @click="addToCart(product)"
-                            class="text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                            Купити
-                        </button>
-                    </div>
-                    <div v-if="product.published == 0" class="mt-2 flex justify-center">
-                        <button type="button"
-                            class="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Немає
-                            в наявності</button>
-
-                    </div>
-                </div>
+                <a v-if="product.published != 0" @click="addToCart(product)"
+                    class="flex items-center justify-center rounded-md bg-slate-900  text-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                    <button class = "flex w-full h-full px-5 py-2.5 justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Додати до корзини
+                    </button>
+                </a>
+                <a v-if="product.published == 0"
+                    class="flex items-center justify-center rounded-md border border-gray-200 bg-white-900  text-center text-sm font-medium text-gray hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                    <button class = "flex w-full h-full px-5 py-2.5 justify-center">
+                        
+                        Немає в наявності
+                    </button>
+                </a>
 
             </div>
         </div>
     </div>
+
 </template>
