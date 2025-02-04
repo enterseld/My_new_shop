@@ -1,7 +1,7 @@
 <script setup>
 import { router, usePage } from '@inertiajs/vue3';
 defineProps({
-    favorites: Array
+    products: Array
 })
 
 
@@ -44,7 +44,7 @@ const showProduct = (id) => {
                 <div class="mt-6 flex ">
 
                     
-                    <div v-for="product in favorites" :key="product.id"
+                    <div v-for="product in products" :key="product.id"
                         class="relative m-2 p-2 flex w-[300px] flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md"
                         @click="showProduct(product.id)">
                         <a class="relative mx-3 mt-3 flex overflow-hidden rounded-xl justify-center">

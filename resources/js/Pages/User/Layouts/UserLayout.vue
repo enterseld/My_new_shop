@@ -16,7 +16,7 @@ onMounted(() => {
     <!--End-->
 
     <!--Main content-->
-    <div class="min-h-screen overflow-hidden" style="
+    <div class="overflow-hidden" style="
     background-image: url('/product_images/Construction2.png');
     background-size: cover;
     background-attachment: fixed;

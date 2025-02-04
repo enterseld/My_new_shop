@@ -32,7 +32,7 @@ const showProduct = (id) => {
         <div v-for="product in products" :key="product.id"
             class="relative m-2 flex w-full max-w-xs flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md"@click="showProduct(product.id)">
             <a 
-                class="relative mx-3 mt-3 flex h-60 overflow-hidden rounded-xl justify-center">
+                class="relative mx-3 mt-3 flex overflow-hidden rounded-xl justify-center">
                 <img v-if="product.product_images.length > 0" :src="product.product_images[0].image"
                     class="object-cover"
                     src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8c25lYWtlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"

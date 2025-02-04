@@ -5,6 +5,7 @@ import Hero from './Layouts/Hero.vue';
 import Products from './Components/Products.vue';
 import { onMounted, ref } from 'vue';
 import Favorites from './Components/Favorites.vue';
+import ProductsScroll from './Components/ProductsScroll.vue';
 
 defineProps({
     products: Array,
@@ -24,7 +25,7 @@ const auth = usePage().props.auth;
             <div class="mx-auto max-w-screen-lg px-4 py-16 sm:px-6 sm:py-24 lg:max-w-screen-2xl lg:px-8">
                 <h2 class="text-2xl font-bold tracking-tight text-gray-900">Новинки</h2>
 
-                <Products :products="products"></Products>
+                <ProductsScroll :products="products"></ProductsScroll>
                 <h2 class="text-2xl font-bold tracking-tight text-gray-900 mt-10">Вподобані товари</h2>
                 <Favorites v-if="auth.user" :favorites="favorites"></Favorites>
                 <div class="flex justify-center mt-5">
