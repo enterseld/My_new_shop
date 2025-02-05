@@ -7,7 +7,8 @@ use App\Http\Resources\ProductResource;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-
+use App\Models\ProductDiameter;
+use App\Models\ProductFitDiameter;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -20,10 +21,14 @@ class ProductListController extends Controller
         $allProducts = Product::with('product_images')->orderBy('id')->get();
         $categories = Category::get();
         $brands = Brand::get();
-        
+        $productDiameters = ProductDiameter::get();
+        $productFitDiameters = ProductFitDiameter::get();
+
         return Inertia::render('User/ProductList', [
             'categories' => $categories,
             'brands' => $brands,
+            'productDiameters' => $productDiameters,
+            'productFitDiameters' => $productFitDiameters,
             'allProducts' => $allProducts,
             'products' => ProductResource::collection($filterProducts),
             'pagination' => [

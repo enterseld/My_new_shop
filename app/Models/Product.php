@@ -54,6 +54,15 @@ class Product extends Model
     {
         return $this->belongsTo(Brand::class);
     }
+    public function product_diameter()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function product_fit_diameter()
+    {
+        return $this->belongsTo(Brand::class);
+    }
     public function cartItems()
     {
         return $this->hasMany(CartItem::class);
