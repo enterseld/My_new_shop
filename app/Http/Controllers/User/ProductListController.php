@@ -16,8 +16,9 @@ class ProductListController extends Controller
 {
     public function index()
     {
-        $products = Product::with('category', 'brand', 'product_images', 'product_comments');
+        $products = Product::with('category', 'brand', 'product_images', 'product_comments', 'product_fit_diameter', 'product_diameter');
         $filterProducts = $products->filtered()->paginate(16)->withQueryString();
+        
         $allProducts = Product::with('product_images')->orderBy('id')->get();
         $categories = Category::get();
         $brands = Brand::get();

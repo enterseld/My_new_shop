@@ -56,12 +56,12 @@ class Product extends Model
     }
     public function product_diameter()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(ProductDiameter::class);
     }
 
     public function product_fit_diameter()
     {
-        return $this->belongsTo(Brand::class);
+        return $this->belongsTo(ProductFitDiameter::class);
     }
     public function cartItems()
     {
@@ -81,6 +81,12 @@ class Product extends Model
 
         })->when(request('categories'), function (Builder $q)  {
             $q->whereIn('category_id',request('categories'));
+            
+        })->when(request('product_diameters'), function (Builder $q)  {
+            $q->whereIn('diameter_of_disk',request('product_diameters'))->orWhereIn('drill_diameter', request('product_diameters'));
+            
+        })->when(request('product_fit_diameters'), function (Builder $q)  {
+            $q->whereIn('diameter_of_fit',request('product_fit_diameters'));
             
         })->when(request('prices'), function(Builder $q)  {
             $q->whereBetween('price',[

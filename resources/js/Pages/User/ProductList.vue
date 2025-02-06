@@ -65,6 +65,7 @@ const selectedBrands = ref([])
 const selectedCategories = ref([])
 const selectedDiameters = ref([])
 const selectedFitDiameters = ref([])
+
 watch(selectedBrands, () => {
     updateFilteredProducts()
 })
@@ -73,10 +74,20 @@ watch(selectedCategories, () => {
 
 })
 
+watch(selectedDiameters, () => {
+    updateFilteredProducts()
+})
+watch(selectedFitDiameters, () => {
+    updateFilteredProducts()
+
+})
+
 function updateFilteredProducts(page = 1) {
     router.get('products', {
         brands: selectedBrands.value,
         categories: selectedCategories.value,
+        product_diameters: selectedDiameters.value,
+        product_fit_diameters: selectedFitDiameters.value,
         prices: {
             from: filterPrices.prices[0],
             to: filterPrices.prices[1]
@@ -320,10 +331,10 @@ function updateFilteredProducts(page = 1) {
                                         <div class="grid grid-cols-3 gap-4">
                                             <div v-for="diameter in productDiameters" :key="diameter.id"
                                                 class="flex items-center">
-                                                <input :id="`filter-${diameter.id + 50}`" :value="diameter.id"
+                                                <input :id="`filter-${diameter.id}`" :value="diameter.number"
                                                     type="checkbox" v-model="selectedDiameters"
                                                     class="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                                                <label :for="`filter-${diameter.id + 50}`"
+                                                <label :for="`filter-${diameter.id}`"
                                                     class="ml-3 text-sm text-gray-600">{{ diameter.number }}</label>
                                             </div>
                                         </div>
@@ -349,10 +360,10 @@ function updateFilteredProducts(page = 1) {
                                         <div class="grid grid-cols-3 gap-4">
                                             <div v-for="fitDiameter in productFitDiameters" :key="fitDiameter.id"
                                                 class="flex items-center">
-                                                <input :id="`filter-${fitDiameter.id + 50}`" :value="fitDiameter.id"
-                                                    type="checkbox" v-model="selectedDiameters"
+                                                <input :id="`filter-${fitDiameter.id}`" :value="fitDiameter.number"
+                                                    type="checkbox" v-model="selectedFitDiameters"
                                                     class="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                                                <label :for="`filter-${fitDiameter.id + 50}`"
+                                                <label :for="`filter-${fitDiameter.id}`"
                                                     class="ml-3 text-sm text-gray-600">{{ fitDiameter.number }}</label>
                                             </div>
                                         </div>
