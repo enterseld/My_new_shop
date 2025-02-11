@@ -13,16 +13,19 @@ defineProps({
 })
 
 const auth = usePage().props.auth;
-
+const productsByCategory = usePage().props.productsByCategory;
 </script>
 
 <template>
     <UserLayout>
+        
+    
         <!--Hero section-->
-        <Hero></Hero>
+        <Hero :productsByCategory = "productsByCategory"></Hero>
+
         <!--End-->
-        <div class="bg-white mx-auto max-w-fit px-4 py-16 sm:px-6 sm:py-24 lg:max-w-screen-2xl lg:px-8">
-            <div class="mx-auto max-w-screen-lg px-4 py-16 sm:px-6 sm:py-24 lg:max-w-screen-2xl lg:px-8">
+        <div class="bg-white mx-auto max-w-fit py-16 sm:py-24 lg:max-w-screen-2xl lg:px-8">
+            <div class="mx-auto max-w-screen-lg px-2 py-16 sm:px-1 sm:py-24 lg:max-w-screen-2xl lg:px-8">
                 <h2 class="text-2xl font-bold tracking-tight text-gray-900">Новинки</h2>
 
                 <ProductsScroll :products="products"></ProductsScroll>

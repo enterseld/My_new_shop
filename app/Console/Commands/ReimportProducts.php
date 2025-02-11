@@ -47,9 +47,13 @@ class ReimportProducts extends Command
 
                 $newProduct->price = (float)$product->price;
                 $newProduct->currency = (string)$product->currencyId;
-                if ((string)$product->categoryId == "0") {
+                if ((string)$product->categoryId == "0" && !(strpos($product->name, "Фреза") === 0)) {
                     $newProduct->category_id = "143";
-                } else {
+                }
+                else if ((string)$product->categoryId == "0" && strpos($product->name, "Фреза") === 0) {
+                    $newProduct->category_id = "41";
+                }
+                else {
                     $newProduct->category_id = (string)$product->categoryId;
                 }
                 $newProduct->vendor_code = (string)$product->vendorCode;

@@ -45,25 +45,24 @@ const showProduct = (id) => {
 
                     
                     <div v-for="product in products" :key="product.id"
-                        class="relative m-2 p-2 flex w-[300px] flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md"
+                        class="relative m-1 lg:m-2 lg:p-2 p-2 flex sm:w-auto lg:w-[300px] flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md"
                         @click="showProduct(product.id)">
-                        <a class="relative mx-3 mt-3 flex overflow-hidden rounded-xl justify-center">
+
+                        <a class="relative flex overflow-hidden rounded-xl justify-center">
                             <img v-if="product.product_images.length > 0" :src="product.product_images[0].image"
                                 class="object-cover" :alt="product.imageAlt" />
                             <img v-else :alt="product.imageAlt" class="object-cover" />
                             <span
                                 class="absolute top-0 left-0 m-2 rounded-full bg-black px-2 text-center text-sm font-medium text-white"></span>
                         </a>
-                        <div class="mt-4 px-5 pb-5">
+                        <div class="mt-4 lg:px-5">
                             <a>
-                                <h5 class="text-base tracking-tight text-slate-900">{{ product.title }}</h5>
+                                <h5 class="lg:text-base text-xs tracking-tight text-slate-900">{{ product.title }}</h5>
                             </a>
-                            <p class="text-sm  text-gray-500 sm:text-sm dark:text-white underline ">
-                                Код товару: {{ product.vendor_code }}
-                            </p>
+                            
                             <div class="mt-1 flex items-center justify-between">
                                 <p>
-                                    <span class="text-xl font-bold text-slate-900">{{ product.price }}грн</span>
+                                    <span class="lg:text-xl text-xs font-bold text-slate-900">{{ product.price }}грн</span>
                                     <span class="text-sm text-slate-900 line-through"></span>
                                 </p>
 
@@ -90,29 +89,35 @@ const showProduct = (id) => {
                                     class="mr-2 ml-3 rounded bg-yellow-200 px-2.5 py-0.5 text-xs font-semibold">{{
                                         product.rating }}</span>
                             </div>
-                            <a v-if="product.published != 0" @click="addToCart(product)"
-                                class="flex items-center justify-center rounded-md bg-slate-900  text-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                                <button class="flex w-full h-full px-5 py-2.5 justify-center">
+                            
+
+                        </div>
+                        <div class = "flex mt-auto justify-center w-auto">
+                        <a v-if="product.published != 0" @click="addToCart(product)"
+                                class=" w-full items-center justify-center rounded-md bg-slate-900  text-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                                <button class="flex items-center w-full h-full px-5 py-2.5 justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-6 w-6" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                     </svg>
-                                    Додати до корзини
+                                    Купити
                                 </button>
                             </a>
                             <a v-if="product.published == 0"
-                                class="flex items-center justify-center rounded-md border border-gray-200 bg-white-900  text-center text-sm font-medium text-gray hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                                class="flex w-full items-center justify-center rounded-md border border-gray-200 bg-white-900  text-center text-sm font-medium text-gray hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-blue-300">
                                 <button class="flex w-full h-full px-5 py-2.5 justify-center">
 
-                                    Немає в наявності
+                                    Замовити
                                 </button>
                             </a>
-
                         </div>
                     </div>
+                    
                 </div>
+                
             </div>
+            
         </div>
     </div>
     
