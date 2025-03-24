@@ -2,7 +2,7 @@
 import UserLayout from './Layouts/UserLayout.vue';
 import axios from 'axios';
 import { Link, usePage, router } from '@inertiajs/vue3';
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import {
     Combobox,
     ComboboxInput,
@@ -28,7 +28,7 @@ const update = (product, quantity) =>
 const remove = (product) => router.delete(route('cart.delete', product), { preserveState: true, replace: true });
 
 
-let filteredCities = ref([]);
+const filteredCities = ref([]);
 let selected = ref("0");
 let query = ref("");
 
@@ -39,28 +39,35 @@ let queryWarehouse = ref("0");
 let cities = ref([]);
 let warehouses = ref([]);
 
-let loadCities = computed(() => {
-    selectedWarehouse = ref("");
+watch(query, (newQuery) => {
+  // Reset selected warehouse when query changes
+  selectedWarehouse.value = "";
+  
+  // Filter cities based on query
+  if (newQuery === '') {
+    filteredCities.value = cities.value.slice(); // Make a copy of the original array
+  } else {
+    filteredCities.value = cities.value.filter((product) => {
+      const searchQuery = newQuery.toLowerCase().replace(/\s+/g, '');
+      
+      const titleWithoutBrackets = product.title
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .replace(/\(.*?\)/g, '');
+        
+      return titleWithoutBrackets.includes(searchQuery);
+    });
+  }
+  // Load warehouses after filtering cities
+  loadAllWarehouses();
+});
 
-    filteredCities.value = query.value === ''
-        ? cities
-        : cities.value.filter((product) => {
-            const searchQuery = query.value.toLowerCase().replace(/\s+/g, '');
-
-            // Remove text inside parentheses
-            const titleWithoutBrackets = product.title
-                .toLowerCase()
-                .replace(/\s+/g, '') // Remove spaces
-                .replace(/\(.*?\)/g, ''); // Remove anything inside parentheses
-
-            return titleWithoutBrackets.includes(searchQuery);
-        });
-
-    loadAllWarehouses();
-
+watch(selected, () => {
+  loadAllWarehouses();
 });
 
 const loadAllWarehouses = () => {
+
     axios
         .get(`/getWarehouses/${selected.value.title}/0`)
         .then((response) => {
@@ -73,20 +80,24 @@ const loadAllWarehouses = () => {
         });
 };
 
-let loadWarehouses = computed(() => {
-    filteredWarehouses.value = queryWarehouse.value === ''
-        ? warehouses
-        : warehouses.value.filter((product) => {
-            const searchQuery = queryWarehouse.value.toLowerCase().replace(/\s+/g, '');
+watch(queryWarehouse, (newQueryWarehouse) => {
 
-            // Remove text inside parentheses
-            const titleWithoutBrackets = product.title
-                .toLowerCase()
-                .replace(/\s+/g, '') // Remove spaces
-                .replace(/\(.*?\)/g, ''); // Remove anything inside parentheses
-
-            return titleWithoutBrackets.includes(searchQuery);
-        });
+  // Filter cities based on query
+  if (newQueryWarehouse === '') {
+    filteredWarehouses.value = warehouses.value.slice(); // Make a copy of the original array
+  } else {
+    filteredWarehouses.value = warehouses.value.filter((product) => {
+      const searchQuery = newQueryWarehouse.toLowerCase().replace(/\s+/g, '');
+      
+      const titleWithoutBrackets = product.title
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .replace(/\(.*?\)/g, '');
+        
+      return titleWithoutBrackets.includes(searchQuery);
+    });
+  }
+  
 
 });
 
@@ -351,7 +362,7 @@ onMounted(() => {
                     <div>
                         <div class="flex flex-wrap -mx-3 mb-6">
                             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                                <Combobox v-model="selected" @focus="loadCities">
+                                <Combobox v-model="selected">
                                     <div class="relative mt-1">
                                         <div
                                             class="relative flex items-center w-full cursor-default overflow-hidden rounded-lg text-left border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
@@ -359,7 +370,7 @@ onMounted(() => {
                                             <ComboboxInput
                                                 class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
                                                 :displayValue="(city) => city.title"
-                                                @change="query = $event.target.value;"
+                                                @input="query = $event.target.value;"
                                                 placeholder="Почніть вводити місто..." />
 
                                             <div class="absolute inset-y-0 right-0 flex items-center pr-2 z-20"
@@ -379,7 +390,7 @@ onMounted(() => {
                                                     class="relative cursor-default select-none px-4 py-2 text-gray-700">
                                                     Nothing found.
                                                 </div>
-                                                <ComboboxOption v-for="city in filteredCities.slice(0, 20)"
+                                                <ComboboxOption v-for="city in (filteredCities || []).slice(0, 20)"
                                                     as="template" :key="city.id" :value="city"
                                                     v-slot="{ selected, active }">
                                                     <li class="relative cursor-default select-none py-2 pl-10 pr-4"
@@ -387,7 +398,7 @@ onMounted(() => {
                                                             'bg-teal-600 text-white': active,
                                                             'text-gray-900': !active,
                                                         }">
-                                                        <span class="block "
+                                                        <span class="block"
                                                             :class="{ 'font-medium': selected, 'font-normal': !selected }">
                                                             {{ city.title }}
                                                         </span>
@@ -427,7 +438,7 @@ onMounted(() => {
                                                     class="relative cursor-default select-none px-4 py-2 text-gray-700">
                                                     Nothing found.
                                                 </div>
-                                                <ComboboxOption v-for="warehouse in filteredWarehouses.slice(0, 20)"
+                                                <ComboboxOption v-for="warehouse in (filteredWarehouses || []).slice(0, 20)"
                                                     as="template" :key="warehouse.id" :value="warehouse"
                                                     v-slot="{ selectedWarehouse, active }">
                                                     <li class="relative cursor-default select-none py-2 pl-10 pr-4"
