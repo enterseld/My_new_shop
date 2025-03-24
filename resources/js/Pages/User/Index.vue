@@ -29,7 +29,7 @@ const productsByCategory = usePage().props.productsByCategory;
                 <h2 class="text-2xl font-bold tracking-tight text-gray-900">Новинки</h2>
 
                 <ProductsScroll :products="products"></ProductsScroll>
-                <h2 class="text-2xl font-bold tracking-tight text-gray-900 mt-10">Вподобані товари</h2>
+                <h2 v-if = "favorites" class="text-2xl font-bold tracking-tight text-gray-900 mt-10">Вподобані товари</h2>
                 <Favorites v-if="auth.user" :favorites="favorites"></Favorites>
                 <div class="flex justify-center mt-5">
                     <Link :href="route('products.index')" type="button"

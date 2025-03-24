@@ -46,22 +46,22 @@ const showProduct = (id) => {
                     
                     <div v-for="product in favorites" :key="product.id"
                         class="relative m-1 lg:m-2 lg:p-2 p-2 flex sm:w-auto lg:w-[300px] flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md"
-                        @click="showProduct(product.id)">
-                        <a class="relative flex overflow-hidden rounded-xl justify-center">
+                        >
+                        <a class="relative flex overflow-hidden rounded-xl justify-center" @click="showProduct(product.id)">
                             <img v-if="product.product_images.length > 0" :src="product.product_images[0].image"
                                 class="object-cover" :alt="product.imageAlt" />
                             <img v-else :alt="product.imageAlt" class="object-cover" />
                             <span
                                 class="absolute top-0 left-0 m-2 rounded-full bg-black px-2 text-center text-sm font-medium text-white"></span>
                         </a>
-                        <div class="mt-4 lg:px-5">
-                            <a>
+                        <div class="mt-4 lg:px-5" >
+                            <a @click="showProduct(product.id)">
                                 <h5 class="lg:text-base text-xs tracking-tight text-slate-900">{{ product.title }}</h5>
                             </a>
-                            <p class="text-sm  text-gray-500 sm:text-sm dark:text-white underline ">
+                            <p class="text-sm  text-gray-500 sm:text-sm dark:text-white underline " @click="showProduct(product.id)">
                                 Код товару: {{ product.vendor_code }}
                             </p>
-                            <div class="mt-1 flex items-center justify-between">
+                            <div class="mt-1 flex items-center justify-between" @click="showProduct(product.id)">
                                 <p>
                                     <span class="lg:text-xl text-xs font-bold text-slate-900">{{ product.price }}грн</span>
                                     <span class="text-sm text-slate-900 line-through"></span>
