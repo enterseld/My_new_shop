@@ -13,7 +13,7 @@ defineProps({
 
     <section class="bg-white dark:bg-gray-900 mx-auto max-w-1xl px-4 sm:px-6 lg:max-w-screen-2xl lg:px-8 py-10">
         <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
-        <h1
+            <h1
                 class="mt-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
                 We invest in the world’s potential</h1>
             <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">Here at
@@ -106,14 +106,22 @@ defineProps({
         </div>
         <Carousel></Carousel>
 
-        <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:py-5">
-            <div v-for="category in productsByCategory"
-                class="grid grid-cols-2 gap-2 lg:p-5 rounded-lg border-2 border-gray-100">
-                <div v-for="product in category.products">
-                    <img class="h-auto max-w-full rounded-lg" :src="product.product_images[0].image" alt="">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:py-5 ">
+            <div v-for="category in productsByCategory" class=" border border-gray-300 shadow-lg bg-white p-3">
+                <div class="text-center text-base lg:text-xl font-bold text-slate-900 
+            h-12 sm:h-16 line-clamp-2 overflow-hidden text-ellipsis whitespace-normal">
+    {{ category.name }}
+</div>
+                <div class="grid grid-cols-2 gap-1 lg:gap-2 lg:p-4 mb-2">
+                    <div v-for="product in category.products" class="h-full bg-white-100">
+                        <img class="h-full max-w-full " :src="product.product_images[0].image" alt="">
+                    </div>
                 </div>
-
+                <Link class="text-xs lg:text-base text-blue-600 hover:text-blue-800 mt-2" href="#">
+                    Переглянути {{ category.name.toLowerCase() }}
+                </Link>
             </div>
+
         </div>
     </section>
 </template>
