@@ -1,8 +1,8 @@
 <template>
     <AdminLayout>
-        <ProductList :comments = "comments" :replies="replies">
+        <CommentsList :comments = "comments" :replies="replies">
             
-        </ProductList>
+        </CommentsList>
 
     </AdminLayout>
 
@@ -14,5 +14,6 @@ defineProps({
     replies:Array
 })
 import AdminLayout from '../Components/AdminLayout.vue';
-import ProductList from './CommentsList.vue';
+
+import CommentsList from './CommentsList.vue';
 </script>

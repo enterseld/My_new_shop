@@ -78,7 +78,7 @@ const submit = () => {
             <div
                 class="flex flex-col lg:flex-row w-10/12 lg:w-8/12 bg-white rounded-xl mx-auto shadow-lg overflow-hidden">
                 <div class="w-full lg:w-1/2 flex flex-col items-center justify-center p-12 bg-no-repeat bg-cover bg-center"
-                    style="background-image: url('product_images/Construction.png');">
+                    style="background-image: url('product_images/Construction1.png');">
 
                 </div>
                 <div class="w-full lg:w-1/2 py-8 px-12">

@@ -133,11 +133,15 @@ const toggleVisibility = (event) => {
         textarea.classList.add('hidden');
     }
 };
-const user_id = usePage().props.auth.user.id;
+
+if(usePage().props.auth.user){
+    const user_id = usePage().props.auth.user.id;
+}
 const isFavorite = ref(false);
 console.log(isFavorite.value)
 
 const isUserInFavorites = async () => {
+    if(usePage().props.auth.user)
     try {
         const response = await axios.get(`/user/${user_id}/favorites`);
         const favorites = response.data.favorites;

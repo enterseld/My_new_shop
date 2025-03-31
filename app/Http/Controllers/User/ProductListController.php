@@ -25,7 +25,7 @@ class ProductListController extends Controller
         $productDiameters = ProductDiameter::get();
         $productFitDiameters = ProductFitDiameter::get();
 
-        return Inertia::render('User/ProductList', [
+        return Inertia::render('User/Catalog', [
             'categories' => $categories,
             'brands' => $brands,
             'productDiameters' => $productDiameters,
