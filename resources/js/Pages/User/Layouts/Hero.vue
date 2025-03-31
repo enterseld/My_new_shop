@@ -1,12 +1,41 @@
 <script setup>
-import { Link, router, usePage } from '@inertiajs/vue3';
+import { Link, router, useForm, usePage } from '@inertiajs/vue3';
 import Carousel from './Carousel.vue';
+import { ref } from 'vue';
 
 defineProps({
     productsByCategory: Array,
 
 })
+const filterPrices = useForm({
+    prices: [0, 100000]
+})
+const selectedBrands = ref([])
+const selectedCategories = ref([])
+const selectedDiameters = ref([])
+const selectedFitDiameters = ref([])
 
+function showCategory(page = 1, categoryId) {
+    if (categoryId) {
+        selectedCategories.value.push(categoryId)
+    }
+    router.get(route('productByCategory.index', { category: categoryId}), {
+        brands: selectedBrands.value,
+        categories: selectedCategories.value,
+        product_diameters: selectedDiameters.value,
+        product_fit_diameters: selectedFitDiameters.value,
+        prices: {
+            from: filterPrices.prices[0],
+            to: filterPrices.prices[1]
+        },
+        page
+    },
+
+        {
+            preserveState: true,
+            replace: true
+        });
+}
 </script>
 
 <template>
@@ -117,9 +146,9 @@ defineProps({
                         <img class="h-full max-w-full " :src="product.product_images[0].image" alt="">
                     </div>
                 </div>
-                <Link class="text-xs lg:text-base text-blue-600 hover:text-blue-800 mt-2" href="#">
+                <button class="text-xs lg:text-base text-blue-600 hover:text-blue-800 mt-2" @click = "showCategory(page = 1, category.id)">
                     Переглянути {{ category.name.toLowerCase() }}
-                </Link>
+                </button>
             </div>
 
         </div>

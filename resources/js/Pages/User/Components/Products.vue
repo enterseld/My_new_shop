@@ -19,7 +19,6 @@ const addToCart = (product) => {
         }
     })
 }
-console.log(usePage().props.products)
 
 
 </script>

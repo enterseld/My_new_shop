@@ -74,8 +74,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 Route::prefix('products')->controller(ProductListController::class)->group(function () {
     Route::get('/','index')->name('products.index');
     Route::get('/{id}','showAndIndex')->name('product.show');
+    Route::get('/category/{category}', 'indexByCategory')->name('productByCategory.index');
 });
-
 //end
 
 //routes for nova poshta

@@ -1,7 +1,7 @@
 <script setup>
 import UserLayout from './Layouts/UserLayout.vue';
-import { ref, watch } from 'vue'
-import { router } from '@inertiajs/vue3';
+import { onMounted, ref, watch } from 'vue'
+import { router, usePage } from '@inertiajs/vue3';
 import {
     Dialog,
     DialogPanel,
@@ -39,7 +39,7 @@ const filterPrices = useForm({
 const priceFilter = () => {
     router.get('products', {
         brands: selectedBrands.value,
-        categories: selectedCategories.value,
+
         prices: {
             from: filterPrices.prices[0],
             to: filterPrices.prices[1]
@@ -53,6 +53,7 @@ const priceFilter = () => {
 const mobileFiltersOpen = ref(false)
 
 const props = defineProps({
+    categoryForList: Number,
     products: Array,
     brands: Array,
     categories: Array,
@@ -63,15 +64,18 @@ const props = defineProps({
 //filter brands and categories
 const selectedBrands = ref([])
 const selectedCategories = ref([])
+
+// Add the category from page props if it exists
+if (usePage().props.categoryForList) {
+  selectedCategories.value.push(usePage().props.categoryForList)
+}
 const selectedDiameters = ref([])
 const selectedFitDiameters = ref([])
 
 watch(selectedBrands, () => {
     updateFilteredProducts()
 })
-watch(selectedCategories, () => {
-    updateFilteredProducts()
-})
+
 
 watch(selectedDiameters, () => {
     updateFilteredProducts()
@@ -82,8 +86,8 @@ watch(selectedFitDiameters, () => {
 })
 
 function updateFilteredProducts(page = 1) {
-    console.log(selectedCategories.value)   
-    router.get('products', {
+    console.log(selectedCategories.value)
+    router.get(route('productByCategory.index', { category: props.categoryForList }), {
         brands: selectedBrands.value,
         categories: selectedCategories.value,
         product_diameters: selectedDiameters.value,
@@ -101,7 +105,10 @@ function updateFilteredProducts(page = 1) {
         });
 }
 
+
 </script>
+
+
 <template>
     <UserLayout>
 
@@ -286,33 +293,6 @@ function updateFilteredProducts(page = 1) {
                                 </DisclosurePanel>
                             </Disclosure>
 
-                            <!--Category-->
-                            <Disclosure as="div" class="border-b border-gray-200 py-6" v-slot="{ open }">
-                                <h3 class="-my-3 flow-root">
-                                    <DisclosureButton
-                                        class="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
-                                        <span class="font-medium text-gray-900">Категорії</span>
-                                        <span class="ml-6 flex items-center">
-                                            <PlusIcon v-if="!open" class="size-5" aria-hidden="true" />
-                                            <MinusIcon v-else class="size-5" aria-hidden="true" />
-                                        </span>
-                                    </DisclosureButton>
-                                </h3>
-                                <DisclosurePanel class="pt-6">
-                                    <div class="space-y-4">
-                                        <div v-for="category in categories" :key="category.id"
-                                            class="flex items-center">
-                                            <input :id="`filter-${category.id + 50}`" :value="category.id"
-                                                type="checkbox" v-model="selectedCategories"
-                                                class="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                                            <label :for="`filter-${category.id + 50}`"
-                                                class="ml-3 text-sm text-gray-600">{{
-                                                    category.name }}</label>
-                                        </div>
-                                    </div>
-                                </DisclosurePanel>
-                            </Disclosure>
-                            <!--End-->
 
                             <!--Diameters-->
                             <Disclosure as="div" class="border-b border-gray-200 py-6" v-slot="{ open }">

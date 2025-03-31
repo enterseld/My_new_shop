@@ -24,7 +24,6 @@ class ProductListController extends Controller
         $brands = Brand::get();
         $productDiameters = ProductDiameter::get();
         $productFitDiameters = ProductFitDiameter::get();
-
         return Inertia::render('User/Catalog', [
             'categories' => $categories,
             'brands' => $brands,
@@ -32,6 +31,33 @@ class ProductListController extends Controller
             'productFitDiameters' => $productFitDiameters,
             'allProducts' => $allProducts,
             'products' => ProductResource::collection($filterProducts),
+            'pagination' => [
+                'current_page' => $filterProducts->currentPage(),
+                'last_page' => $filterProducts->lastPage(),
+                'per_page' => $filterProducts->perPage(),
+                'total' => $filterProducts->total(),
+            ],
+        ]);
+    }
+
+    public function indexByCategory($category)
+    {
+        $products = Product::with('category', 'brand', 'product_images', 'product_comments', 'product_fit_diameter', 'product_diameter');
+        $filterProducts = $products->filtered()->paginate(16)->withQueryString();
+        $allProducts = Product::with('product_images')->orderBy('id')->get();
+        $categories = Category::get();
+        $brands = Brand::get();
+        $productDiameters = ProductDiameter::get();
+        $productFitDiameters = ProductFitDiameter::get();
+
+        return Inertia::render('User/ListForCategory', [
+            'categories' => $categories,
+            'brands' => $brands,
+            'productDiameters' => $productDiameters,
+            'productFitDiameters' => $productFitDiameters,
+            'allProducts' => $allProducts,
+            'products' => ProductResource::collection($filterProducts),
+            'categoryForList' => $category,
             'pagination' => [
                 'current_page' => $filterProducts->currentPage(),
                 'last_page' => $filterProducts->lastPage(),
