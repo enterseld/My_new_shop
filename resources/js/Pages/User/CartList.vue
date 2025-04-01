@@ -40,30 +40,30 @@ let cities = ref([]);
 let warehouses = ref([]);
 
 watch(query, (newQuery) => {
-  // Reset selected warehouse when query changes
-  selectedWarehouse.value = "";
-  
-  // Filter cities based on query
-  if (newQuery === '') {
-    filteredCities.value = cities.value.slice(); // Make a copy of the original array
-  } else {
-    filteredCities.value = cities.value.filter((product) => {
-      const searchQuery = newQuery.toLowerCase().replace(/\s+/g, '');
-      
-      const titleWithoutBrackets = product.title
-        .toLowerCase()
-        .replace(/\s+/g, '')
-        .replace(/\(.*?\)/g, '');
-        
-      return titleWithoutBrackets.includes(searchQuery);
-    });
-  }
-  // Load warehouses after filtering cities
-  loadAllWarehouses();
+    // Reset selected warehouse when query changes
+    selectedWarehouse.value = "";
+
+    // Filter cities based on query
+    if (newQuery === '') {
+        filteredCities.value = cities.value.slice(); // Make a copy of the original array
+    } else {
+        filteredCities.value = cities.value.filter((product) => {
+            const searchQuery = newQuery.toLowerCase().replace(/\s+/g, '');
+
+            const titleWithoutBrackets = product.title
+                .toLowerCase()
+                .replace(/\s+/g, '')
+                .replace(/\(.*?\)/g, '');
+
+            return titleWithoutBrackets.includes(searchQuery);
+        });
+    }
+    // Load warehouses after filtering cities
+    loadAllWarehouses();
 });
 
 watch(selected, () => {
-  loadAllWarehouses();
+    loadAllWarehouses();
 });
 
 const loadAllWarehouses = () => {
@@ -82,22 +82,22 @@ const loadAllWarehouses = () => {
 
 watch(queryWarehouse, (newQueryWarehouse) => {
 
-  // Filter cities based on query
-  if (newQueryWarehouse === '') {
-    filteredWarehouses.value = warehouses.value.slice(); // Make a copy of the original array
-  } else {
-    filteredWarehouses.value = warehouses.value.filter((product) => {
-      const searchQuery = newQueryWarehouse.toLowerCase().replace(/\s+/g, '');
-      
-      const titleWithoutBrackets = product.title
-        .toLowerCase()
-        .replace(/\s+/g, '')
-        .replace(/\(.*?\)/g, '');
-        
-      return titleWithoutBrackets.includes(searchQuery);
-    });
-  }
-  
+    // Filter cities based on query
+    if (newQueryWarehouse === '') {
+        filteredWarehouses.value = warehouses.value.slice(); // Make a copy of the original array
+    } else {
+        filteredWarehouses.value = warehouses.value.filter((product) => {
+            const searchQuery = newQueryWarehouse.toLowerCase().replace(/\s+/g, '');
+
+            const titleWithoutBrackets = product.title
+                .toLowerCase()
+                .replace(/\s+/g, '')
+                .replace(/\(.*?\)/g, '');
+
+            return titleWithoutBrackets.includes(searchQuery);
+        });
+    }
+
 
 });
 
@@ -125,11 +125,11 @@ if (auth.user) {
 
 let sendOrder = async () => {
     if (!validate()) {
-        if(auth.user)
-        Swal.fire({
-            text: "Будь ласка, введіть правильний номер телефону та ПІБ",
-            icon: "warning"
-        })
+        if (auth.user)
+            Swal.fire({
+                text: "Будь ласка, введіть правильний номер телефону та ПІБ",
+                icon: "warning"
+            })
         else Swal.fire({
             text: "Будь ласка, введіть правильний номер телефону, email та ПІБ",
             icon: "warning"
@@ -199,13 +199,13 @@ let sendOrder = async () => {
 
 let validate = () => {
     let patternPhone1 = /^\+?\d{1,3}\d{9}$/;
-    let patternPhone2 = /^\d{10}$/; 
+    let patternPhone2 = /^\d{10}$/;
     let patternEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if ((patternPhone1.test(phone_number.value) || patternPhone2.test(phone_number.value)) && (patternEmail.test(email.value) || auth.user) && first_name.value!="" && last_name.value!="" && middle_name.value!=""){
+    if ((patternPhone1.test(phone_number.value) || patternPhone2.test(phone_number.value)) && (patternEmail.test(email.value) || auth.user) && first_name.value != "" && last_name.value != "" && middle_name.value != "") {
 
         return true;
     }
-    else{
+    else {
         console.log("not passed")
         return false;
     }
@@ -290,7 +290,7 @@ onMounted(() => {
                                         </button>
                                         <div>
                                             <input type="number" id="first_product"
-                                                v-model="carts[itemId(product.id)].quantity"
+                                                v-model="carts[itemId(product.id)].quantity" min="1"
                                                 class="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                                 placeholder="1" required />
                                         </div>
@@ -438,7 +438,8 @@ onMounted(() => {
                                                     class="relative cursor-default select-none px-4 py-2 text-gray-700">
                                                     Nothing found.
                                                 </div>
-                                                <ComboboxOption v-for="warehouse in (filteredWarehouses || []).slice(0, 20)"
+                                                <ComboboxOption
+                                                    v-for="warehouse in (filteredWarehouses || []).slice(0, 20)"
                                                     as="template" :key="warehouse.id" :value="warehouse"
                                                     v-slot="{ selectedWarehouse, active }">
                                                     <li class="relative cursor-default select-none py-2 pl-10 pr-4"
@@ -465,15 +466,16 @@ onMounted(() => {
                         </div>
 
                     </div>
-                    
-                    <div class="relative mb-4" v-if = "!auth.user">
+
+                    <div class="relative mb-4" v-if="!auth.user">
                         <label for="phone_number" class="leading-7 text-sm text-gray-600">Електронна пошта</label>
                         <input type="text" id="phone_number" name="type" v-model="email"
                             class="w-full font-sm bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
                     </div>
                     <div class="relative mb-4">
                         <label for="phone_number" class="leading-7 text-sm text-gray-600">Номер телефону</label>
-                        <input type="text" id="phone_number" name="type" v-model="phone_number" placeholder="+380953456789 або 0951234567"
+                        <input type="text" id="phone_number" name="type" v-model="phone_number"
+                            placeholder="+380953456789 або 0951234567"
                             class="w-full font-sm bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
                     </div>
                     <button type="submit"
