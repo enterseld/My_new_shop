@@ -325,39 +325,38 @@ onMounted(() => {
                 class="container px-5  mx-auto flex flex-wrap justify-center lg:flex-col lg:space-y-4 xl:flex-row xl:space-y-0 xl:space-x-4">
                 <div
                     class="lg:w-2/3 md:w-4/4 bg-white flex-col ml-50 md:py-8 mt-8 ml-5 md:mt-0 w-full sm:mt-4 lg:inline-block xl:block ">
-                    <h2 class="text-gray-900 text-lg mb-1 font-medium title-font mx-auto">Summary</h2>
-                    <p class="leading-relaxed mb-5 text-gray-600">Total: {{ total }} грн</p>
+                    <h2 class="text-gray-900 text-lg mb-1 font-medium title-font mx-auto">Підсумок</h2>
+                    <p class="leading-relaxed text-lg mb-5 text-gray-600">Загалом: {{ total }} грн</p>
                     <div class="flex flex-wrap -mx-3 mb-2">
-                        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                        <div class="w-full md:w-full px-3 mb-6 md:mb-0 flex">
                             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                                 for="grid-city">
-
                             </label>
-                            <input v-model="first_name"
-                                class="bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
-                                id="grid-city" type="text" placeholder="Ім'я">
-                        </div>
-                        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                                for="grid-state">
-
-                            </label>
-                            <div class="relative">
-                                <input v-model="last_name"
-                                    class="bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
-                                    id="grid-city" type="text" placeholder="Прізвище">
-
+                            <div class="relative z-0 w-full mb-5 group">
+                                <input type="name" name="floating_name" id="floating_name" v-model="first_name"
+                                    class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                                    placeholder=" " required />
+                                <label for="floating_name"
+                                    class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Ім'я</label>
+                            </div>
+                            <div class="relative z-0 w-full mb-5 ml-5 group">
+                                <input type="last_name" name="floating_last_name" id="floating_last_name"
+                                    v-model="last_name"
+                                    class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                                    placeholder=" " required />
+                                <label for="floating_last_name"
+                                    class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Прізвище</label>
+                            </div>
+                            <div class="relative z-0 w-full mb-5 ml-5 group">
+                                <input type="middle_name" name="floating_middle_name" id="floating_middle_name"
+                                    v-model="middle_name"
+                                    class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                                    placeholder=" " required />
+                                <label for="floating_middle_name"
+                                    class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">По-батькові</label>
                             </div>
                         </div>
-                        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                                for="grid-zip">
 
-                            </label>
-                            <input v-model="middle_name"
-                                class="bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
-                                id="grid-zip" type="text" placeholder="По-батькові">
-                        </div>
                     </div>
                     <div>
                         <div class="flex flex-wrap -mx-3 mb-6">
@@ -467,16 +466,28 @@ onMounted(() => {
 
                     </div>
 
-                    <div class="relative mb-4" v-if="!auth.user">
-                        <label for="phone_number" class="leading-7 text-sm text-gray-600">Електронна пошта</label>
-                        <input type="text" id="phone_number" name="type" v-model="email"
-                            class="w-full font-sm bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
+                    
+                    <div class="relative z-0 w-full mb-5 group" v-if="!auth.user">
+                        <input type="email" name="floating_email" id="floating_phone_number" v-model="email"
+                            class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                            placeholder=" " required />
+                        <label for="email"
+                            class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Електронна пошта</label>
                     </div>
-                    <div class="relative mb-4">
-                        <label for="phone_number" class="leading-7 text-sm text-gray-600">Номер телефону</label>
-                        <input type="text" id="phone_number" name="type" v-model="phone_number"
-                            placeholder="+380953456789 або 0951234567"
-                            class="w-full font-sm bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
+
+                    <div class="relative z-0 w-full mb-5 group">
+                        <input type="phone_number" name="floating_phone_number" id="floating_phone_number" v-model="phone_number"
+                            class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                            placeholder=" " required />
+                        <label for="phone_number"
+                            class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Номер телефону (+380953456789 або 0121234567)</label>
+                    </div>
+                    <div class="flex items-center mb-4">
+                        <input checked id="checkbox-1" type="checkbox" value=""
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="checkbox-1" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Я
+                            погоджуюся із <a href="#" class="text-blue-600 hover:underline dark:text-blue-500">умовами
+                                обслуговування</a>.</label>
                     </div>
                     <button type="submit"
                         class="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg"
