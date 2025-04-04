@@ -1,20 +1,49 @@
+<script setup>
+import { Link, router, useForm, usePage } from '@inertiajs/vue3';
+import Carousel from './Carousel.vue';
+import { ref } from 'vue';
+
+defineProps({
+    productsByCategory: Array,
+
+})
+const filterPrices = useForm({
+    prices: [0, 100000]
+})
+const selectedBrands = ref([])
+const selectedCategories = ref([])
+const selectedDiameters = ref([])
+const selectedFitDiameters = ref([])
+
+function showCategory(page = 1, categoryId) {
+    if (categoryId) {
+        selectedCategories.value.push(categoryId)
+    }
+    router.get(route('productByCategory.index', { category: categoryId}), {
+        brands: selectedBrands.value,
+        categories: selectedCategories.value,
+        product_diameters: selectedDiameters.value,
+        product_fit_diameters: selectedFitDiameters.value,
+        prices: {
+            from: filterPrices.prices[0],
+            to: filterPrices.prices[1]
+        },
+        page
+    },
+
+        {
+            preserveState: true,
+            replace: true
+        });
+}
+</script>
+
 <template>
 
-    <section class="bg-white dark:bg-gray-900 mx-auto max-w-1xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-screen-2xl lg:px-8">
+    <section class="bg-white dark:bg-gray-900 mx-auto max-w-1xl px-4 sm:px-6 lg:max-w-screen-2xl lg:px-8 py-10">
         <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
-            <a href="#"
-                class="inline-flex justify-between items-center py-1 px-1 pr-4 mb-7 text-sm text-gray-700 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
-                role="alert">
-                <span class="text-xs bg-primary-600 rounded-full text-white px-4 py-1.5 mr-3">New</span> <span
-                    class="text-sm font-medium">Flowbite is out! See what's new</span>
-                <svg class="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                        clip-rule="evenodd"></path>
-                </svg>
-            </a>
             <h1
-                class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
+                class="mt-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
                 We invest in the world’s potential</h1>
             <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">Here at
                 Flowbite we focus on markets where technology, innovation, and capital can unlock long-term value and
@@ -103,6 +132,25 @@
                     </a>
                 </div>
             </div>
+        </div>
+        <Carousel></Carousel>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:py-5 ">
+            <div v-for="category in productsByCategory" class=" border border-gray-300 shadow-lg bg-white p-3">
+                <div class="text-center text-base lg:text-xl font-bold text-slate-900 
+            h-12 sm:h-16 line-clamp-2 overflow-hidden text-ellipsis whitespace-normal">
+    {{ category.name }}
+</div>
+                <div class="grid grid-cols-2 gap-1 lg:gap-2 lg:p-4 mb-2">
+                    <div v-for="product in category.products" class="h-full bg-white-100">
+                        <img class="h-full max-w-full " :src="product.product_images[0].image" alt="">
+                    </div>
+                </div>
+                <button class="text-xs lg:text-base text-blue-600 hover:text-blue-800 mt-2" @click = "showCategory(page = 1, category.id)">
+                    Переглянути {{ category.name.toLowerCase() }}
+                </button>
+            </div>
+
         </div>
     </section>
 </template>

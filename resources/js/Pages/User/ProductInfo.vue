@@ -1,6 +1,7 @@
 <script setup>
 
 
+import axios from 'axios';
 import Products from './Components/Products.vue';
 import UserLayout from './Layouts/UserLayout.vue';
 import { router, usePage, Link } from '@inertiajs/vue3';
@@ -11,9 +12,10 @@ defineProps({
     products: Object,
 })
 
+
 const auth = usePage().props.auth;
-const inputText = ref(""); // Using ref for reactive data
-const isButtonDisabled = computed(() => !inputText.value.trim());
+const comment = ref(""); // Using ref for reactive data
+const isButtonDisabled = computed(() => !comment.value.trim());
 
 
 const addToCart = (product) => {
@@ -36,10 +38,9 @@ let commentText = ref("");
 const starsContainer = ref(null);
 
 const sendComment = async (commentText, rating, product) => {
-    const textArea = document.getElementById('comment');
-    commentText.value = textArea.value.trim();
+    console.log(comment.value);
     const formData = new FormData();
-    formData.append('comment', commentText);
+    formData.append('comment', comment.value);
     formData.append('rating', rating);
     formData.append('user_name', auth.user.name);
     formData.append('product_id', product.id);
@@ -133,10 +134,62 @@ const toggleVisibility = (event) => {
     }
 };
 
+if(usePage().props.auth.user){
+    const user_id = usePage().props.auth.user.id;
+}
+const isFavorite = ref(false);
+console.log(isFavorite.value)
+
+const isUserInFavorites = async () => {
+    if(usePage().props.auth.user)
+    try {
+        const response = await axios.get(`/user/${user_id}/favorites`);
+        const favorites = response.data.favorites;
+        const isFavorite = favorites.some(fav => fav.id === usePage().props.product.id);
+ 
+        return isFavorite;
+    } catch (error) {
+        console.error('Error loading favorites:', error);
+        return []; // Return an empty array or handle the error appropriately
+    }
+}
+
+const addToFavorite = async (product) => {
+    const formData = new FormData();
+    formData.append('user_id', auth.user.id);
+    formData.append('product_id', product.id);
+
+    try {
+        await router.post('/user/favorites/store', formData, {
+            onSuccess: page => {
+                window.location.reload();
+            },
+        })
+    } catch (err) {
+        console.log(err)
+    }
+};
+
+const removeFromFavorite = async (product) => {
+    const formData = new FormData();
+    formData.append('user_id', auth.user.id);
+    formData.append('product_id', product.id);
+
+    try {
+        await router.post('/user/favorites/delete', formData, {
+            onSuccess: page => {
+                window.location.reload();
+            },
+        })
+    } catch (err) {
+        console.log(err)
+    }
+};
 
 
-
-onMounted(() => {
+onMounted(async () => {
+    isFavorite.value = await isUserInFavorites();
+    console.log(isFavorite.value)
     document.addEventListener("scroll", handleScroll);
 });
 
@@ -220,19 +273,44 @@ onUnmounted(() => {
                             </p>
                         </div>
                         <div class="mt-6 sm:gap-4 sm:items-center sm:flex sm:mt-8">
-                            <a href="#" title=""
-                                class="flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                            <a v-if="!auth.user" title=""
+                                class="disabled flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                                 role="button">
-                                <svg class="w-5 h-5 -ms-2 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                <svg class="w-5 h-5 -ms-2 me-2 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                     width="24" height="24" fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                         stroke-width="2"
                                         d="M12.01 6.001C6.5 1 1 8 5.782 13.001L12.011 20l6.23-7C23 8 17.5 1 12.01 6.002Z" />
                                 </svg>
-                                Add to favorites
+                                Додати до улюблених
                             </a>
-
-                            <a @click="addToCart(product)"
+                            <div v-else>
+                                <a v-if="isFavorite" title="" @click="removeFromFavorite(product)"
+                                    class="flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                                    role="button">
+                                    <svg class="w-5 h-5 -ms-2 me-2" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red"
+                                        viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M12.01 6.001C6.5 1 1 8 5.782 13.001L12.011 20l6.23-7C23 8 17.5 1 12.01 6.002Z" />
+                                    </svg>
+                                    Прибрати з улюблених
+                                </a>
+                                <a v-else title="" @click="addToFavorite(product)"
+                                    class="flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                                    role="button">
+                                    <svg class="w-5 h-5 -ms-2 me-2" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                        viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M12.01 6.001C6.5 1 1 8 5.782 13.001L12.011 20l6.23-7C23 8 17.5 1 12.01 6.002Z" />
+                                    </svg>
+                                    Додати до улюблених
+                                </a>
+                            </div>
+                            <a v-if="product.inStock" @click="addToCart(product)"
                                 class="flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                                 role="button">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -240,8 +318,31 @@ onUnmounted(() => {
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                                 </svg>
-                                Add to cart
+                                Купити
                             </a>
+                            <a v-if="!product.inStock"
+                                class="disabled flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                                role="button" data-popover-target="popover-out-of-stock">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                </svg>
+                                Немає в наявності
+                            </a>
+                            <div data-popover id="popover-out-of-stock" role="tooltip"
+                                class="absolute z-10 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800">
+                                <div
+                                    class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+                                    <h3 class="font-semibold text-gray-900 dark:text-white">
+                                        Повідомлення!</h3>
+                                </div>
+                                <div class="px-3 py-2">
+                                    <p>Якщо ви бажаєте замовити товар, якого немає в наявності, напишіть нам на
+                                        електронну пошту. Доставка в разі такого замовлення буде відбуватися довше.</p>
+                                </div>
+                                <div data-popper-arrow></div>
+                            </div>
                         </div>
 
                         <hr class="my-6 md:my-8 border-gray-200 dark:border-gray-800" />
@@ -302,14 +403,18 @@ onUnmounted(() => {
                                         <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0"></dd>
                                         <dt class="text-sm/6 font-medium text-gray-900">
 
-                                            <div v-if="product.diamond_layer_height" class="text-sm/6 font-medium text-gray-600">Висота </div>
-                                            <div v-if="product.diamond_layer_width" class="text-sm/6 font-medium text-gray-600">Ширина </div>
+                                            <div v-if="product.diamond_layer_height"
+                                                class="text-sm/6 font-medium text-gray-600">Висота </div>
+                                            <div v-if="product.diamond_layer_width"
+                                                class="text-sm/6 font-medium text-gray-600">Ширина </div>
 
                                         </dt>
                                         <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                                             <div> </div>
-                                            <div v-if="product.diamond_layer_height">{{ product.diamond_layer_height }}мм</div>
-                                            <div v-if="product.diamond_layer_width">{{ product.diamond_layer_width }}мм</div>
+                                            <div v-if="product.diamond_layer_height">{{ product.diamond_layer_height
+                                                }}мм</div>
+                                            <div v-if="product.diamond_layer_width">{{ product.diamond_layer_width }}мм
+                                            </div>
                                         </dd>
                                     </div>
                                     <div v-if="product.end_type"
@@ -328,8 +433,10 @@ onUnmounted(() => {
                                         <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0"></dd>
                                         <dt class="text-sm/6 font-medium text-gray-900">
 
-                                            <div v-if="product.drill_diameter" class="text-sm/6 font-medium text-gray-600">Діаметр </div>
-                                            <div v-if="product.length" class="text-sm/6 font-medium text-gray-600">Довжина </div>
+                                            <div v-if="product.drill_diameter"
+                                                class="text-sm/6 font-medium text-gray-600">Діаметр </div>
+                                            <div v-if="product.length" class="text-sm/6 font-medium text-gray-600">
+                                                Довжина </div>
 
                                         </dt>
                                         <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
@@ -345,7 +452,7 @@ onUnmounted(() => {
                                         <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                                             {{ product.number_of_segments }}шт</dd>
                                     </div>
-                                    
+
 
 
                                     <div class="px-4 py-6">
@@ -358,7 +465,7 @@ onUnmounted(() => {
                                             <div
                                                 class="py-2 px-4 mb-4 mt-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
                                                 <label for="comment" class="sr-only">Your comment</label>
-                                                <textarea id="comment" rows="6" v-model="inputText"
+                                                <textarea v-model="comment" rows="6"
                                                     class="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
                                                     placeholder="Напишіть ваш коментар..." required></textarea>
                                             </div>

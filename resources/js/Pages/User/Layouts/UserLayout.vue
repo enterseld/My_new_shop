@@ -16,17 +16,18 @@ onMounted(() => {
     <!--End-->
 
     <!--Main content-->
-    <div class="min-h-screen overflow-hidden" style="
+    <div class="overflow-hidden" style="
     background-image: url('/product_images/Construction2.png');
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
     background-repeat: no-repeat;">
     <slot />
-    </div>
+    
     <!--End-->
 
     <!--Footer-->
-    <Footer></Footer>
+    <Footer class="mx-auto max-w-screen-lg px-4 pt-16 sm:px-6 sm:pt-24 lg:max-w-screen-2xl lg:px-8"></Footer>
     <!--End-->
+    </div>
 </template>

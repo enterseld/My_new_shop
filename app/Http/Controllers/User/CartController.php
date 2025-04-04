@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CartResource;
 use App\Models\CartItem;
 use App\Models\Product;
-use App\Models\UserAddress;
+use App\Models\UserAdress;
 use App\Providers\NovaPostService as ServicesNovaPostService;
 
 use Illuminate\Http\Request;
@@ -29,7 +29,7 @@ class CartController extends Controller
 
         if ($user) {
             $cartItems = CartItem::where('user_id', $user->id)->get();
-            $userAdress = UserAddress::where('user_id', $user->id)->where('isMain', 1)->first();
+            $userAdress = UserAdress::where('user_id', $user->id)->where('isMain', 1)->first();
 
             if ($cartItems->count() > 0) {
 

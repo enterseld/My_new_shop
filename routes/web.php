@@ -4,13 +4,19 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminCommentsController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminRepliesController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\User\AdressesController;
 use App\Http\Controllers\User\CartController;
 use App\Http\Controllers\User\CommentsController;
+use App\Http\Controllers\User\FavoriteProductsController;
+use App\Http\Controllers\User\OrdersController;
 use App\Http\Controllers\User\ProductListController;
 use App\Http\Controllers\User\ReplyController;
 use App\Http\Controllers\User\UserController;
+use App\Models\FavoriteProducts;
 use Inertia\Inertia;
 
 
@@ -38,6 +44,10 @@ Route::prefix('cart')->controller(CartController::class)->group(function (){
 //end
 
 Route::post('/comment/store', [CommentsController::class, 'store'])->name('comments.store');
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/comments', [AdminCommentsController::class, 'index'])->name('admin.comments.index');
+    Route::patch('/comments/update/{id}', [AdminCommentsController::class, 'update'])->name('admin.comments.update');
+});
 Route::post('/reply/store', [ReplyController::class, 'store'])->name('reply.store');
 //admin
 
@@ -64,8 +74,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 Route::prefix('products')->controller(ProductListController::class)->group(function () {
     Route::get('/','index')->name('products.index');
     Route::get('/{id}','showAndIndex')->name('product.show');
+    Route::get('/category/{category}', 'indexByCategory')->name('productByCategory.index');
 });
-
 //end
 
 //routes for nova poshta
@@ -73,4 +83,10 @@ Route::get('/warehouses', [CartController::class, 'getWarehouses']);
 Route::get('/getCities/{findBy}', [CartController::class, 'getCities']);
 Route::get('/getWarehouses/{City}/{findBy}', [CartController::class, 'getWarehouses']);
 //end
+Route::post('/orders/store', [OrdersController::class, 'store']);
+Route::post('/adresses/store', [AdressesController::class, 'store']);
+
+Route::get('/user/{id}/favorites', [FavoriteProductsController::class, 'index']);
+Route::post('/user/favorites/store', [FavoriteProductsController::class, 'store']);
+Route::post('/user/favorites/delete', [FavoriteProductsController::class, 'delete']);
 require __DIR__.'/auth.php';
