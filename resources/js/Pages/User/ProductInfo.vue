@@ -38,7 +38,7 @@ let commentText = ref("");
 const starsContainer = ref(null);
 
 const sendComment = async (commentText, rating, product) => {
-    console.log(comment.value);
+
     const formData = new FormData();
     formData.append('comment', comment.value);
     formData.append('rating', rating);
@@ -134,14 +134,15 @@ const toggleVisibility = (event) => {
     }
 };
 
-if(usePage().props.auth.user){
-    const user_id = usePage().props.auth.user.id;
-}
+let user_id = ref();
+
 const isFavorite = ref(false);
-console.log(isFavorite.value)
+
 
 const isUserInFavorites = async () => {
+
     if(usePage().props.auth.user)
+    user_id = usePage().props.auth.user.id;
     try {
         const response = await axios.get(`/user/${user_id}/favorites`);
         const favorites = response.data.favorites;
@@ -189,7 +190,6 @@ const removeFromFavorite = async (product) => {
 
 onMounted(async () => {
     isFavorite.value = await isUserInFavorites();
-    console.log(isFavorite.value)
     document.addEventListener("scroll", handleScroll);
 });
 
