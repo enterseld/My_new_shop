@@ -1,7 +1,41 @@
+<script setup>
+
+import { Link, router, useForm, usePage } from '@inertiajs/vue3';
+import Carousel from './Carousel.vue';
+import { ref } from 'vue';
+const filterPrices = useForm({
+    prices: [0, 100000]
+})
+const selectedBrands = ref([])
+const selectedCategories = ref([])
+const selectedDiameters = ref([])
+const selectedFitDiameters = ref([])
+
+function showCategory(page = 1, categoryId) {
+    if (categoryId) {
+        selectedCategories.value.push(categoryId)
+    }
+    router.get(route('productByCategory.index', { category: categoryId }), {
+        brands: selectedBrands.value,
+        categories: selectedCategories.value,
+        product_diameters: selectedDiameters.value,
+        product_fit_diameters: selectedFitDiameters.value,
+        prices: {
+            from: filterPrices.prices[0],
+            to: filterPrices.prices[1]
+        },
+        page
+    },
+
+        {
+            preserveState: true,
+            replace: true
+        });
+}
+
+</script>
+
 <template>
-
-    
-
 <footer class="bg-white dark:bg-gray-900"><hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">
       <div class="mx-auto grid grid-cols-2 gap-8 px-4 py-6 lg:py-8 md:grid-cols-4">
         
@@ -50,17 +84,17 @@
         <div>
             <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Каталог</h2>
             <ul class="text-gray-500 dark:text-gray-400 font-medium">
-                <li class="mb-4">
-                    <a href="#" class="hover:underline">Алмазні диски</a>
+                <li class="mb-4" >
+                    <button class="hover:underline" @click="showCategory(page = 1, 2)">Алмазні диски</button>
                 </li>
                 <li class="mb-4">
-                    <a href="#" class="hover:underline">Свердла</a>
+                    <button class="hover:underline" @click="showCategory(page = 1, 21)">Свердла</button>
                 </li>
                 <li class="mb-4">
-                    <a href="#" class="hover:underline">Фрези</a>
+                    <button class="hover:underline" @click="showCategory(page = 1, 41)">Фрези</button>
                 </li>
                 <li class="mb-4">
-                    <a href="#" class="hover:underline">Комплектуючі</a>
+                    <button class="hover:underline" @click="showCategory(page = 1, 102)">Комплектуючі</button>
                 </li>
             </ul>
         </div>
