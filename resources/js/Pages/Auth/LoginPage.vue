@@ -12,7 +12,6 @@ import { computed } from 'vue';
 const canLogin = usePage().props.canLogin;
 const canRegister = usePage().props.canRegister;
 const auth = usePage().props.auth;
-const allProducts = usePage().props.allProducts;
 const cart = computed(() => usePage().props.cart);
 
 defineProps({

@@ -1,6 +1,6 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import {
     Combobox,
     ComboboxInput,
@@ -11,11 +11,24 @@ import {
 
 const canLogin = usePage().props.canLogin;
 const auth = usePage().props.auth;
-const allProducts = usePage().props.allProducts;
+let allProducts = ref([]);
 const cart = computed(() => usePage().props.cart);
 
 let selected = ref(allProducts[0])
 let query = ref('')
+
+const loadAllProducts = () => {
+    axios
+        .get('/products/all_products')
+        .then((response) => {
+            // Map the response data to match the Combobox items
+            allProducts = response.data.allProducts;
+
+        })
+        .catch((error) => {
+            console.error('Error loading products:', error);
+        });
+};
 
 let filteredProducts = computed(() =>
     query.value === ''
@@ -32,6 +45,10 @@ let filteredProducts = computed(() =>
             return titleMatches || vendorCodeMatches;
         })
 );
+
+onMounted(() => {
+    loadAllProducts();
+})
 
 </script>
 <template>
@@ -147,7 +164,7 @@ let filteredProducts = computed(() =>
                             class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Contact</a>
                     </li>
                     <li>
-                        <Combobox v-model="selected">
+                        <Combobox v-model="selected" @update:modelValue="onSelect">
                             <div class="relative mt-1">
 
                                 <div
@@ -167,8 +184,7 @@ let filteredProducts = computed(() =>
                                         <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                                     </ComboboxButton>
                                 </div>
-                                <TransitionRoot leave="transition ease-in duration-100" leaveFrom="opacity-100"
-                                    leaveTo="opacity-0" @after-leave="query = ''">
+
                                     <ComboboxOptions
                                         class="absolute mt-1 z-20 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
                                         <div v-if="filteredProducts.length === 0 && query !== ''"
@@ -179,28 +195,28 @@ let filteredProducts = computed(() =>
                                         <ComboboxButton v-for="person in filteredProducts.slice(0, 20)" :key="person.id"
                                             :value="person" v-slot="{ selected, active }">
                                             <Link :href="route('product.show', person.id)">
-                                                <li class="flex w-full shadow-inner m-1 overflow-hidden flex-col items-center relative cursor-default select-none p-2 border-2 mb-1 mr-2 rounded"
-                                                    :class="{
-                                                        'bg-teal-600 text-white': active,
-                                                        'text-gray-900': !active,
-                                                    }">
-                                                    <!-- Title: Ensure it takes full width -->
-                                                    <p class="mt-1 w-full" :class="{ 'font-medium': selected, 'font-normal': !selected }">
-                                                        {{ person.title }}
-                                                    </p>
-                                                    <!-- Image: Let the image scale without affecting the width -->
-                                                    <img v-if="person.product_images.length > 0" :src="person.product_images[0].image"
-                                                        class="w-16 md:w-32 max-w-full max-h-full" alt="Apple Watch">
-                                                                            </li>
-                                            </Link>
-                                        </ComboboxButton>
-                                    </ComboboxOptions>
-                                </TransitionRoot>
-                            </div>
-                        </Combobox>
+                    <li class="flex w-full shadow-inner m-1 overflow-hidden flex-col items-center relative cursor-default select-none p-2 border-2 mb-1 mr-2 rounded"
+                        :class="{
+                            'bg-teal-600 text-white': active,
+                            'text-gray-900': !active,
+                        }">
+                        <!-- Title: Ensure it takes full width -->
+                        <p class="mt-1 w-full" :class="{ 'font-medium': selected, 'font-normal': !selected }">
+                            {{ person.title }}
+                        </p>
+                        <!-- Image: Let the image scale without affecting the width -->
+                        <img v-if="person.product_images.length > 0" :src="person.product_images[0].image"
+                            class="w-16 md:w-32 max-w-full max-h-full" alt="Apple Watch">
                     </li>
-                </ul>
+                    </Link>
+                    </ComboboxButton>
+                    </ComboboxOptions>
+
             </div>
+            </Combobox>
+            </li>
+            </ul>
+        </div>
         </div>
 
 

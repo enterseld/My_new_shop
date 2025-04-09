@@ -18,7 +18,6 @@ class UserController extends Controller
     public function index()
     {
         $products = Product::with('brand', 'category', 'product_images')->orderBy('id')->limit(8)->get();
-        $allProducts = Product::with('product_images')->orderBy('id')->where('published', '!=', 0)->get();
         $favorites = '';
         if ($currentUser = Auth::user()) {
             $favorites = $currentUser->favorites;
@@ -40,7 +39,6 @@ class UserController extends Controller
 
         return Inertia::render('User/Index', [
             'products' => $products,
-            'allProducts' => $allProducts,
             'productsByCategory' => $productsByCategory,
             'canLogin' => app('router')->has('login'),
             'favorites' => $favorites,

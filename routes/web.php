@@ -73,8 +73,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 //routes for product list and filters
 Route::prefix('products')->controller(ProductListController::class)->group(function () {
     Route::get('/','index')->name('products.index');
+    Route::get('/all_products','indexAll')->name('allProducts.index');
     Route::get('/{id}','showAndIndex')->name('product.show');
     Route::get('/category/{category}', 'indexByCategory')->name('productByCategory.index');
+    
 });
 //end
 

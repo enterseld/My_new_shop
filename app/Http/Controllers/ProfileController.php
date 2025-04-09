@@ -19,11 +19,10 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {   
-        $allProducts = Product::with('product_images')->orderBy('id')->get();
+   
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
-            'allProducts' => $allProducts,
         ]);
     }
 
