@@ -147,9 +147,9 @@ onMounted(() => {
 
             </div>
 
-            <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-user">
-                <ul
-                    class="flex flex-col  font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+            <div class="flex-grow md:flex-grow-0 w-full md:w-auto items-center justify-between hidden md:flex md:order-1" id="navbar-user">
+  
+                <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
                     <li class="flex items-center">
                         <a href="#"
                             class="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500"
@@ -163,60 +163,59 @@ onMounted(() => {
                         <a href="#"
                             class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Contact</a>
                     </li>
-                    <li>
-                        <Combobox v-model="selected" @update:modelValue="onSelect">
+                    <li class="transition-all duration-300"
+                        :class="{ 'w-150': query.length > 0, 'w-100': query.length === 0 }">
+                        <Combobox>
                             <div class="relative mt-1">
-
                                 <div
-                                    class="relative pe-20 flex items-center w-full cursor-default overflow-hidden rounded-lg text-left border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
+                                    class="pe-20 relative flex items-center w-full cursor-default overflow-hidden rounded-lg text-left border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        stroke-width="1.5" stroke="currentColor" class="size-6 ml-2">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                                     </svg>
                                     <ComboboxInput
                                         class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
-                                        :displayValue="(person) => person.name" @change="query = $event.target.value"
+                                        @change="query = $event.target.value"
                                         placeholder="Пошук по сайту..." />
+                                    <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
 
-
-                                    <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2 z-20">
-                                        <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                                     </ComboboxButton>
                                 </div>
 
-                                    <ComboboxOptions
-                                        class="absolute mt-1 z-20 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
-                                        <div v-if="filteredProducts.length === 0 && query !== ''"
-                                            class="relative cursor-default select-none px-4 py-2 text-gray-700">
-                                            Nothing found.
+                                <ComboboxOptions
+                                    class="absolute mt-1 z-20 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                                    <div v-if="filteredProducts.length === 0 && query !== ''"
+                                        class="relative cursor-default select-none px-4 py-2 text-gray-700">
+                                        Nothing found.
+                                    </div>
+
+                                    <button v-for="product_search in filteredProducts.slice(0, 10)" :key="product_search.id"
+                                        :value="product_search" >
+                                        <Link :href="route('product.show', product_search.id)">
+                                        <div class="flex w-full shadow-inner m-1 overflow-hidden flex-col items-center relative cursor-default select-none p-2 border-2 mb-1 mr-2 rounded"
+                                            :class="{
+                                                'bg-teal-600 text-white': active,
+                                                'text-gray-900': !active,
+                                            }">
+                                            <!-- Title: Ensure it takes full width -->
+                                            <p class="mt-1 w-full"
+                                                :class="{ 'font-medium': selected, 'font-normal': !selected }">
+                                                {{ product_search.title }}
+                                            </p>
+                                            <!-- Image: Let the image scale without affecting the width -->
+                                            <img v-if="product_search.product_images.length > 0"
+                                                :src="product_search.product_images[0].image"
+                                                class="w-16 md:w-32 max-w-full max-h-full" alt="Apple Watch">
                                         </div>
-
-                                        <ComboboxButton v-for="person in filteredProducts.slice(0, 20)" :key="person.id"
-                                            :value="person" v-slot="{ selected, active }">
-                                            <Link :href="route('product.show', person.id)">
-                    <li class="flex w-full shadow-inner m-1 overflow-hidden flex-col items-center relative cursor-default select-none p-2 border-2 mb-1 mr-2 rounded"
-                        :class="{
-                            'bg-teal-600 text-white': active,
-                            'text-gray-900': !active,
-                        }">
-                        <!-- Title: Ensure it takes full width -->
-                        <p class="mt-1 w-full" :class="{ 'font-medium': selected, 'font-normal': !selected }">
-                            {{ person.title }}
-                        </p>
-                        <!-- Image: Let the image scale without affecting the width -->
-                        <img v-if="person.product_images.length > 0" :src="person.product_images[0].image"
-                            class="w-16 md:w-32 max-w-full max-h-full" alt="Apple Watch">
+                                        </Link>
+                                    </button>
+                                </ComboboxOptions>
+                            </div>
+                        </Combobox>
                     </li>
-                    </Link>
-                    </ComboboxButton>
-                    </ComboboxOptions>
-
+                </ul>
             </div>
-            </Combobox>
-            </li>
-            </ul>
-        </div>
         </div>
 
 
