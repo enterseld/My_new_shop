@@ -93,6 +93,26 @@ class Product extends Model
                 request('prices.from',0),
                 request('prices.to', 100000),
             ]);
+        })->when(request('sort_by'), function (Builder $q) {
+            switch (request('sort_by')) {
+                case 'Рейтинг':
+                    $q->orderBy('rating', 'desc'); // assuming you have 'rating' column
+                    break;
+                case 'Нові':
+                    $q->orderBy('id', 'desc'); // newest products first
+                    break;
+                case 'Низька ціна':
+                    $q->orderBy('price', 'asc');
+                    break;
+                case 'Висока ціна':
+                    $q->orderBy('price', 'desc');
+                    break;
+                default:
+                    // optional: set a default sorting
+                    $q->orderBy('id', 'asc');
+                    break;
+            }
+        
         });
         
     }
