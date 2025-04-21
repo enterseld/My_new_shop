@@ -28,12 +28,11 @@ class AdminCommentsController extends Controller
         if($request->type == "Comment"){
             $comment = ProductComments::findOrFail($id);
             $comment->published = 1;
-            
+            $comment->update();
 
             $rating = ProductComments::where("published", 1)->where("product_id", $request->product_id) ->sum("rating")/ProductComments::where("published", 1)->where("product_id", $request->product_id)->count("rating");
-
             ProductHelper::setRating($request, $request->product_id, $rating);
-            $comment->update();
+
             return redirect()->route('admin.comments.index')->with('success', 'Comment updated successfully.');
         }
         if($request->type == "Reply"){

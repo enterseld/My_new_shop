@@ -73,7 +73,7 @@ const addToCart = (product) => {
                     </p>
                     <span v-if="product.rating != '0'"
                         class="mr-2 ml-3 rounded bg-yellow-200 px-2.5 py-0.5 text-xs font-semibold">{{
-                            product.rating }}</span>
+                            Number.parseFloat(product.rating).toFixed(1) }}</span>
                 </div>
                 <a v-if="product.published != 0" @click="addToCart(product)"
                     class="flex items-center justify-center rounded-md bg-slate-900  text-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-blue-300">

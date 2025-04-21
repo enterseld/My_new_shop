@@ -86,7 +86,7 @@ const showProduct = (id) => {
                                 </p>
                                 <span v-if="product.rating != '0'"
                                     class="mr-2 ml-3 rounded bg-yellow-200 px-2.5 py-0.5 text-xs font-semibold">{{
-                                        product.rating }}</span>
+                                        Number.parseFloat(product.rating).toFixed(1) }}</span>
                             </div>
                             
 
