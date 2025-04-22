@@ -27,6 +27,7 @@ class ProductListController extends Controller
             'brands' => $brands,
             'productDiameters' => $productDiameters,
             'productFitDiameters' => $productFitDiameters,
+            'viewMode' => $productFitDiameters,
             'products' => ProductResource::collection($filterProducts),
             'pagination' => [
                 'current_page' => $filterProducts->currentPage(),

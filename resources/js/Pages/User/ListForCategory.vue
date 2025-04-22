@@ -15,12 +15,12 @@ import {
     TransitionChild,
     TransitionRoot,
 } from '@headlessui/vue'
-import { XMarkIcon } from '@heroicons/vue/24/outline'
+import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/vue/20/solid'
 import Products from '../User/Components/Products.vue';
 import SecondaryButtonVue from '@/Components/SecondaryButton.vue';
 import { useForm } from '@inertiajs/vue3';
-import { BAR_MAP } from 'element-plus';
+import Cookies from 'js-cookie';
 
 const sortOptions = ref([
     { name: 'Популярні', href: '#', current: false },
@@ -116,7 +116,25 @@ function updateFilteredProducts(page = 1) {
         });
 }
 
+const viewMode = ref('grid');
 
+// Read from cookie when page loads
+onMounted(() => {
+  const savedViewMode = Cookies.get('viewMode');
+  if (savedViewMode === 'grid' || savedViewMode === 'list') {
+    viewMode.value = savedViewMode;
+  }
+});
+
+// Save to cookie when viewMode changes
+watch(viewMode, (newMode) => {
+  Cookies.set('viewMode', newMode, { expires: 30 }); // expires in 30 days
+});
+
+// Toggle button
+const toggleViewMode = () => {
+  viewMode.value = viewMode.value === 'grid' ? 'list' : 'grid';
+};
 
 </script>
 
@@ -231,9 +249,11 @@ function updateFilteredProducts(page = 1) {
                         </Menu>
 
 
-                        <button type="button" class="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7">
-                            <span class="sr-only">View grid</span>
-                            <Squares2X2Icon class="size-5" aria-hidden="true" />
+                        <button type="button" @click="toggleViewMode"
+                            class="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7">
+                            <span class="sr-only">Toggle view</span>
+                            <Squares2X2Icon v-show="viewMode === 'grid'" class="size-5" aria-hidden="true" />
+                            <Bars3Icon v-show="viewMode === 'list'" class="size-5" aria-hidden="true" />
                         </button>
                         <button type="button" class="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden"
                             @click="mobileFiltersOpen = true">
@@ -369,7 +389,7 @@ function updateFilteredProducts(page = 1) {
 
                         <!-- Product grid -->
                         <div class="lg:col-span-3">
-                            <Products :products="products.data"></Products>
+                            <Products :products="products.data" :viewMode="viewMode"></Products>
                         </div>
                     </div>
 
