@@ -8,6 +8,7 @@ use App\Models\ChatSession;
 use App\Models\Message;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use App\Events\NewChatMessage;
 
 class ChatController extends Controller
 {
@@ -47,6 +48,8 @@ class ChatController extends Controller
             'message_text' => $request->message_text,
         ]);
 
+        event(new NewChatMessage($message));
+
         return response()->json($message);
     }
 
@@ -54,8 +57,8 @@ class ChatController extends Controller
     public function getMessages(Request $request, $sessionId)
     {
         $messages = Message::where('chat_session_id', $sessionId)
-                    ->orderBy('created_at')
-                    ->get();
+            ->orderBy('created_at')
+            ->get();
 
         return response()->json($messages);
     }

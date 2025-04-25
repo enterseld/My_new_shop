@@ -6,6 +6,7 @@ import Products from './Components/Products.vue';
 import { onMounted, ref } from 'vue';
 import Favorites from './Components/Favorites.vue';
 import ProductsScroll from './Components/ProductsScroll.vue';
+import ChatWidget from './Components/ChatWidget.vue';
 
 defineProps({
     products: Array,
@@ -40,7 +41,9 @@ const productsByCategory = usePage().props.productsByCategory;
 
             </div>
         </div>
-
+        <ChatWidget>
+            
+        </ChatWidget>
     </UserLayout>
 
 </template>

@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\AdminRepliesController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\User\AdressesController;
 use App\Http\Controllers\User\CartController;
+use App\Http\Controllers\User\ChatController;
 use App\Http\Controllers\User\CommentsController;
 use App\Http\Controllers\User\FavoriteProductsController;
 use App\Http\Controllers\User\OrdersController;
@@ -91,4 +92,30 @@ Route::post('/adresses/store', [AdressesController::class, 'store']);
 Route::get('/user/{id}/favorites', [FavoriteProductsController::class, 'index']);
 Route::post('/user/favorites/store', [FavoriteProductsController::class, 'store']);
 Route::post('/user/favorites/delete', [FavoriteProductsController::class, 'delete']);
+
+Route::middleware('auth')->group(function () {
+    // Старт сесії чату для автентифікованих користувачів
+    Route::post('/chat/start', [ChatController::class, 'startSession'])->name('chat.start');
+    
+    // Надіслати повідомлення в чат
+    Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+    
+    // Отримати повідомлення для конкретної сесії
+    Route::get('/chat/messages/{sessionId}', [ChatController::class, 'getMessages'])->name('chat.messages');
+});
+
+// Для гостей (якщо не автентифіковано)
+Route::middleware('guest')->group(function () {
+    // Старт сесії чату для гостей
+    Route::post('/chat/start', [ChatController::class, 'startSession'])->name('chat.start.guest');
+    
+    // Надіслати повідомлення в чат
+    Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send.guest');
+    
+    // Отримати повідомлення для конкретної сесії
+    Route::get('/chat/messages/{sessionId}', [ChatController::class, 'getMessages'])->name('chat.messages.guest');
+});
+
+
+
 require __DIR__.'/auth.php';
