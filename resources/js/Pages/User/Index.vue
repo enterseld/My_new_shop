@@ -2,8 +2,6 @@
 import UserLayout from './Layouts/UserLayout.vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import Hero from './Layouts/Hero.vue';
-import Products from './Components/Products.vue';
-import { onMounted, ref } from 'vue';
 import Favorites from './Components/Favorites.vue';
 import ProductsScroll from './Components/ProductsScroll.vue';
 
@@ -14,12 +12,21 @@ defineProps({
 
 const auth = usePage().props.auth;
 const productsByCategory = usePage().props.productsByCategory;
+
+const search = (product, quantity) =>
+    router.post(route('search', vector = "123"), {
+        quantity,
+        preserveState: true,
+        replace: true
+    })
+
 </script>
 
 <template>
     <UserLayout>
-        
-    
+
+
+                
         <!--Hero section-->
         <Hero :productsByCategory = "productsByCategory"></Hero>
 

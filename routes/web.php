@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminCommentsController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminRepliesController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\PineconeSearchController;
 use App\Http\Controllers\User\AdressesController;
 use App\Http\Controllers\User\CartController;
 use App\Http\Controllers\User\CommentsController;
@@ -91,4 +92,10 @@ Route::post('/adresses/store', [AdressesController::class, 'store']);
 Route::get('/user/{id}/favorites', [FavoriteProductsController::class, 'index']);
 Route::post('/user/favorites/store', [FavoriteProductsController::class, 'store']);
 Route::post('/user/favorites/delete', [FavoriteProductsController::class, 'delete']);
+
+//routes for pinecone
+Route::post('/search', [PineconeSearchController::class, 'search']);
+//end
+
+
 require __DIR__.'/auth.php';

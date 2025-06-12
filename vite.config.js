@@ -20,10 +20,15 @@ export default defineConfig({
     ],
 
     server: {
-      host: '0.0.0.0',  // container listens on all interfaces
+      host: '0.0.0.0',
       port: 5173,
+      watch: {
+            usePolling: true,     
+            interval: 100,       
+        },
       hmr: {
-        host: 'localhost',  // client connects to localhost (adjust if needed)
+        host: 'localhost',      
+            port: 5173,
       },
     },
 });
