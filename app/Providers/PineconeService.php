@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Providers;
 
 use Illuminate\Support\Facades\Http;
 
@@ -19,7 +19,7 @@ class PineconeService
 
     public function query(array $vector, int $topK = 2)
     {
-        $url = "https://{$this->indexName}-{$this->region}.svc.pinecone.io/query";
+        $url = "https://test-chat-ree2g3y.svc.aped-4627-b74a.pinecone.io/query";
 
         $response = Http::withHeaders([
             'Api-Key' => $this->apiKey,
