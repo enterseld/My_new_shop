@@ -4,6 +4,9 @@ import { Link, router, usePage } from '@inertiajs/vue3';
 import Hero from './Layouts/Hero.vue';
 import Favorites from './Components/Favorites.vue';
 import ProductsScroll from './Components/ProductsScroll.vue';
+import { ref } from 'vue'
+import { pipeline, env } from '@xenova/transformers'
+
 
 defineProps({
     products: Array,
@@ -13,12 +16,30 @@ defineProps({
 const auth = usePage().props.auth;
 const productsByCategory = usePage().props.productsByCategory;
 
-const search = (product, quantity) =>
-    router.post(route('search', vector = "123"), {
-        quantity,
-        preserveState: true,
-        replace: true
-    })
+env.allowRemoteModels = true
+env.allowLocalModels = false
+
+const inputText = ref('')
+const embedding = ref([])
+const loading = ref(false)
+const response = ref('')
+const embedText = async () => {
+  loading.value = true
+  try {
+    const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2')
+    const output = await extractor(inputText.value, { pooling: 'mean', normalize: true })
+    const vector = embedding.value
+    response.value = await axios.post('/search', {
+            vector,
+        })
+  } catch (error) {
+    console.error('Error computing embedding:', error)
+  } finally {
+    loading.value = false
+    console.log(response)
+  }
+}
+
 
 </script>
 
@@ -26,9 +47,9 @@ const search = (product, quantity) =>
     <UserLayout>
 
 
-                
+
         <!--Hero section-->
-        <Hero :productsByCategory = "productsByCategory"></Hero>
+        <Hero :productsByCategory="productsByCategory"></Hero>
 
         <!--End-->
         <div class="bg-white mx-auto max-w-fit py-16 sm:py-24 lg:max-w-screen-2xl lg:px-8">
@@ -36,16 +57,27 @@ const search = (product, quantity) =>
                 <h2 class="text-2xl font-bold tracking-tight text-gray-900">Новинки</h2>
 
                 <ProductsScroll :products="products"></ProductsScroll>
-                <h2 v-if = "favorites" class="text-2xl font-bold tracking-tight text-gray-900 mt-10">Вподобані товари</h2>
+                <h2 v-if="favorites" class="text-2xl font-bold tracking-tight text-gray-900 mt-10">Вподобані товари</h2>
                 <Favorites v-if="auth.user" :favorites="favorites"></Favorites>
                 <div class="flex justify-center mt-5">
                     <Link :href="route('products.index')" type="button"
                         class="text-gray-900 bg-gradient-to-r from-teal-200 to-lime-200 hover:bg-gradient-to-l hover:from-teal-200 hover:to-lime-200 focus:ring-4 focus:outline-none focus:ring-lime-200 dark:focus:ring-teal-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
                     All Products</Link>
                 </div>
-
-
             </div>
+        </div>
+
+
+        <div class="p-4 max-w-md mx-auto">
+            <input v-model="inputText" placeholder="Enter text" class="w-full p-2 border rounded" />
+            <button @click="embedText" :disabled="loading || !inputText"
+                class="mt-2 w-full bg-blue-600 text-white py-2 rounded">
+                {{ loading ? 'Embedding...' : 'Get Embedding' }}
+            </button>
+
+            <pre v-if="embedding.length" class="mt-4 text-xs whitespace-pre-wrap">
+      {{ embedding }}
+    </pre>
         </div>
 
     </UserLayout>
