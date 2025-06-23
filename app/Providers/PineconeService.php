@@ -17,7 +17,7 @@ class PineconeService
         $this->region = env('PINECONE_REGION', 'us-east-1');
     }
 
-    public function query(array $vector, int $topK = 2)
+    public function query(array $vector, int $topK = 5)
     {
         $url = "https://test-chat-ree2g3y.svc.aped-4627-b74a.pinecone.io/query";
 

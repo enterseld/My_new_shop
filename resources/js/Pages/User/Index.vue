@@ -23,12 +23,15 @@ const inputText = ref('')
 const embedding = ref([])
 const loading = ref(false)
 const response = ref('')
+
+
 const embedText = async () => {
   loading.value = true
   try {
     const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2')
-    const output = await extractor(inputText.value, { pooling: 'mean', normalize: true })
-    const vector = embedding.value
+    const result = await extractor(inputText.value, { pooling: 'mean', normalize: true })
+    let vector = result.data
+    console.log(vector)
     response.value = await axios.post('/search', {
             vector,
         })
@@ -36,7 +39,7 @@ const embedText = async () => {
     console.error('Error computing embedding:', error)
   } finally {
     loading.value = false
-    console.log(response)
+    console.log(response.value.data.matches)
   }
 }
 
