@@ -22,7 +22,7 @@ class ChatController extends Controller
             'model' => 'mistralai/mistral-7b-instruct:free',
             'messages' => $messages,
             'max_tokens' => 1024,
-            'temperature' => 0.7,
+            'temperature' => 0.7, # creativity
         ]);
 
         if ($response->failed()) {

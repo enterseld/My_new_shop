@@ -23,25 +23,57 @@ const inputText = ref('')
 const embedding = ref([])
 const loading = ref(false)
 const response = ref('')
+const reply = ref('')
 
+const messages = ref([
+    {
+        role: 'system',
+        content: `Ти — україномовний консультант магазину алмазного інструменту. Відповідай чітко, ввічливо та лише українською. Якщо користувач запитує про товар — допоможи обрати найкращий варіант з наданих. Якщо запит про доставку, оплату, повернення — відповідай відповідно до політики магазину.`,
+    }
+])
 
 const embedText = async () => {
-  loading.value = true
-  try {
-    const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2')
-    const result = await extractor(inputText.value, { pooling: 'mean', normalize: true })
-    let vector = result.data
-    console.log(vector)
-    response.value = await axios.post('/search', {
-            vector,
+    loading.value = true
+    try {
+        const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2')
+        const result = await extractor(inputText.value, { pooling: 'mean', normalize: true })
+        const vector = result.data
+        console.log(vector)
+        response.value = await axios.post('/search', { vector, })
+        const matches = response.value.data.matches || []
+        const productList = matches.map((match, i) =>
+            `${i + 1}. ${match.metadata.text}`
+        ).join('\n')
+
+        messages.value.push({
+            role: 'system',
+            content: `Ось список релевантних товарів на основі запиту користувача:\n${productList}`,
         })
-  } catch (error) {
-    console.error('Error computing embedding:', error)
-  } finally {
-    loading.value = false
-    console.log(response.value.data.matches)
-  }
+
+        messages.value.push({
+            role: 'user',
+            content: `Який із цих товарів найкраще підійде для мого запиту: "${inputText.value}"? Поясни чому.`,
+        })
+
+        const res = await axios.post('/ask', {
+            messages: messages.value,
+        })
+        console.log(res)
+        const assistantReply = res.data.reply
+        console.log(assistantReply)
+        messages.value.push({ role: 'assistant', content: assistantReply })
+        reply.value = assistantReply
+
+    } catch (error) {
+        console.error('Помилка embedding, пошуку або відповіді:', error)
+        reply.value = 'Вибач, щось пішло не так. Спробуй ще раз.'
+    } finally {
+        loading.value = false
+        console.log(response.value.data.matches)
+    }
 }
+
+
 
 
 </script>

@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\PineconeSearchController;
 use App\Http\Controllers\User\AdressesController;
 use App\Http\Controllers\User\CartController;
+use App\Http\Controllers\User\ChatController;
 use App\Http\Controllers\User\CommentsController;
 use App\Http\Controllers\User\FavoriteProductsController;
 use App\Http\Controllers\User\OrdersController;
@@ -97,5 +98,8 @@ Route::post('/user/favorites/delete', [FavoriteProductsController::class, 'delet
 Route::post('/search', [PineconeSearchController::class, 'search']);
 //end
 
+//routes for openrouter
+Route::post('/ask', [ChatController::class, 'ask']);
+//end
 
 require __DIR__.'/auth.php';
