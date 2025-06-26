@@ -19,10 +19,10 @@ class ChatController extends Controller
             'Authorization' => 'Bearer ' . env('OPENROUTER_API_KEY'),
             'Content-Type' => 'application/json',
         ])->post('https://openrouter.ai/api/v1/chat/completions', [
-            'model' => 'mistralai/mistral-7b-instruct:free',
+            'model' => 'mistralai/mistral-small-3.2-24b-instruct:free',
             'messages' => $messages,
             'max_tokens' => 1024,
-            'temperature' => 0.7, # creativity
+            'temperature' => 0.4, # creativity
         ]);
 
         if ($response->failed()) {
