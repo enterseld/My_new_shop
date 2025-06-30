@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class ChatSessions extends Model
+{
+    protected $fillable = ['user_id', 'quantity', 'product_id'];
+
+    use HasFactory;
+
+    public function chatMessages()
+    {
+        return $this->hasMany(ChatMessages::class);
+    }
+
+}

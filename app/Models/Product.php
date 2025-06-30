@@ -96,7 +96,7 @@ class Product extends Model
         })->when(request('sort_by'), function (Builder $q) {
             switch (request('sort_by')) {
                 case 'Рейтинг':
-                    $q->orderBy('rating', 'desc'); // assuming you have 'rating' column
+                    $q->orderBy('rating', 'desc');
                     break;
                 case 'Нові':
                     $q->orderBy('id', 'desc'); // newest products first
