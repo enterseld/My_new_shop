@@ -4,6 +4,7 @@ import { initFlowbite } from 'flowbite';
 import Header from './Header.vue';
 import Footer from './Footer.vue';
 import Hero from './Hero.vue';
+import ChatPopup from './ChatPopup.vue';
 onMounted(() => {
     initFlowbite();
 })
@@ -30,4 +31,6 @@ onMounted(() => {
     <Footer class="mx-auto max-w-screen-lg px-4 pt-16 sm:px-6 sm:pt-24 lg:max-w-screen-2xl lg:px-8"></Footer>
     <!--End-->
     </div>
+
+    <ChatPopup></ChatPopup>
 </template>
