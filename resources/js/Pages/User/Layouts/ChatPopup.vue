@@ -1,8 +1,20 @@
 <script setup>
 import { ref } from 'vue'
+import axios from 'axios'
 
 const isOpen = ref(false)
 const message = ref('')
+
+const initSession = async () => {
+    try {
+        const response = await axios.post('/initSession')
+        console.log('Session started:', response.data)
+    } catch (error) {
+        console.error('Failed to start session:', error)
+    }
+    isOpen.value = !isOpen.value
+
+}
 
 function toggleChat() {
     isOpen.value = !isOpen.value
@@ -18,7 +30,7 @@ function sendMessage() {
 </script>
 
 <template>
-    <button @click="toggleChat"
+    <button @click="initSession"
         class="fixed bottom-10 right-10 z-50 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition">
         💬
     </button>

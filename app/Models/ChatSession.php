@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ChatSessions extends Model
+class ChatSession extends Model
 {
     protected $fillable = ['user_id', 'quantity', 'product_id'];
 

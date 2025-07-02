@@ -12,6 +12,7 @@ use App\Http\Controllers\PineconeSearchController;
 use App\Http\Controllers\User\AdressesController;
 use App\Http\Controllers\User\CartController;
 use App\Http\Controllers\User\ChatController;
+use App\Http\Controllers\User\ChatSessionsController;
 use App\Http\Controllers\User\CommentsController;
 use App\Http\Controllers\User\FavoriteProductsController;
 use App\Http\Controllers\User\OrdersController;
@@ -93,6 +94,11 @@ Route::post('/adresses/store', [AdressesController::class, 'store']);
 Route::get('/user/{id}/favorites', [FavoriteProductsController::class, 'index']);
 Route::post('/user/favorites/store', [FavoriteProductsController::class, 'store']);
 Route::post('/user/favorites/delete', [FavoriteProductsController::class, 'delete']);
+
+//routes for chat
+Route::post('/initSession', [ChatSessionsController::class, 'initSession']);
+
+//end
 
 //routes for pinecone
 Route::post('/search', [PineconeSearchController::class, 'search']);
