@@ -13,8 +13,8 @@ class ChatMessages extends Model
     
     
 
-    public function chatSessions()
+    public function chatSession()
     {
-        return $this->belongsTo(ChatSessions::class);
+        return $this->belongsTo(ChatSession::class);
     }
 }

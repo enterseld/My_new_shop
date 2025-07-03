@@ -4,7 +4,7 @@ import axios from 'axios'
 
 const isOpen = ref(false)
 const message = ref('')
-
+const session = ref('')
 const initSession = async () => {
     try {
         const response = await axios.post('/initSession')

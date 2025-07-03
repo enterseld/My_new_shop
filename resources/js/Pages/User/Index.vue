@@ -39,7 +39,7 @@ const embedText = async () => {
         const result = await extractor(inputText.value, { pooling: 'mean', normalize: true })
         const vector = result.data
         console.log(vector)
-        response.value = await axios.post('/search', { vector, })
+        response.value = await axios.post('/search', { vector })
         const matches = response.value.data.matches || []
         const productList = matches.map((match, i) =>
             `${i + 1}. ${match.metadata.text}`
@@ -50,14 +50,16 @@ const embedText = async () => {
             content: `Мені потрібно обрати ${inputText.value}. Ось список релевантних товарів:\n${productList} Який краще обрати(обери тільки один)? Поясни чому.`,
         })
 
-        console.log(messages)
+        console.log(messages.value)
 
         const res = await axios.post('/ask', {
             messages: messages.value,
+            session_id: '1',
+            last_message: inputText.value
         })
         console.log(res)
         const assistantReply = res.data.reply
-        console.log(assistantReply)
+        console.log('assistantReply:', assistantReply)
         messages.value.push({ role: 'assistant', content: assistantReply })
         reply.value = assistantReply
 

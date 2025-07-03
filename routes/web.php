@@ -106,6 +106,7 @@ Route::post('/search', [PineconeSearchController::class, 'search']);
 
 //routes for openrouter
 Route::post('/ask', [ChatController::class, 'ask']);
+Route::post('/ask/product', [ChatController::class, 'ask']);
 //end
 
 require __DIR__.'/auth.php';
