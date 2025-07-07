@@ -1,14 +1,25 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
-
+import { pipeline, env } from '@xenova/transformers'
 const isOpen = ref(false)
-const message = ref('')
 const session = ref('')
+const inputText = ref('')
+const embedding = ref([])
+const loading = ref(false)
+const response = ref(null)
+const reply = ref('')
+const chatMessages = ref([])
+
+
+env.allowRemoteModels = true
+env.allowLocalModels = false
+
 const initSession = async () => {
     try {
         const response = await axios.post('/initSession')
         console.log('Session started:', response.data)
+        session.value = response.data.session_id
     } catch (error) {
         console.error('Failed to start session:', error)
     }
@@ -16,17 +27,67 @@ const initSession = async () => {
 
 }
 
+const messagesConsult = ref([
+    {
+        role: 'system',
+        content: `Ти — україномовний консультант магазину алмазного інструменту. Відповідай чітко, ввічливо та лише українською. Якщо користувач запитує про товар — допоможи обрати найкращий варіант з наданих, але обирай тільки товари, які надані, не придумуй інші. Якщо запит про доставку, оплату, повернення — відповідай відповідно до політики магазину.`,
+    }
+])
+
+const normalQuestion = async () => {
+    loading.value = true
+    try {
+        if (!response.value) {
+            const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2')
+            const result = await extractor(inputText.value, { pooling: 'mean', normalize: true })
+            const vector = result.data
+            console.log(vector)
+
+            response.value = await axios.post('/search', { vector })
+            const matches = response.value.data.matches || []
+            const productList = matches.map((match, i) =>
+                `${i + 1}. ${match.metadata.text}`
+            ).join('\n')
+
+            messagesConsult.value.push({
+                role: 'user',
+                content: `Мені потрібно обрати ${inputText.value}. Ось список релевантних товарів:\n${productList} Який краще обрати(обери тільки один)? Поясни чому.`,
+            })
+        } else {
+            messagesConsult.value.push({
+                role: 'user',
+                content: `Ось наступне питання ${inputText.value}. Ось список релевантних товарів:\n${productList} Який краще обрати(обери тільки один)? Поясни чому.`,
+            })
+        }
+        chatMessages.value.push({ role: 'user', content: inputText.value })
+        console.log(messagesConsult.value)
+
+        const res = await axios.post('/ask', {
+            messages: messagesConsult.value,
+            session_id: '1',
+            last_message: inputText.value
+        })
+        console.log(res)
+        const assistantReply = res.data.reply
+        console.log('assistantReply:', assistantReply)
+        reply.value = assistantReply
+        chatMessages.value.push({ role: 'assistant', content: assistantReply })
+    } catch (error) {
+        console.error('Помилка embedding, пошуку або відповіді:', error)
+        reply.value = 'Вибач, щось пішло не так. Спробуй ще раз.'
+    } finally {
+        loading.value = false
+        console.log(response.value.data.matches)
+    }
+}
+
+
+
+
 function toggleChat() {
     isOpen.value = !isOpen.value
 }
 
-function sendMessage() {
-    if (message.value.trim() !== '') {
-        // You can emit, store, or send the message
-        console.log('User message:', message.value)
-        message.value = ''
-    }
-}
 </script>
 
 <template>
@@ -44,16 +105,26 @@ function sendMessage() {
         </div>
 
         <!-- Messages Area -->
+        <!-- Messages Area -->
         <div class="p-4 flex-1 overflow-y-auto max-h-60 text-sm text-gray-700">
-            <p class="mb-2">👋 Hi! How can I help you?</p>
-            <!-- Add dynamic messages here -->
+            <p class="mb-2">👋 Вітаю! Чим можу допомогти?</p>
+            <div v-for="(msg, index) in chatMessages" :key="index" class="mb-2">
+                <p v-if="msg.role === 'user'"
+                    class="text-right bg-gray-200 rounded-lg p-2 inline-block ml-auto max-w-[90%]">
+                    {{ msg.content }}
+                </p>
+                <p v-else-if="msg.role === 'assistant'"
+                    class="text-left bg-blue-100 rounded-lg p-2 inline-block mr-auto max-w-[90%]">
+                    {{ msg.content }}
+                </p>
+            </div>
         </div>
 
         <!-- Input Area -->
         <div class="p-2 border-t border-gray-200 flex">
-            <input v-model="message" @keyup.enter="sendMessage" type="text" placeholder="Type a message..."
+            <input v-model="inputText" @keyup.enter="sendMessage" type="text" placeholder="Type a message..."
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none text-sm" />
-            <button @click="sendMessage"
+            <button @click="normalQuestion" :disabled="loading || !inputText"
                 class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 text-sm">
                 Send
             </button>

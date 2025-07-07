@@ -13,22 +13,26 @@ class ChatSessionsController extends Controller
 {
     public function initSession(Request $request)
     {
+
         if (Auth::check()) {
             $session = ChatSession::firstOrCreate([
                 'user_id' => Auth::id(),
             ]);
             return response()->json($session);
         } else {
-            $guestToken = $request->cookie('guest_token') ?? Str::uuid();
-            if (!$request->cookie('guest_token')) {
-                cookie()->queue(cookie('guest_token', $guestToken, 60 * 24 * 30)); // на 30 днів
+            $guestToken = $request->cookie('guest_token');
+
+            if (!$guestToken) {
+                $guestToken = Str::uuid();
+                cookie()->queue(cookie('guest_token', $guestToken, 60 * 24 * 30)); // 30 days
             }
+
             $session = ChatSession::firstOrCreate([
                 'guest_token' => $guestToken,
             ]);
+
             return response()->json($session);
         }
-        
     }
 
     public function sendMessage(Request $request)

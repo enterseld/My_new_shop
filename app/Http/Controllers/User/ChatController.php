@@ -29,7 +29,7 @@ class ChatController extends Controller
         ])->post('https://openrouter.ai/api/v1/chat/completions', [
             'model' => 'mistralai/mistral-small-3.2-24b-instruct:free',
             'messages' => $messages,
-            'max_tokens' => 1024,
+            'max_tokens' => 512,
             'temperature' => 0.4, # creativity
         ]);
 

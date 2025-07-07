@@ -4,9 +4,6 @@ import { Link, router, usePage } from '@inertiajs/vue3';
 import Hero from './Layouts/Hero.vue';
 import Favorites from './Components/Favorites.vue';
 import ProductsScroll from './Components/ProductsScroll.vue';
-import { ref } from 'vue'
-import { pipeline, env } from '@xenova/transformers'
-
 
 defineProps({
     products: Array,
@@ -15,65 +12,6 @@ defineProps({
 
 const auth = usePage().props.auth;
 const productsByCategory = usePage().props.productsByCategory;
-
-env.allowRemoteModels = true
-env.allowLocalModels = false
-
-const inputText = ref('')
-const embedding = ref([])
-const loading = ref(false)
-const response = ref('')
-const reply = ref('')
-
-const messages = ref([
-    {
-        role: 'system',
-        content: `Ти — україномовний консультант магазину алмазного інструменту. Відповідай чітко, ввічливо та лише українською. Якщо користувач запитує про товар — допоможи обрати найкращий варіант з наданих, але обирай тільки товари, які надані, не придумуй інші. Якщо запит про доставку, оплату, повернення — відповідай відповідно до політики магазину.`,
-    }
-])
-
-const embedText = async () => {
-    loading.value = true
-    try {
-        const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2')
-        const result = await extractor(inputText.value, { pooling: 'mean', normalize: true })
-        const vector = result.data
-        console.log(vector)
-        response.value = await axios.post('/search', { vector })
-        const matches = response.value.data.matches || []
-        const productList = matches.map((match, i) =>
-            `${i + 1}. ${match.metadata.text}`
-        ).join('\n')
-
-        messages.value.push({
-            role: 'user',
-            content: `Мені потрібно обрати ${inputText.value}. Ось список релевантних товарів:\n${productList} Який краще обрати(обери тільки один)? Поясни чому.`,
-        })
-
-        console.log(messages.value)
-
-        const res = await axios.post('/ask', {
-            messages: messages.value,
-            session_id: '1',
-            last_message: inputText.value
-        })
-        console.log(res)
-        const assistantReply = res.data.reply
-        console.log('assistantReply:', assistantReply)
-        messages.value.push({ role: 'assistant', content: assistantReply })
-        reply.value = assistantReply
-
-    } catch (error) {
-        console.error('Помилка embedding, пошуку або відповіді:', error)
-        reply.value = 'Вибач, щось пішло не так. Спробуй ще раз.'
-    } finally {
-        loading.value = false
-        console.log(response.value.data.matches)
-    }
-}
-
-
-
 
 </script>
 
@@ -100,20 +38,6 @@ const embedText = async () => {
                 </div>
             </div>
         </div>
-
-
-        <div class="p-4 max-w-md mx-auto">
-            <input v-model="inputText" placeholder="Enter text" class="w-full p-2 border rounded" />
-            <button @click="embedText" :disabled="loading || !inputText"
-                class="mt-2 w-full bg-blue-600 text-white py-2 rounded">
-                {{ loading ? 'Embedding...' : 'Get Embedding' }}
-            </button>
-
-            <pre v-if="embedding.length" class="mt-4 text-xs whitespace-pre-wrap">
-      {{ embedding }}
-    </pre>
-        </div>
-
     </UserLayout>
 
 </template>
