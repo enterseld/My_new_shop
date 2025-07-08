@@ -19,7 +19,7 @@ const initSession = async () => {
     try {
         const response = await axios.post('/initSession')
         console.log('Session started:', response.data)
-        session.value = response.data.session_id
+        session.value = response.data.session
     } catch (error) {
         console.error('Failed to start session:', error)
     }
@@ -37,6 +37,8 @@ const messagesConsult = ref([
 const normalQuestion = async () => {
     loading.value = true
     try {
+
+        
         if (!response.value) {
             const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2')
             const result = await extractor(inputText.value, { pooling: 'mean', normalize: true })
@@ -56,7 +58,7 @@ const normalQuestion = async () => {
         } else {
             messagesConsult.value.push({
                 role: 'user',
-                content: `Ось наступне питання ${inputText.value}. Ось список релевантних товарів:\n${productList} Який краще обрати(обери тільки один)? Поясни чому.`,
+                content: `Ось наступне питання ${inputText.value}.`,
             })
         }
         chatMessages.value.push({ role: 'user', content: inputText.value })
@@ -64,7 +66,7 @@ const normalQuestion = async () => {
 
         const res = await axios.post('/ask', {
             messages: messagesConsult.value,
-            session_id: '1',
+            session_id: session.value.id,
             last_message: inputText.value
         })
         console.log(res)
@@ -72,6 +74,9 @@ const normalQuestion = async () => {
         console.log('assistantReply:', assistantReply)
         reply.value = assistantReply
         chatMessages.value.push({ role: 'assistant', content: assistantReply })
+
+
+
     } catch (error) {
         console.error('Помилка embedding, пошуку або відповіді:', error)
         reply.value = 'Вибач, щось пішло не так. Спробуй ще раз.'

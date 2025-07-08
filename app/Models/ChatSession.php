@@ -13,7 +13,7 @@ class ChatSession extends Model
 
     public function chatMessages()
     {
-        return $this->hasMany(ChatMessages::class);
+        return $this->hasMany(ChatMessages::class, 'session_id');
     }
 
 }

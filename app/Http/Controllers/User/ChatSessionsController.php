@@ -18,7 +18,11 @@ class ChatSessionsController extends Controller
             $session = ChatSession::firstOrCreate([
                 'user_id' => Auth::id(),
             ]);
-            return response()->json($session);
+            $chatMessages = $session->chatMessages;
+            return response()->json([
+                'session' => $session,
+                'messages' => $chatMessages
+            ]);
         } else {
             $guestToken = $request->cookie('guest_token');
 
@@ -30,8 +34,11 @@ class ChatSessionsController extends Controller
             $session = ChatSession::firstOrCreate([
                 'guest_token' => $guestToken,
             ]);
-
-            return response()->json($session);
+            $chatMessages = $session->chatMessages;
+            return response()->json([
+                'session' => $session,
+                'messages' => $chatMessages
+            ]);
         }
     }
 
