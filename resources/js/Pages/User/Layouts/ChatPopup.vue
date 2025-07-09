@@ -10,6 +10,7 @@ const loading = ref(false)
 const response = ref(null)
 const reply = ref('')
 const chatMessages = ref([])
+const messagesConsult = ref([])
 
 
 env.allowRemoteModels = true
@@ -20,25 +21,31 @@ const initSession = async () => {
         const response = await axios.post('/initSession')
         console.log('Session started:', response.data)
         session.value = response.data.session
+        if (response.data.messages?.length) {
+            chatMessages.value = response.data.messages.map((msg, index) => ({
+                content: msg.message,
+                role: index % 2 === 0 ? 'user' : 'assistant'
+            }));
+        }
+        console.log("messages array:", chatMessages.value)
+        if (!response.data.messages || response.data.messages.length === 0) {
+            chatMessages.value.push({
+                role: 'system',
+                content: `Ти — україномовний консультант магазину алмазного інструменту. Відповідай чітко, ввічливо та лише українською. Якщо користувач запитує про товар — допоможи обрати найкращий варіант з наданих, але обирай тільки товари, які надані, не придумуй інші. Якщо запит про доставку, оплату, повернення — відповідай відповідно до політики магазину.`,
+            })
+        }
     } catch (error) {
         console.error('Failed to start session:', error)
     }
     isOpen.value = !isOpen.value
-
 }
 
-const messagesConsult = ref([
-    {
-        role: 'system',
-        content: `Ти — україномовний консультант магазину алмазного інструменту. Відповідай чітко, ввічливо та лише українською. Якщо користувач запитує про товар — допоможи обрати найкращий варіант з наданих, але обирай тільки товари, які надані, не придумуй інші. Якщо запит про доставку, оплату, повернення — відповідай відповідно до політики магазину.`,
-    }
-])
 
 const normalQuestion = async () => {
     loading.value = true
     try {
 
-        
+
         if (!response.value) {
             const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2')
             const result = await extractor(inputText.value, { pooling: 'mean', normalize: true })
