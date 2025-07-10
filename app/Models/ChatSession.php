@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ChatSession extends Model
 {
-    protected $fillable = ['user_id', 'quantity', 'product_id', 'guest_token'];
+    protected $fillable = ['user_id', 'quantity', 'product_id', 'guest_token', 'type_of_session'];
 
     use HasFactory;
 

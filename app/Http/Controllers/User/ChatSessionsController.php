@@ -17,11 +17,13 @@ class ChatSessionsController extends Controller
         if (Auth::check()) {
             $session = ChatSession::firstOrCreate([
                 'user_id' => Auth::id(),
+                'type_of_session' => $request->session_type
             ]);
             $chatMessages = $session->chatMessages;
             return response()->json([
                 'session' => $session,
-                'messages' => $chatMessages
+                'messages' => $chatMessages,
+                'type_of_session' => $request->session_type
             ]);
         } else {
             $guestToken = $request->cookie('guest_token');
@@ -33,11 +35,13 @@ class ChatSessionsController extends Controller
 
             $session = ChatSession::firstOrCreate([
                 'guest_token' => $guestToken,
+                'type_of_session' => $request->session_type
             ]);
             $chatMessages = $session->chatMessages;
             return response()->json([
                 'session' => $session,
-                'messages' => $chatMessages
+                'messages' => $chatMessages,
+                'type_of_session' => $request->session_type
             ]);
         }
     }
