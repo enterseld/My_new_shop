@@ -102,6 +102,7 @@ Route::post('/initSession', [ChatSessionsController::class, 'initSession']);
 
 //routes for pinecone
 Route::post('/search', [PineconeSearchController::class, 'search']);
+Route::post('/search/tos', [PineconeSearchController::class, 'search_tos']);
 //end
 
 //routes for openrouter

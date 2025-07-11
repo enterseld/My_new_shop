@@ -36,4 +36,24 @@ class PineconeService
 
         throw new \Exception('Pinecone query failed: ' . $response->body());
     }
+
+    public function query_tos(array $vector, int $topK = 3)
+    {
+        $url = "https://tos-question-ree2g3y.svc.aped-4627-b74a.pinecone.io/query";
+
+        $response = Http::withHeaders([
+            'Api-Key' => $this->apiKey,
+            'Content-Type' => 'application/json',
+        ])->post($url, [
+            'vector' => $vector,
+            'topK' => $topK,
+            'includeMetadata' => true,
+        ]);
+
+        if ($response->successful()) {
+            return $response->json();
+        }
+
+        throw new \Exception('Pinecone query failed: ' . $response->body());
+    }
 }

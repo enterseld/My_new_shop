@@ -46,7 +46,7 @@ class ChatController extends Controller
         ]);
     }
     
-    public function askProduct(Request $request)
+    public function askNormal(Request $request)
     {
         $messages = $request->input('messages');
 

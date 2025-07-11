@@ -130,7 +130,7 @@ const normalQuestion = async () => {
             const vector = result.data
             console.log(vector)
 
-            response.value = await axios.post('/search', { vector })
+            response.value = await axios.post('/search/tos', { vector })
 
             const matches = response.value.data.matches || []
 
