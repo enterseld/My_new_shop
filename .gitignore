@@ -1,21 +1,66 @@
-/.phpunit.cache
-/node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
+# Laravel
 /vendor
-/.env
-/.env.backup
-/.env.production
-.phpactor.json
-.phpunit.result.cache
-Homestead.json
-Homestead.yaml
+/node_modules
+/public/storage
+/public/hot
+/public/build
+/storage/*.key
+/storage/logs/*.log
+/bootstrap/cache/*.php
+
+# Laravel Octane (Swoole runtime in Docker)
+/storage/framework/swoole
+
+# Environment files
+.env
+.env.backup
+.env.production
 auth.json
-npm-debug.log
-yarn-error.log
-/.fleet
+
+# PHPUnit
+/.phpunit.cache
+.phpunit.result.cache
+
+# Lock files (optional to ignore if shared across team)
+/composer.lock
+/package-lock.json
+/npm-debug.log
+/yarn-error.log
+
+# IDEs & editors
 /.idea
 /.vscode
+/.fleet
 /.zed
+.phpactor.json
+
+# Vite
+/resources/js/.vite
+
+# Tailwind / PostCSS
+tailwind.config.cjs
+.postcssrc
+
+# Database / ERD tools
+*.sqlite
+*.sqlite3
+*.db
+*.sql
+*.bak
+db.vuerd.json
+
+# Docker (optional: ignore overrides and build artifacts)
+.docker/
+docker-compose.override.yml
+*.pid
+*.sock
+*.img
+*.tar
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Homestead (if not used)
+Homestead.json
+Homestead.yaml
