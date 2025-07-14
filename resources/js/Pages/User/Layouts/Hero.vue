@@ -19,7 +19,7 @@ function showCategory(page = 1, categoryId) {
     if (categoryId) {
         selectedCategories.value.push(categoryId)
     }
-    router.get(route('productByCategory.index', { category: categoryId}), {
+    router.get(route('productByCategory.index', { category: categoryId }), {
         brands: selectedBrands.value,
         categories: selectedCategories.value,
         product_diameters: selectedDiameters.value,
@@ -139,14 +139,15 @@ function showCategory(page = 1, categoryId) {
             <div v-for="category in productsByCategory" class=" border border-gray-300 shadow-lg bg-white p-3">
                 <div class="text-center text-base lg:text-xl font-bold text-slate-900 
             h-12 sm:h-16 line-clamp-2 overflow-hidden text-ellipsis whitespace-normal">
-    {{ category.name }}
-</div>
+                    {{ category.name }}
+                </div>
                 <div class="grid grid-cols-2 gap-1 lg:gap-2 lg:p-4 mb-2">
                     <div v-for="product in category.products" class="h-full bg-white-100">
                         <img class="h-full max-w-full " :src="product.product_images[0].image" alt="">
                     </div>
                 </div>
-                <button class="text-xs lg:text-base text-blue-600 hover:text-blue-800 mt-2" @click = "showCategory(page = 1, category.id)">
+                <button class="text-xs lg:text-base text-blue-600 hover:text-blue-800 mt-2"
+                    @click="showCategory(page = 1, category.id)">
                     Переглянути {{ category.name.toLowerCase() }}
                 </button>
             </div>

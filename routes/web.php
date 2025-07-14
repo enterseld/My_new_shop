@@ -8,8 +8,11 @@ use App\Http\Controllers\Admin\AdminCommentsController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminRepliesController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\PineconeSearchController;
 use App\Http\Controllers\User\AdressesController;
 use App\Http\Controllers\User\CartController;
+use App\Http\Controllers\User\ChatController;
+use App\Http\Controllers\User\ChatSessionsController;
 use App\Http\Controllers\User\CommentsController;
 use App\Http\Controllers\User\FavoriteProductsController;
 use App\Http\Controllers\User\OrdersController;
@@ -73,8 +76,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 //routes for product list and filters
 Route::prefix('products')->controller(ProductListController::class)->group(function () {
     Route::get('/','index')->name('products.index');
+    Route::get('/all_products','indexAll')->name('allProducts.index');
     Route::get('/{id}','showAndIndex')->name('product.show');
     Route::get('/category/{category}', 'indexByCategory')->name('productByCategory.index');
+    
 });
 //end
 
@@ -89,4 +94,20 @@ Route::post('/adresses/store', [AdressesController::class, 'store']);
 Route::get('/user/{id}/favorites', [FavoriteProductsController::class, 'index']);
 Route::post('/user/favorites/store', [FavoriteProductsController::class, 'store']);
 Route::post('/user/favorites/delete', [FavoriteProductsController::class, 'delete']);
+
+//routes for chat
+Route::post('/initSession', [ChatSessionsController::class, 'initSession']);
+
+//end
+
+//routes for pinecone
+Route::post('/search', [PineconeSearchController::class, 'search']);
+Route::post('/search/tos', [PineconeSearchController::class, 'search_tos']);
+//end
+
+//routes for openrouter
+Route::post('/ask', [ChatController::class, 'ask']);
+Route::post('/ask/product', [ChatController::class, 'ask']);
+//end
+
 require __DIR__.'/auth.php';

@@ -24,7 +24,7 @@ class CartController extends Controller
 
     public function view(Request $request, Product $product)
     {
-        $allProducts = Product::with('product_images')->orderBy('id')->get();
+
         $user = $request->user();
 
         if ($user) {
@@ -36,7 +36,7 @@ class CartController extends Controller
                 return Inertia::render('User/CartList', [
                     'cartItems' => $cartItems,
                     'userAdress' => $userAdress,
-                    'allProducts' => $allProducts,
+
                 ]);
             }
         } else {
@@ -45,7 +45,7 @@ class CartController extends Controller
                 $cartItems = new CartResource(Cart::getProductsAndCartItems());
                 return Inertia::render('User/CartList', [
                     'cartItems' => $cartItems,
-                    'allProducts' => $allProducts,
+
                 ]);
             } else {
                 return redirect()->back();

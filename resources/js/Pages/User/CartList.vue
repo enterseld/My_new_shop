@@ -362,29 +362,28 @@ onMounted(() => {
                         <div class="flex flex-wrap -mx-3 mb-6">
                             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                                 <Combobox v-model="selected">
-                                    <div class="relative mt-1">
-                                        <div
-                                            class="relative flex items-center w-full cursor-default overflow-hidden rounded-lg text-left border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
+                                    <div class="relative z-30 w-full mb-5 group">
+                                        <div class="relative">
+                                            <ComboboxInput id="floating_city" name="floating_city"
+                                                class="peer block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600"
+                                                :displayValue="(city) => city?.title"
+                                                @input="query = $event.target.value" placeholder=" " required />
 
-                                            <ComboboxInput
-                                                class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
-                                                :displayValue="(city) => city.title"
-                                                @input="query = $event.target.value;"
-                                                placeholder="Почніть вводити місто..." />
+                                            <label for="floating_city"
+                                                class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                                                Місто
+                                            </label>
 
-                                            <div class="absolute inset-y-0 right-0 flex items-center pr-2 z-20"
-                                                @click="handleChange">
-                                                <ComboboxButton>
-                                                    <ChevronUpDownIcon class="h-5 w-5 text-gray-400"
-                                                        aria-hidden="true" />
-                                                </ComboboxButton>
-                                            </div>
-
+                                            <ComboboxButton
+                                                class="absolute inset-y-0 right-0 flex items-center pr-2 z-20">
+                                                <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                            </ComboboxButton>
                                         </div>
+
                                         <TransitionRoot leave="transition ease-in duration-100" leaveFrom="opacity-100"
                                             leaveTo="opacity-0" @after-leave="query = ''">
                                             <ComboboxOptions
-                                                class="absolute mt-1 z-20 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                                                class="absolute mt-1 z-50 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
                                                 <div v-if="filteredCities.length === 0 && query !== ''"
                                                     class="relative cursor-default select-none px-4 py-2 text-gray-700">
                                                     Nothing found.
@@ -415,27 +414,30 @@ onMounted(() => {
                             </div>
                             <div class="w-full md:w-2/3 px-3">
                                 <Combobox v-model="selectedWarehouse" @focus="loadWarehouses">
-                                    <div class="relative mt-1">
-                                        <div
-                                            class="relative flex items-center w-full cursor-default overflow-hidden rounded-lg text-left border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
-
-                                            <ComboboxInput
-                                                class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
-                                                :displayValue="(warehouse) => warehouse.title"
-                                                @change="queryWarehouse = $event.target.value"
-                                                placeholder="Почніть вводити назву чи номер відділення..." />
-                                            <ComboboxButton
-                                                class="absolute inset-y-0 right-0 flex items-center pr-2 z-20">
-                                                <ChevronUpDownIcon class="h-5 w-5 text-gray-400" />
-                                            </ComboboxButton>
+                                    <div class="relative z-30 w-full mb-5 group">
+                                        <div class="relative">
+                                            <ComboboxInput id="floating_warehouse" name="floating_warehouse"
+                                                class="peer block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600"
+                                                :displayValue="(warehouse) => warehouse?.title"
+                                                @change="queryWarehouse = $event.target.value" placeholder=" "
+                                                required />
+                                            <label for="floating_warehouse"
+                                                class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                                                Назва або номер відділення
+                                            </label>
                                         </div>
+
+                                        <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2 z-20">
+                                            <ChevronUpDownIcon class="h-5 w-5 text-gray-400" />
+                                        </ComboboxButton>
+
                                         <TransitionRoot leave="transition ease-in duration-100" leaveFrom="opacity-100"
                                             leaveTo="opacity-0" @after-leave="queryWarehouse = ''">
                                             <ComboboxOptions
-                                                className="absolute mt-1 z-20 max-h-60 w-full overflow-x-auto whitespace-nowrap rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                                                class="absolute mt-1 z-40 max-h-60 w-full overflow-x-auto whitespace-nowrap rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
                                                 <div v-if="filteredWarehouses.length === 0 && queryWarehouse !== ''"
                                                     class="relative cursor-default select-none px-4 py-2 text-gray-700">
-                                                    Nothing found.
+                                                    Нічого не знайдено.
                                                 </div>
                                                 <ComboboxOption
                                                     v-for="warehouse in (filteredWarehouses || []).slice(0, 20)"
@@ -446,7 +448,7 @@ onMounted(() => {
                                                             'bg-teal-600 text-white': active,
                                                             'text-gray-900': !active,
                                                         }">
-                                                        <span class="block "
+                                                        <span
                                                             :class="{ 'font-medium': selectedWarehouse, 'font-normal': !selectedWarehouse }">
                                                             {{ warehouse.title }}
                                                         </span>
@@ -466,24 +468,27 @@ onMounted(() => {
 
                     </div>
 
-                    
-                    <div class="relative z-0 w-full mb-5 group" v-if="!auth.user">
+
+                    <div class="relative z-30 w-full mb-5 group" v-if="!auth.user">
                         <input type="email" name="floating_email" id="floating_phone_number" v-model="email"
                             class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                             placeholder=" " required />
                         <label for="email"
-                            class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Електронна пошта</label>
+                            class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Електронна
+                            пошта</label>
                     </div>
 
                     <div class="relative z-0 w-full mb-5 group">
-                        <input type="phone_number" name="floating_phone_number" id="floating_phone_number" v-model="phone_number"
-                            class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                        <input type="phone_number" name="floating_phone_number" id="floating_phone_number"
+                            v-model="phone_number"
+                            class="block py-2.5  px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                             placeholder=" " required />
                         <label for="phone_number"
-                            class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Номер телефону (+380953456789 або 0121234567)</label>
+                            class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Номер
+                            телефону (+380123456789)</label>
                     </div>
                     <div class="flex items-center mb-4">
-                        <input checked id="checkbox-1" type="checkbox" value=""
+                        <input id="checkbox-1" type="checkbox" value="0"
                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                         <label for="checkbox-1" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Я
                             погоджуюся із <a href="#" class="text-blue-600 hover:underline dark:text-blue-500">умовами

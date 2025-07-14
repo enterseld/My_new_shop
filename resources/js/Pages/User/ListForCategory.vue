@@ -15,21 +15,26 @@ import {
     TransitionChild,
     TransitionRoot,
 } from '@headlessui/vue'
-import { XMarkIcon } from '@heroicons/vue/24/outline'
+import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/vue/20/solid'
 import Products from '../User/Components/Products.vue';
 import SecondaryButtonVue from '@/Components/SecondaryButton.vue';
 import { useForm } from '@inertiajs/vue3';
-import { BAR_MAP } from 'element-plus';
+import Cookies from 'js-cookie';
 
+const sortOptions = ref([
+    { name: 'Популярні', href: '#', current: false },
+    { name: 'Рейтинг', href: '#', current: false },
+    { name: 'Нові', href: '#', current: false },
+    { name: 'Низька ціна', href: '#', current: false },
+    { name: 'Висока ціна', href: '#', current: false },
+])
 
-const sortOptions = [
-    { name: 'Most Popular', href: '#', current: true },
-    { name: 'Best Rating', href: '#', current: false },
-    { name: 'Newest', href: '#', current: false },
-    { name: 'Price: Low to High', href: '#', current: false },
-    { name: 'Price: High to Low', href: '#', current: false },
-]
+const selectOption = (selectedOption) => {
+    sortOptions.value.forEach(option => {
+        option.current = option.name === selectedOption.name
+    })
+}
 
 
 const filterPrices = useForm({
@@ -85,13 +90,19 @@ watch(selectedFitDiameters, () => {
 
 })
 
+watch(sortOptions, ()=>{
+    updateFilteredProducts()
+}, { deep: true })
+
 function updateFilteredProducts(page = 1) {
     console.log(selectedCategories.value)
-    router.get(route('productByCategory.index', { category: props.categoryForList }), {
+    const selectedSort = sortOptions.value.find(option => option.current)
+    router.get('products', {
         brands: selectedBrands.value,
         categories: selectedCategories.value,
         product_diameters: selectedDiameters.value,
         product_fit_diameters: selectedFitDiameters.value,
+        sort_by: selectedSort ? selectedSort.name : null,
         prices: {
             from: filterPrices.prices[0],
             to: filterPrices.prices[1]
@@ -105,6 +116,25 @@ function updateFilteredProducts(page = 1) {
         });
 }
 
+const viewMode = ref('grid');
+
+// Read from cookie when page loads
+onMounted(() => {
+  const savedViewMode = Cookies.get('viewMode');
+  if (savedViewMode === 'grid' || savedViewMode === 'list') {
+    viewMode.value = savedViewMode;
+  }
+});
+
+// Save to cookie when viewMode changes
+watch(viewMode, (newMode) => {
+  Cookies.set('viewMode', newMode, { expires: 30 }); // expires in 30 days
+});
+
+// Toggle button
+const toggleViewMode = () => {
+  viewMode.value = viewMode.value === 'grid' ? 'list' : 'grid';
+};
 
 </script>
 
@@ -191,7 +221,7 @@ function updateFilteredProducts(page = 1) {
                             <div>
                                 <MenuButton
                                     class="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
-                                    Sort
+                                    Сортувати за:
                                     <ChevronDownIcon
                                         class="-mr-1 ml-1 size-5 shrink-0 text-gray-400 group-hover:text-gray-500"
                                         aria-hidden="true" />
@@ -209,6 +239,7 @@ function updateFilteredProducts(page = 1) {
                                     <div class="py-1">
                                         <MenuItem v-for="option in sortOptions" :key="option.name" v-slot="{ active }">
                                         <a :href="option.href"
+                                            @click.prevent="selectOption(option)"
                                             :class="[option.current ? 'font-medium text-gray-900' : 'text-gray-500', active ? 'bg-gray-100 outline-none' : '', 'block px-4 py-2 text-sm']">{{
                                                 option.name }}</a>
                                         </MenuItem>
@@ -217,9 +248,12 @@ function updateFilteredProducts(page = 1) {
                             </transition>
                         </Menu>
 
-                        <button type="button" class="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7">
-                            <span class="sr-only">View grid</span>
-                            <Squares2X2Icon class="size-5" aria-hidden="true" />
+
+                        <button type="button" @click="toggleViewMode"
+                            class="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7">
+                            <span class="sr-only">Toggle view</span>
+                            <Squares2X2Icon v-show="viewMode === 'grid'" class="size-5" aria-hidden="true" />
+                            <Bars3Icon v-show="viewMode === 'list'" class="size-5" aria-hidden="true" />
                         </button>
                         <button type="button" class="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden"
                             @click="mobileFiltersOpen = true">
@@ -355,7 +389,7 @@ function updateFilteredProducts(page = 1) {
 
                         <!-- Product grid -->
                         <div class="lg:col-span-3">
-                            <Products :products="products.data"></Products>
+                            <Products :products="products.data" :viewMode="viewMode"></Products>
                         </div>
                     </div>
 

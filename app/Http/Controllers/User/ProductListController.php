@@ -18,8 +18,6 @@ class ProductListController extends Controller
     {
         $products = Product::with('category', 'brand', 'product_images', 'product_comments', 'product_fit_diameter', 'product_diameter');
         $filterProducts = $products->filtered()->paginate(16)->withQueryString();
-        
-        $allProducts = Product::with('product_images')->orderBy('id')->get();
         $categories = Category::get();
         $brands = Brand::get();
         $productDiameters = ProductDiameter::get();
@@ -29,7 +27,7 @@ class ProductListController extends Controller
             'brands' => $brands,
             'productDiameters' => $productDiameters,
             'productFitDiameters' => $productFitDiameters,
-            'allProducts' => $allProducts,
+            'viewMode' => $productFitDiameters,
             'products' => ProductResource::collection($filterProducts),
             'pagination' => [
                 'current_page' => $filterProducts->currentPage(),
@@ -44,7 +42,7 @@ class ProductListController extends Controller
     {
         $products = Product::with('category', 'brand', 'product_images', 'product_comments', 'product_fit_diameter', 'product_diameter');
         $filterProducts = $products->filtered()->paginate(16)->withQueryString();
-        $allProducts = Product::with('product_images')->orderBy('id')->get();
+
         $categories = Category::get();
         $brands = Brand::get();
         $productDiameters = ProductDiameter::get();
@@ -55,7 +53,7 @@ class ProductListController extends Controller
             'brands' => $brands,
             'productDiameters' => $productDiameters,
             'productFitDiameters' => $productFitDiameters,
-            'allProducts' => $allProducts,
+
             'products' => ProductResource::collection($filterProducts),
             'categoryForList' => $category,
             'pagination' => [
@@ -67,17 +65,23 @@ class ProductListController extends Controller
         ]);
     }
 
+    public function indexAll()
+    {
+        $allProducts = Product::with('product_images')->orderBy('id')->get();
+        return response()->json(['allProducts' => $allProducts]);
+    }
+
     public function showAndIndex($id)
     {
-
         $product = Product::with('category', 'brand', 'product_images', 'product_comments.comments_replies')->findOrFail($id);
         $products = Product::with('brand', 'category', 'product_images')->orderBy('id')->limit(4)->get();
-        $allProducts = Product::with('product_images')->orderBy('id')->get();
+
 
         return Inertia::render('User/ProductInfo', [
-            'allProducts' => $allProducts,
             'product' => $product,
             'products' => $products
         ]);
     }
+
+    
 }
