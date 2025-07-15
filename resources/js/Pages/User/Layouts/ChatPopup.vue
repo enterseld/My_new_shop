@@ -195,7 +195,7 @@ function toggleChat() {
     </transition>
     <!-- Chat Box -->
     <div v-if="isOpen"
-        class="fixed bottom-20 right-4 w-80 bg-white border border-gray-300 rounded-xl shadow-xl flex flex-col">
+        class="fixed z-50 bottom-20 right-4 w-80 bg-white border border-gray-300 rounded-xl shadow-xl flex flex-col">
 
         <!-- Header -->
         <div class="bg-blue-600 text-white px-4 py-2 rounded-t-xl flex justify-between items-center">
@@ -203,7 +203,7 @@ function toggleChat() {
             <div class="flex items-center space-x-2">
                 <button @click="toggleSessionType"
                     class="bg-white text-blue-600 px-2 py-1 rounded text-xs hover:bg-gray-100">
-                    {{ sessionType }}
+                    {{ sessionType === 'normal' ? 'Умови обслуговування' : 'Підбір товару' }}
                 </button>
                 <button @click="toggleChat" class="text-white hover:text-gray-200">✖</button>
             </div>
@@ -211,7 +211,8 @@ function toggleChat() {
 
         <!-- Messages Area -->
         <div class="p-4 overflow-y-auto h-64 text-sm text-gray-700 flex flex-col justify-start">
-            <p class="mb-2">👋 Вітаю! Чим можу допомогти?</p>
+            <p v-if="sessionType === 'normal'" class="mb-2">👋 Вітаю! Чим можу допомогти?</p>
+            <p v-if="sessionType === 'product'" class="mb-2">👋 Вітаю! Можу допомогти підібрати товар за потреби!</p>
             <div v-for="(msg, index) in chatMessages" :key="index" class="mb-2">
                 <!-- USER message -->
                 <div v-if="msg.role === 'user'" class="flex justify-end">
@@ -235,7 +236,7 @@ function toggleChat() {
 
         <!-- Input Area -->
         <div v-if="sessionType === 'product'" class="p-2 border-t border-gray-200 flex">
-            <input v-model="inputText" @keyup.enter="sendMessage" type="text" placeholder="Type a message..."
+            <input v-model="inputText" @keyup.enter="sendMessage" type="text" placeholder="Напишіть ваше питання..."
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none text-sm" />
             <button @click="productQuestion" :disabled="loading || !inputText"
                 class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 text-sm flex items-center justify-center min-w-[90px]">
@@ -243,13 +244,13 @@ function toggleChat() {
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
                 </svg>
-                <span v-else>Send normal</span>
+                <span v-else>Надіслати</span>
             </button>
 
         </div>
 
         <div v-if="sessionType === 'normal'" class="p-2 border-t border-gray-200 flex">
-            <input v-model="inputText" @keyup.enter="sendMessage" type="text" placeholder="Type a message..."
+            <input v-model="inputText" @keyup.enter="sendMessage" type="text" placeholder="Напишіть ваше питання..."
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none text-sm" />
             <button @click="normalQuestion" :disabled="loading || !inputText"
                 class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 text-sm flex items-center justify-center min-w-[90px]">
