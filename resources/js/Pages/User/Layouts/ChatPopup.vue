@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import axios from 'axios'
 import { pipeline, env } from '@xenova/transformers'
 const isOpen = ref(false)
@@ -12,7 +12,7 @@ const response = ref(null)
 const reply = ref('')
 const chatMessages = ref([])
 const messagesConsult = ref([])
-
+const messagesEnd = ref(null);
 
 env.allowRemoteModels = true
 env.allowLocalModels = false
@@ -172,20 +172,27 @@ const normalQuestion = async () => {
         inputText.value = '';
     }
 }
-
+watch(chatMessages, () => {
+    nextTick(() => {
+        messagesEnd.value?.scrollIntoView({ behavior: 'smooth' });
+    });
+});
 function toggleChat() {
     isOpen.value = !isOpen.value
 }
+
+
 
 </script>
 
 <template>
     <!-- Chat Toggle Button -->
-    <button @click="initSession"
-        class="fixed bottom-10 right-10 z-50 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition">
-        💬
-    </button>
-
+    <transition name="fade">
+        <button v-if="!isOpen" @click="initSession"
+            class="fixed bottom-6 right-6 z-50 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out">
+            💬
+        </button>
+    </transition>
     <!-- Chat Box -->
     <div v-if="isOpen"
         class="fixed bottom-20 right-4 w-80 bg-white border border-gray-300 rounded-xl shadow-xl flex flex-col">
@@ -203,18 +210,27 @@ function toggleChat() {
         </div>
 
         <!-- Messages Area -->
-        <div class="p-4 flex-1 overflow-y-auto max-h-60 text-sm text-gray-700">
+        <div class="p-4 overflow-y-auto h-64 text-sm text-gray-700 flex flex-col justify-start">
             <p class="mb-2">👋 Вітаю! Чим можу допомогти?</p>
             <div v-for="(msg, index) in chatMessages" :key="index" class="mb-2">
-                <p v-if="msg.role === 'user'"
-                    class="text-right bg-gray-200 rounded-lg p-2 inline-block ml-auto max-w-[90%]">
-                    {{ msg.content }}
-                </p>
-                <p v-else-if="msg.role === 'assistant'"
-                    class="text-left bg-blue-100 rounded-lg p-2 inline-block mr-auto max-w-[90%]">
-                    {{ msg.content }}
-                </p>
+                <!-- USER message -->
+                <div v-if="msg.role === 'user'" class="flex justify-end">
+                    <div
+                        class="bg-blue-600 text-white px-4 py-2 max-w-[75%] rounded-2xl rounded-br-none text-sm shadow-md">
+                        {{ msg.content }}
+                    </div>
+                </div>
+
+                <!-- ASSISTANT message -->
+                <div v-else class="flex justify-start">
+                    <div
+                        class="bg-gray-100 text-gray-900 w-full px-4 py-3 rounded-2xl rounded-bl-none text-sm shadow-sm">
+                        {{ msg.content }}
+                    </div>
+                </div>
             </div>
+
+            <div ref="messagesEnd" />
         </div>
 
         <!-- Input Area -->
@@ -222,17 +238,26 @@ function toggleChat() {
             <input v-model="inputText" @keyup.enter="sendMessage" type="text" placeholder="Type a message..."
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none text-sm" />
             <button @click="productQuestion" :disabled="loading || !inputText"
-                class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 text-sm">
-                Send normal
+                class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 text-sm flex items-center justify-center min-w-[90px]">
+                <svg v-if="loading" class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                </svg>
+                <span v-else>Send normal</span>
             </button>
+
         </div>
 
         <div v-if="sessionType === 'normal'" class="p-2 border-t border-gray-200 flex">
             <input v-model="inputText" @keyup.enter="sendMessage" type="text" placeholder="Type a message..."
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none text-sm" />
             <button @click="normalQuestion" :disabled="loading || !inputText"
-                class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 text-sm">
-                Send prod
+                class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 text-sm flex items-center justify-center min-w-[90px]">
+                <svg v-if="loading" class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                </svg>
+                <span v-else>Надіслати</span>
             </button>
         </div>
     </div>
