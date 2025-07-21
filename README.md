@@ -15,7 +15,7 @@ A modern, full-stack e-commerce web application built with **Laravel** (back-end
 
 ### 💬 AI-Powered Consultant Chat
 - Semantic product search & recommendation
-- GPT-based conversational interface
+- Conversational interface
 - Context-aware assistance
 - Integration with product metadata
 
@@ -23,19 +23,9 @@ A modern, full-stack e-commerce web application built with **Laravel** (back-end
 | Stack        | Tools / Frameworks                            |
 |--------------|-----------------------------------------------|
 | **Frontend** | Vue 3, Vite, Tailwind CSS, Axios              |
-| **Backend**  | Laravel 10, Laravel Sanctum, Eloquent ORM     |
-| **AI**       | OpenAI / Transformers.js, Pinecone (optional) |
-| **Database** | MySQL / MariaDB                               |
-| **DevOps**   | Docker, Laravel Octane, Nginx, Composer       |
-
----
-
-## 📸 Screenshots
-
-<!-- Add screenshots or gifs here -->
-![Home Page](screenshots/home.png)
-![AI Chatbot](screenshots/chat.png)
-![Admin Dashboard](screenshots/admin.png)
+| **Backend**  | Laravel 11, Laravel Sanctum, Eloquent ORM     |
+| **AI**       | OpenRouter, Transformers.js, Pinecone         |
+| **Database** | MySQL                                         |
 
 ---
 
@@ -45,7 +35,7 @@ A modern, full-stack e-commerce web application built with **Laravel** (back-end
 - PHP >= 8.2
 - Node.js >= 18
 - Composer
-- MySQL or MariaDB
+- MySQL
 - Docker (optional)
 
 ### 1. Clone the Repository
@@ -53,32 +43,27 @@ A modern, full-stack e-commerce web application built with **Laravel** (back-end
 ```bash
 git clone https://github.com/your-username/laravel-vue-ecommerce-ai.git
 cd laravel-vue-ecommerce-ai
+```
 2. Set Up Backend (Laravel)
-bash
-Копіювати
-Редагувати
+```bash
 composer install
 cp .env.example .env
 php artisan key:generate
-
 # Configure your .env database settings
 php artisan migrate --seed
 php artisan storage:link
+```
 3. Set Up Frontend (Vue)
-bash
-Копіювати
-Редагувати
+```bash
 cd resources/js
 npm install
 npm run dev
+```
 4. Run the Project
-bash
-Копіювати
-Редагувати
+```bash
 php artisan serve
-Or use Octane for better performance:
-
-bash
-Копіювати
-Редагувати
+```
+Or use Octane for better performance(Not for Windows):
+```bash
 php artisan octane:start
+```

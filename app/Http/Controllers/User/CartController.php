@@ -8,7 +8,7 @@ use App\Http\Resources\CartResource;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\UserAdress;
-use App\Providers\NovaPostService as ServicesNovaPostService;
+use App\Services\NovaPostService as ServicesNovaPostService;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;

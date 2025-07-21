@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Providers\PineconeService;
+use App\Services\PineconeService;
 use Illuminate\Http\Request;
 
 class PineconeSearchController extends Controller

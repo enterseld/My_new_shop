@@ -12,6 +12,7 @@
         "laravel/octane": "^2.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "liqpay/liqpay": "^1.4",
         "spatie/laravel-sluggable": "^3.6",
         "tightenco/ziggy": "^2.0"
     },
