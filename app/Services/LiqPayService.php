@@ -4,7 +4,6 @@ namespace App\Services;
 
 use Illuminate\Support\ServiceProvider;
 
-
 class LiqPayService
 {
     protected string $publicKey;
@@ -19,20 +18,21 @@ class LiqPayService
     public function generateCheckoutPayload(float $amount, int $order_id): array
     {
         $params = [
+            'version'        => '3',
+            'public_key'     => $this->publicKey,
             'action'         => 'pay',
-            'version'        => '7',
-            'public_key'     => config('services.liqpay.public_key'),
             'amount'         => $amount,
             'currency'       => 'UAH',
             'description'    => 'Оплата замовлення №' . $order_id,
-            'order_id'       => $order_id,
-            'receiver_last_name'  => 'LastName',
-            'receiver_first_name'  => 'FirstName'
+            'order_id'       => (string)$order_id,
+            'server_url'     => route('liqpay.callback'),
+            'result_url'     => route('payment.success'),
+            'language'       => 'uk'
         ];
 
         $json = json_encode($params);
         $data = base64_encode($json);
-        $signature = base64_encode(sha1($this->privateKey . $data . $this->privateKey, true));
+        $signature = $this->generateSignature($data);
 
         return [
             'data' => $data,
@@ -42,12 +42,17 @@ class LiqPayService
 
     public function validateSignature(string $data, string $signature): bool
     {
-        $expected = base64_encode(sha1($this->privateKey . $data . $this->privateKey, true));
-        return $expected === $signature;
+        $expected = $this->generateSignature($data);
+        return hash_equals($expected, $signature);
     }
 
     public function decodeCallbackData(string $data): array
     {
-        return json_decode(base64_decode($data), true);
+        return json_decode(base64_decode($data), true) ?? [];
+    }
+
+    private function generateSignature(string $data): string
+    {
+        return base64_encode(sha1($this->privateKey . $data . $this->privateKey, true));
     }
 }

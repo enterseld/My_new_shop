@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminCommentsController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminRepliesController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\LiqPayController;
 use App\Http\Controllers\PineconeSearchController;
 use App\Http\Controllers\User\AdressesController;
 use App\Http\Controllers\User\CartController;
@@ -108,6 +109,14 @@ Route::post('/search/tos', [PineconeSearchController::class, 'search_tos']);
 //routes for openrouter
 Route::post('/ask', [ChatController::class, 'ask']);
 Route::post('/ask/product', [ChatController::class, 'ask']);
+//end
+
+//routes for liqpay
+Route::post('/liqpay/getPaymentForm', [LiqPayController::class, 'getPaymentForm']);
+Route::post('/liqpay/callback', [LiqPayController::class, 'callback'])->name('liqpay.callback');
+Route::get('/payment/success', function() {
+    return view('payment.success');
+})->name('payment.success');
 //end
 
 require __DIR__.'/auth.php';

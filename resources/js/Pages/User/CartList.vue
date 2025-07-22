@@ -134,67 +134,78 @@ let sendOrder = async () => {
             text: "Будь ласка, введіть правильний номер телефону, email та ПІБ",
             icon: "warning"
         })
-        return; // Stop execution of outerFunction if validation fails
-    }
-    if (auth.user) {
-        const formOrder = new FormData();
-        formOrder.append('first_name', first_name.value);
-        formOrder.append('last_name', last_name.value);
-        formOrder.append('middle_name', middle_name.value);
-        formOrder.append('total_price', total.value);
-        formOrder.append('email', usePage().props.auth.user.email);
-        formOrder.append('mobile_phone', phone_number.value);
-        formOrder.append('shipping_city', selected.value.title);
-        formOrder.append('shipping_warehouse', selectedWarehouse.value.title);
-        formOrder.append('user_id', usePage().props.auth.user.id);
-
-        formOrder.append('products', JSON.stringify(usePage().props.cart.data.items));
-
-        const formAdress = new FormData();
-        formAdress.append('shipping_city', selected.value.title);
-        formAdress.append('shipping_warehouse', selectedWarehouse.value.title);
-        formAdress.append('user_id', usePage().props.auth.user.id);
-        try {
-            router.post('/orders/store', formOrder, {
-                onSuccess: page => {
-                    router.post('/adresses/store', formAdress, {
-                        onSuccess: page => {
-                            console.log('Address stored successfully');
-
-                        },
-                    })
-                },
-            })
-        }
-        catch (err) {
-            console.log('An error occurred:', err);
-        }
-    }
-    else {
-        const formOrder = new FormData();
-        formOrder.append('first_name', first_name.value);
-        formOrder.append('last_name', last_name.value);
-        formOrder.append('middle_name', middle_name.value);
-        formOrder.append('email', email.value);
-        formOrder.append('total_price', total.value);
-        formOrder.append('mobile_phone', phone_number.value);
-        formOrder.append('shipping_city', selected.value.title);
-        formOrder.append('shipping_warehouse', selectedWarehouse.value.title);
-        formOrder.append('user_id', 0);
-
-        formOrder.append('products', JSON.stringify(usePage().props.cart.data.items));
-        try {
-            router.post('/orders/store', formOrder, {
-                onSuccess: page => {
-                },
-            })
-        }
-        catch (err) {
-            console.log('An error occurred:', err);
-        }
+        return;
     }
 
+    const formOrder = new FormData();
+    formOrder.append('first_name', first_name.value);
+    formOrder.append('last_name', last_name.value);
+    formOrder.append('middle_name', middle_name.value);
+    formOrder.append('total_price', total.value);
+    formOrder.append('mobile_phone', phone_number.value);
+    formOrder.append('shipping_city', selected.value.title);
+    formOrder.append('shipping_warehouse', selectedWarehouse.value.title);
+    formOrder.append('products', JSON.stringify(usePage().props.cart.data.items));
 
+    const userId = auth.user ? usePage().props.auth.user.id : 0;
+    const emailToSend = auth.user ? usePage().props.auth.user.email : email.value;
+    formOrder.append('email', emailToSend);
+    formOrder.append('user_id', userId);
+
+    const formAdress = new FormData();
+    formAdress.append('shipping_city', selected.value.title);
+    formAdress.append('shipping_warehouse', selectedWarehouse.value.title);
+    formAdress.append('user_id', userId);
+
+    try {
+        const orderResponse = await axios.post('/orders/store', formOrder, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+        
+        if (auth.user) {
+            await axios.post('/adresses/store', formAdress, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
+        }
+        const orderId = orderResponse.data.order_id;
+        console.log(orderId)
+        const response = await axios.post('/liqpay/getPaymentForm', {
+            amount: total.value,
+            order_id: orderId
+        });
+        const { data, signature } = response.data;
+
+        if (!window.LiqPayCheckout) {
+            const script = document.createElement('script');
+            script.src = 'https://static.liqpay.ua/libjs/checkout.js';
+            script.onload = () => launchLiqPay(data, signature);
+            document.body.appendChild(script);
+        } else {
+            launchLiqPay(data, signature);
+        }
+
+        function launchLiqPay(data, signature) {
+            LiqPayCheckout.init({
+                data,
+                signature,
+                embedTo: "#liqpay_placeholder",
+                mode: "popup"
+            }).on("liqpay.callback", function (data) {
+                console.log("liqpay.callback", data);
+            }).on("liqpay.ready", function (data) {
+                console.log("liqpay.ready", data);
+            }).on("liqpay.close", function (data) {
+                console.log("liqpay.close", data);
+            });
+        }
+    }
+    catch (err) {
+        console.error('An error occurred:', err);
+    }
 };
 
 let validate = () => {
