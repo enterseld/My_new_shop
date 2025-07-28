@@ -65,7 +65,7 @@ class NovaPostService
     public function makeRequestAllWarehouses(string $modelName, string $calledMethod, string $findBy)
     {
         $methodProperties = new stdClass();
-        $methodProperties->Limit = "20";
+        $methodProperties->Limit = "10";
         $methodProperties->FindByString = $findBy;
         
     

@@ -1,114 +1,117 @@
 <script setup>
 import UserLayout from './Layouts/UserLayout.vue';
 import axios from 'axios';
-import { Link, usePage, router } from '@inertiajs/vue3';
+import { usePage} from '@inertiajs/vue3';
 import { ref, computed, onMounted, watch } from 'vue'
 import {
-    Combobox,
-    ComboboxInput,
-    ComboboxOptions,
-    ComboboxOption,
-    ComboboxButton
+  Combobox,
+  ComboboxInput,
+  ComboboxOptions,
+  ComboboxOption,
+  ComboboxButton,
+  TransitionRoot
 } from '@headlessui/vue'
-import { ChevronUpDownIcon } from '@heroicons/vue/20/solid';
+import { ChevronUpDownIcon, CheckIcon } from '@heroicons/vue/20/solid'
 
 const auth = usePage().props.auth;
 const carts = computed(() => usePage().props.cart.data.items);
 const products = computed(() => usePage().props.cart.data.products);
 const total = computed(() => usePage().props.cart.data.total);
 const itemId = (id) => carts.value.findIndex((item) => item.product_id == id);
+// Reactive state
+const cities = ref([])
+const warehouses = ref([])
+const selected = ref(null)
+const selectedWarehouse = ref(null)
+const query = ref('')
+const queryWarehouse = ref('')
+const citiesLoading = ref(false)
+const warehousesLoading = ref(false)
 
-const update = (product, quantity) =>
-    router.patch(route('cart.update', product), {
-        quantity,
-        preserveState: true,
-        replace: true
-    })
+// Computed filtered arrays
+const filteredCities = computed(() => {
+  if (query.value === '') {
+    return cities.value
+  }
+  
+  const searchQuery = query.value.toLowerCase().replace(/\s+/g, '')
+  return cities.value.filter((city) => {
+    const titleNormalized = city.title
+      .toLowerCase()
+      .replace(/\s+/g, '')
+      .replace(/\(.*?\)/g, '')
+    return titleNormalized.includes(searchQuery)
+  })
+})
 
-const remove = (product) => router.delete(route('cart.delete', product), { preserveState: true, replace: true });
+const filteredWarehouses = computed(() => {
+  if (queryWarehouse.value === '') {
+    return warehouses.value
+  }
+  
+  const searchQuery = queryWarehouse.value.toLowerCase().replace(/\s+/g, '')
+  return warehouses.value.filter((warehouse) => {
+    const titleNormalized = warehouse.title
+      .toLowerCase()
+      .replace(/\s+/g, '')
+      .replace(/\(.*?\)/g, '')
+    return titleNormalized.includes(searchQuery)
+  })
+})
 
+// Event handlers
+const handleCityInput = (event) => {
+  query.value = event.target.value
+}
 
-const filteredCities = ref([]);
-let selected = ref("0");
-let query = ref("");
+const handleWarehouseInput = (event) => {
+  queryWarehouse.value = event.target.value
+}
 
-let filteredWarehouses = ref([]);
-let selectedWarehouse = ref("");
-let queryWarehouse = ref("0");
+// API functions with error handling and loading states
+const loadCities = async () => {
+  try {
+    citiesLoading.value = true
+    const response = await axios.get('/getCities/0')
+    cities.value = response.data.cities || []
+  } catch (error) {
+    console.error('Error loading cities:', error)
+    cities.value = []
+  } finally {
+    citiesLoading.value = false
+  }
+}
 
-let cities = ref([]);
-let warehouses = ref([]);
+const loadWarehouses = async (cityTitle) => {
+  if (!cityTitle) {
+    warehouses.value = []
+    return
+  }
 
-watch(query, (newQuery) => {
-    // Reset selected warehouse when query changes
-    selectedWarehouse.value = "";
+  try {
+    warehousesLoading.value = true
+    const response = await axios.get(`/getWarehouses/${encodeURIComponent(cityTitle)}/0`)
+    warehouses.value = response.data.warehouses || []
+  } catch (error) {
+    console.error('Error loading warehouses:', error)
+    warehouses.value = []
+  } finally {
+    warehousesLoading.value = false
+  }
+}
 
-    // Filter cities based on query
-    if (newQuery === '') {
-        filteredCities.value = cities.value.slice(); // Make a copy of the original array
-    } else {
-        filteredCities.value = cities.value.filter((product) => {
-            const searchQuery = newQuery.toLowerCase().replace(/\s+/g, '');
-
-            const titleWithoutBrackets = product.title
-                .toLowerCase()
-                .replace(/\s+/g, '')
-                .replace(/\(.*?\)/g, '');
-
-            return titleWithoutBrackets.includes(searchQuery);
-        });
-    }
-    // Load warehouses after filtering cities
-    loadAllWarehouses();
-});
-
-watch(selected, () => {
-    loadAllWarehouses();
-});
-
-const loadAllWarehouses = () => {
-
-    axios
-        .get(`/getWarehouses/${selected.value.title}/0`)
-        .then((response) => {
-            // Map the response data to match the Combobox items
-            warehouses.value = response.data.warehouses;
-
-        })
-        .catch((error) => {
-            console.error('Error loading cities:', error);
-        });
-};
-
-watch(queryWarehouse, (newQueryWarehouse) => {
-
-    // Filter cities based on query
-    if (newQueryWarehouse === '') {
-        filteredWarehouses.value = warehouses.value.slice(); // Make a copy of the original array
-    } else {
-        filteredWarehouses.value = warehouses.value.filter((product) => {
-            const searchQuery = newQueryWarehouse.toLowerCase().replace(/\s+/g, '');
-
-            const titleWithoutBrackets = product.title
-                .toLowerCase()
-                .replace(/\s+/g, '')
-                .replace(/\(.*?\)/g, '');
-
-            return titleWithoutBrackets.includes(searchQuery);
-        });
-    }
-
-
-});
-
-let handleChange = () => {
-    if (selectedWarehouse.value.title) {
-        selectedWarehouse.value.title = "";
-    }
-    else {
-        selectedWarehouse = ref("");
-    }
-};
+// Watchers
+watch(selected, (newCity) => {
+  // Reset warehouse selection when city changes
+  selectedWarehouse.value = null
+  queryWarehouse.value = ''
+  
+  if (newCity?.title) {
+    loadWarehouses(newCity.title)
+  } else {
+    warehouses.value = []
+  }
+})
 
 let phone_number = ref("");
 let first_name = ref("");
@@ -163,7 +166,7 @@ let sendOrder = async () => {
                 'Content-Type': 'multipart/form-data',
             }
         });
-        
+
         if (auth.user) {
             await axios.post('/adresses/store', formAdress, {
                 headers: {
@@ -222,20 +225,16 @@ let validate = () => {
     }
 }
 
+// Initialize on mount
 onMounted(() => {
-    axios
-        .get(`/getCities/0`)
-        .then((response) => {
-            // Map the response data to match the Combobox items
-            cities.value = response.data.cities;
+  loadCities()
+})
 
-        })
-        .catch((error) => {
-            console.error('Error loading cities:', error);
-        });
-
-
-});
+// Expose selected values for parent component
+defineExpose({
+  selectedCity: selected,
+  selectedWarehouse
+})
 
 
 </script>
@@ -377,8 +376,8 @@ onMounted(() => {
                                         <div class="relative">
                                             <ComboboxInput id="floating_city" name="floating_city"
                                                 class="peer block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600"
-                                                :displayValue="(city) => city?.title"
-                                                @input="query = $event.target.value" placeholder=" " required />
+                                                :displayValue="(city) => city?.title || ''" @input="handleCityInput"
+                                                placeholder=" " required />
 
                                             <label for="floating_city"
                                                 class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
@@ -397,17 +396,17 @@ onMounted(() => {
                                                 class="absolute mt-1 z-50 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
                                                 <div v-if="filteredCities.length === 0 && query !== ''"
                                                     class="relative cursor-default select-none px-4 py-2 text-gray-700">
-                                                    Nothing found.
+                                                    Нічого не знайдено.
                                                 </div>
-                                                <ComboboxOption v-for="city in (filteredCities || []).slice(0, 20)"
-                                                    as="template" :key="city.id" :value="city"
-                                                    v-slot="{ selected, active }">
+
+                                                <ComboboxOption v-for="city in filteredCities.slice(0, 20)"
+                                                    :key="city.id" :value="city" v-slot="{ selected, active }">
                                                     <li class="relative cursor-default select-none py-2 pl-10 pr-4"
                                                         :class="{
                                                             'bg-teal-600 text-white': active,
                                                             'text-gray-900': !active,
                                                         }">
-                                                        <span class="block"
+                                                        <span class="block truncate"
                                                             :class="{ 'font-medium': selected, 'font-normal': !selected }">
                                                             {{ city.title }}
                                                         </span>
@@ -423,47 +422,59 @@ onMounted(() => {
                                     </div>
                                 </Combobox>
                             </div>
+
+                            <!-- Warehouse Selection -->
                             <div class="w-full md:w-2/3 px-3">
-                                <Combobox v-model="selectedWarehouse" @focus="loadWarehouses">
-                                    <div class="relative z-40 w-full mb-5 group">
+                                <Combobox v-model="selectedWarehouse">
+                                    <div class="relative z-30 w-full mb-5 group">
                                         <div class="relative">
                                             <ComboboxInput id="floating_warehouse" name="floating_warehouse"
                                                 class="peer block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600"
-                                                :displayValue="(warehouse) => warehouse?.title"
-                                                @change="queryWarehouse = $event.target.value" placeholder=" "
-                                                required />
+                                                :displayValue="(warehouse) => warehouse?.title || ''"
+                                                @input="handleWarehouseInput" :disabled="!selected || warehousesLoading"
+                                                placeholder=" " required />
+
                                             <label for="floating_warehouse"
                                                 class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
                                                 Назва або номер відділення
+                                                <span v-if="warehousesLoading" class="text-xs">(завантаження...)</span>
                                             </label>
-                                        </div>
 
-                                        <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2 z-20">
-                                            <ChevronUpDownIcon class="h-5 w-5 text-gray-400" />
-                                        </ComboboxButton>
+                                            <ComboboxButton
+                                                class="absolute inset-y-0 right-0 flex items-center pr-2 z-20"
+                                                :disabled="!selected || warehousesLoading">
+                                                <ChevronUpDownIcon class="h-5 w-5"
+                                                    :class="warehousesLoading ? 'text-gray-300 animate-spin' : 'text-gray-400'" />
+                                            </ComboboxButton>
+                                        </div>
 
                                         <TransitionRoot leave="transition ease-in duration-100" leaveFrom="opacity-100"
                                             leaveTo="opacity-0" @after-leave="queryWarehouse = ''">
                                             <ComboboxOptions
-                                                class="absolute mt-1 z-40 max-h-60 w-full overflow-x-auto whitespace-nowrap rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
-                                                <div v-if="filteredWarehouses.length === 0 && queryWarehouse !== ''"
+                                                class="absolute mt-1 z-40 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                                                <div v-if="filteredWarehouses.length === 0 && queryWarehouse !== '' && !warehousesLoading"
                                                     class="relative cursor-default select-none px-4 py-2 text-gray-700">
                                                     Нічого не знайдено.
                                                 </div>
-                                                <ComboboxOption
-                                                    v-for="warehouse in (filteredWarehouses || []).slice(0, 20)"
-                                                    as="template" :key="warehouse.id" :value="warehouse"
-                                                    v-slot="{ selectedWarehouse, active }">
+
+                                                <div v-if="warehousesLoading"
+                                                    class="relative cursor-default select-none px-4 py-2 text-gray-500">
+                                                    Завантаження відділень...
+                                                </div>
+
+                                                <ComboboxOption v-for="warehouse in filteredWarehouses.slice(0, 20)"
+                                                    :key="warehouse.id" :value="warehouse"
+                                                    v-slot="{ selected: warehouseSelected, active }">
                                                     <li class="relative cursor-default select-none py-2 pl-10 pr-4"
                                                         :class="{
                                                             'bg-teal-600 text-white': active,
                                                             'text-gray-900': !active,
                                                         }">
-                                                        <span
-                                                            :class="{ 'font-medium': selectedWarehouse, 'font-normal': !selectedWarehouse }">
+                                                        <span class="block"
+                                                            :class="{ 'font-medium': warehouseSelected, 'font-normal': !warehouseSelected }">
                                                             {{ warehouse.title }}
                                                         </span>
-                                                        <span v-if="selectedWarehouse"
+                                                        <span v-if="warehouseSelected"
                                                             class="absolute inset-y-0 left-0 flex items-center pl-3"
                                                             :class="{ 'text-white': active, 'text-teal-600': !active }">
                                                             <CheckIcon class="h-5 w-5" aria-hidden="true" />

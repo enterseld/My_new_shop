@@ -36,7 +36,7 @@ class CartController extends Controller
                 return Inertia::render('User/CartList', [
                     'cartItems' => $cartItems,
                     'userAdress' => $userAdress,
-
+                    
                 ]);
             }
         } else {
