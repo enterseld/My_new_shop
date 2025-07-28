@@ -26,16 +26,6 @@ A modern, full-stack e-commerce web application built with **Laravel** (back-end
 | **Backend**  | Laravel 11, Laravel Sanctum, Eloquent ORM     |
 | **AI**       | OpenRouter, Transformers.js, Pinecone         |
 | **Database** | MySQL                                         |
-| **DevOps**   | Docker, Laravel Octane, Nginx, Composer       |
-
----
-
-## 📸 Screenshots
-
-<!-- Add screenshots or gifs here -->
-![Home Page](screenshots/home.png)
-![AI Chatbot](screenshots/chat.png)
-![Admin Dashboard](screenshots/admin.png)
 
 ---
 
