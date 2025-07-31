@@ -1,15 +1,15 @@
 <script setup>
 import UserLayout from './Layouts/UserLayout.vue';
 import axios from 'axios';
-import { usePage} from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
 import { ref, computed, onMounted, watch } from 'vue'
 import {
-  Combobox,
-  ComboboxInput,
-  ComboboxOptions,
-  ComboboxOption,
-  ComboboxButton,
-  TransitionRoot
+    Combobox,
+    ComboboxInput,
+    ComboboxOptions,
+    ComboboxOption,
+    ComboboxButton,
+    TransitionRoot
 } from '@headlessui/vue'
 import { ChevronUpDownIcon, CheckIcon } from '@heroicons/vue/20/solid'
 
@@ -18,6 +18,7 @@ const carts = computed(() => usePage().props.cart.data.items);
 const products = computed(() => usePage().props.cart.data.products);
 const total = computed(() => usePage().props.cart.data.total);
 const itemId = (id) => carts.value.findIndex((item) => item.product_id == id);
+
 // Reactive state
 const cities = ref([])
 const warehouses = ref([])
@@ -30,87 +31,87 @@ const warehousesLoading = ref(false)
 
 // Computed filtered arrays
 const filteredCities = computed(() => {
-  if (query.value === '') {
-    return cities.value
-  }
-  
-  const searchQuery = query.value.toLowerCase().replace(/\s+/g, '')
-  return cities.value.filter((city) => {
-    const titleNormalized = city.title
-      .toLowerCase()
-      .replace(/\s+/g, '')
-      .replace(/\(.*?\)/g, '')
-    return titleNormalized.includes(searchQuery)
-  })
+    if (query.value === '') {
+        return cities.value
+    }
+
+    const searchQuery = query.value.toLowerCase().replace(/\s+/g, '')
+    return cities.value.filter((city) => {
+        const titleNormalized = city.title
+            .toLowerCase()
+            .replace(/\s+/g, '')
+            .replace(/\(.*?\)/g, '')
+        return titleNormalized.includes(searchQuery)
+    })
 })
 
 const filteredWarehouses = computed(() => {
-  if (queryWarehouse.value === '') {
-    return warehouses.value
-  }
-  
-  const searchQuery = queryWarehouse.value.toLowerCase().replace(/\s+/g, '')
-  return warehouses.value.filter((warehouse) => {
-    const titleNormalized = warehouse.title
-      .toLowerCase()
-      .replace(/\s+/g, '')
-      .replace(/\(.*?\)/g, '')
-    return titleNormalized.includes(searchQuery)
-  })
+    if (queryWarehouse.value === '') {
+        return warehouses.value
+    }
+
+    const searchQuery = queryWarehouse.value.toLowerCase().replace(/\s+/g, '')
+    return warehouses.value.filter((warehouse) => {
+        const titleNormalized = warehouse.title
+            .toLowerCase()
+            .replace(/\s+/g, '')
+            .replace(/\(.*?\)/g, '')
+        return titleNormalized.includes(searchQuery)
+    })
 })
 
 // Event handlers
 const handleCityInput = (event) => {
-  query.value = event.target.value
+    query.value = event.target.value
 }
 
 const handleWarehouseInput = (event) => {
-  queryWarehouse.value = event.target.value
+    queryWarehouse.value = event.target.value
 }
 
 // API functions with error handling and loading states
 const loadCities = async () => {
-  try {
-    citiesLoading.value = true
-    const response = await axios.get('/getCities/0')
-    cities.value = response.data.cities || []
-  } catch (error) {
-    console.error('Error loading cities:', error)
-    cities.value = []
-  } finally {
-    citiesLoading.value = false
-  }
+    try {
+        citiesLoading.value = true
+        const response = await axios.get('/getCities/0')
+        cities.value = response.data.cities || []
+    } catch (error) {
+        console.error('Error loading cities:', error)
+        cities.value = []
+    } finally {
+        citiesLoading.value = false
+    }
 }
 
 const loadWarehouses = async (cityTitle) => {
-  if (!cityTitle) {
-    warehouses.value = []
-    return
-  }
+    if (!cityTitle) {
+        warehouses.value = []
+        return
+    }
 
-  try {
-    warehousesLoading.value = true
-    const response = await axios.get(`/getWarehouses/${encodeURIComponent(cityTitle)}/0`)
-    warehouses.value = response.data.warehouses || []
-  } catch (error) {
-    console.error('Error loading warehouses:', error)
-    warehouses.value = []
-  } finally {
-    warehousesLoading.value = false
-  }
+    try {
+        warehousesLoading.value = true
+        const response = await axios.get(`/getWarehouses/${encodeURIComponent(cityTitle)}/0`)
+        warehouses.value = response.data.warehouses || []
+    } catch (error) {
+        console.error('Error loading warehouses:', error)
+        warehouses.value = []
+    } finally {
+        warehousesLoading.value = false
+    }
 }
 
 // Watchers
 watch(selected, (newCity) => {
-  // Reset warehouse selection when city changes
-  selectedWarehouse.value = null
-  queryWarehouse.value = ''
-  
-  if (newCity?.title) {
-    loadWarehouses(newCity.title)
-  } else {
-    warehouses.value = []
-  }
+    // Reset warehouse selection when city changes
+    selectedWarehouse.value = null
+    queryWarehouse.value = ''
+
+    if (newCity?.title) {
+        loadWarehouses(newCity.title)
+    } else {
+        warehouses.value = []
+    }
 })
 
 let phone_number = ref("");
@@ -175,7 +176,8 @@ let sendOrder = async () => {
             });
         }
         const orderId = orderResponse.data.order_id;
-        console.log(orderId)
+
+
         const response = await axios.post('/liqpay/getPaymentForm', {
             amount: total.value,
             order_id: orderId
@@ -190,15 +192,34 @@ let sendOrder = async () => {
         } else {
             launchLiqPay(data, signature);
         }
-
+        
         function launchLiqPay(data, signature) {
+            const originalData = data;
+
             LiqPayCheckout.init({
                 data,
                 signature,
                 embedTo: "#liqpay_placeholder",
                 mode: "popup"
             }).on("liqpay.callback", function (data) {
-                console.log("liqpay.callback", data);
+                console.log(signature)
+                
+                console.log(location.hostname)
+                if (location.hostname === '127.0.0.1') {
+                    console.log("Sending callback to server");
+                    axios.post('/liqpay/callback', {
+                        data: originalData,
+                        signature: signature,
+                        info: data
+                    }).then(response => {
+                        console.log('Callback POST success:', response.data);
+                        if (response.status === 200) {
+                            window.location.href = '/dashboard';
+                        }
+                    }).catch(error => {
+                        console.error('Callback POST failed:', error);
+                    });
+                }
             }).on("liqpay.ready", function (data) {
                 console.log("liqpay.ready", data);
             }).on("liqpay.close", function (data) {
@@ -227,13 +248,13 @@ let validate = () => {
 
 // Initialize on mount
 onMounted(() => {
-  loadCities()
+    loadCities()
 })
 
 // Expose selected values for parent component
 defineExpose({
-  selectedCity: selected,
-  selectedWarehouse
+    selectedCity: selected,
+    selectedWarehouse
 })
 
 
