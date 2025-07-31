@@ -25,7 +25,8 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd sockets
 # Install Swoole extension with specific options
 RUN pecl install --configureoptions 'enable-brotli="no"' swoole \
     && docker-php-ext-enable swoole
-
+    
+RUN echo "memory_limit=250M" > /usr/local/etc/php/conf.d/memory-limit.ini
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
