@@ -28,7 +28,7 @@ const query = ref('')
 const queryWarehouse = ref('')
 const citiesLoading = ref(false)
 const warehousesLoading = ref(false)
-
+const liqPay = ref('liqpay')
 // Computed filtered arrays
 const filteredCities = computed(() => {
     if (query.value === '') {
@@ -175,56 +175,58 @@ let sendOrder = async () => {
                 }
             });
         }
+
+
         const orderId = orderResponse.data.order_id;
-
-
-        const response = await axios.post('/liqpay/getPaymentForm', {
-            amount: total.value,
-            order_id: orderId
-        });
-        const { data, signature } = response.data;
-
-        if (!window.LiqPayCheckout) {
-            const script = document.createElement('script');
-            script.src = 'https://static.liqpay.ua/libjs/checkout.js';
-            script.onload = () => launchLiqPay(data, signature);
-            document.body.appendChild(script);
-        } else {
-            launchLiqPay(data, signature);
-        }
-        
-        function launchLiqPay(data, signature) {
-            const originalData = data;
-
-            LiqPayCheckout.init({
-                data,
-                signature,
-                embedTo: "#liqpay_placeholder",
-                mode: "popup"
-            }).on("liqpay.callback", function (data) {
-                console.log(signature)
-                
-                console.log(location.hostname)
-                if (location.hostname === '127.0.0.1') {
-                    console.log("Sending callback to server");
-                    axios.post('/liqpay/callback', {
-                        data: originalData,
-                        signature: signature,
-                        info: data
-                    }).then(response => {
-                        console.log('Callback POST success:', response.data);
-                        if (response.status === 200) {
-                            window.location.href = '/dashboard';
-                        }
-                    }).catch(error => {
-                        console.error('Callback POST failed:', error);
-                    });
-                }
-            }).on("liqpay.ready", function (data) {
-                console.log("liqpay.ready", data);
-            }).on("liqpay.close", function (data) {
-                console.log("liqpay.close", data);
+        if (liqPay.value == 'liqPay') {
+            const response = await axios.post('/liqpay/getPaymentForm', {
+                amount: total.value,
+                order_id: orderId
             });
+            const { data, signature } = response.data;
+
+            if (!window.LiqPayCheckout) {
+                const script = document.createElement('script');
+                script.src = 'https://static.liqpay.ua/libjs/checkout.js';
+                script.onload = () => launchLiqPay(data, signature);
+                document.body.appendChild(script);
+            } else {
+                launchLiqPay(data, signature);
+            }
+
+            function launchLiqPay(data, signature) {
+                const originalData = data;
+
+                LiqPayCheckout.init({
+                    data,
+                    signature,
+                    embedTo: "#liqpay_placeholder",
+                    mode: "popup"
+                }).on("liqpay.callback", function (data) {
+                    console.log(signature)
+
+                    console.log(location.hostname)
+                    if (location.hostname === '127.0.0.1') {
+                        console.log("Sending callback to server");
+                        axios.post('/liqpay/callback', {
+                            data: originalData,
+                            signature: signature,
+                            info: data
+                        }).then(response => {
+                            console.log('Callback POST success:', response.data);
+                            if (response.status === 200) {
+                                window.location.href = '/dashboard';
+                            }
+                        }).catch(error => {
+                            console.error('Callback POST failed:', error);
+                        });
+                    }
+                }).on("liqpay.ready", function (data) {
+                    console.log("liqpay.ready", data);
+                }).on("liqpay.close", function (data) {
+                    console.log("liqpay.close", data);
+                });
+            }
         }
     }
     catch (err) {
@@ -244,6 +246,10 @@ let validate = () => {
         console.log("not passed")
         return false;
     }
+}
+
+const check = () => {
+    console.log(liqPay.value)
 }
 
 // Initialize on mount
@@ -530,13 +536,48 @@ defineExpose({
                             class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Номер
                             телефону (+380123456789)</label>
                     </div>
-                    <div class="flex items-center mb-4">
+
+                    <h3 class="mb-2 font-semibold text-gray-900 dark:text-white">Оплата</h3>
+                    <ul
+                        class="items-center w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <li class="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                            <div class="flex items-center ps-3">
+                                <input id="liqpay" type="radio" value="liqpay" name="list-radio" v-model="liqPay"
+                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                <label for="liqpay"
+                                    class="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Онлайн
+                                    через сервіс LiqPay</label>
+                            </div>
+                        </li>
+                        <li class="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                            <div class="flex items-center ps-3">
+                                <input id="card" type="radio" value="card" name="list-radio" v-model="liqPay"
+                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                <label for="card"
+                                    class="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Оплата
+                                    на картку</label>
+                            </div>
+                        </li>
+                        <li class="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                            <div class="flex items-center ps-3">
+                                <input id="novapay" type="radio" value="novapay" name="list-radio" v-model="liqPay"
+                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                <label for="novapay"
+                                    class="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">NovaPay
+                                    (додаткова комісія)</label>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="flex items-center mb-4 mt-4">
                         <input id="checkbox-1" type="checkbox" value="0"
                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                         <label for="checkbox-1" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Я
                             погоджуюся із <a href="#" class="text-blue-600 hover:underline dark:text-blue-500">умовами
                                 обслуговування</a>.</label>
                     </div>
+
+
                     <button type="submit"
                         class="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg"
                         @click="sendOrder()">
