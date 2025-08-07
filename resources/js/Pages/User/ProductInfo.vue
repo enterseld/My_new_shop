@@ -19,6 +19,7 @@ const isButtonDisabled = computed(() => !comment.value.trim());
 
 
 const addToCart = (product) => {
+    console.log(product.value)
     router.post(route('cart.store', product), {
         onSuccess: (page) => {
             if (page.props.flash.success) {

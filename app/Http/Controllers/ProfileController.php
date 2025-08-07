@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
@@ -19,10 +20,12 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {   
-   
+        $email = $request->user()->email;
+        $orders = Order::with('order_items')->where('email', $email)->get();
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
+            'orders' => $orders,
         ]);
     }
 

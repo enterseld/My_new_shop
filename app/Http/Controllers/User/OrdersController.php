@@ -14,7 +14,6 @@ class OrdersController extends Controller
     public function store(Request $request)
     {
         $products = json_decode($request->products, true);
-
         $order = new Order();
         $order->first_name = $request->first_name;
         $order->last_name = $request->last_name;
@@ -38,9 +37,8 @@ class OrdersController extends Controller
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $product['product_id'],
-
                 'quantity' => $product['quantity'],
-
+                'vendor_code' => $product['vendor_code'],
                 'unit_price' => "200",
             ]);
         }

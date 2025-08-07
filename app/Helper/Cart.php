@@ -24,7 +24,7 @@ class Cart
     public static function getCartItems()
     {
         if ($user = Auth::user()) {
-            return CartItem::whereUserId($user->id)->get()->map(fn(CartItem $item) => ['product_id' => $item->product_id, 'quantity' => $item->quantity]);
+            return CartItem::whereUserId($user->id)->get()->map(fn(CartItem $item) => ['product_id' => $item->product_id, 'quantity' => $item->quantity, 'vendor_code' => $item->vendor_code]);
         } else {
             return self::getCookieCartItems();
         }
@@ -57,6 +57,7 @@ class Cart
                 'user_id' => $user->id,
                 'product_id' => $cartItem['product_id'],
                 'quantity' => $cartItem['quantity'],
+                'vendor_code' => $cartItem['vendor_code'],
             ];
         }
         if (!empty($savedCartItems)) {
@@ -82,6 +83,7 @@ class Cart
                     'user_id' => $request->user()->id,
                     'product_id' => $cartItem['product_id'],
                     'quantity' => $cartItem['quantity'],
+                    'vendor_code' => $cartItem['vendor_code'],
                 ];
             }
         }

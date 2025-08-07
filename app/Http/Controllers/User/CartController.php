@@ -105,7 +105,8 @@ class CartController extends Controller
                 CartItem::create([
                     'user_id' => $user->id,
                     'product_id' => $product->id,
-                    'quantity' => 1
+                    'quantity' => 1,
+                    'vendor_code' => $product->vendor_code,
                 ]);
             }
         } else {
@@ -114,6 +115,7 @@ class CartController extends Controller
             foreach ($cartItems as $item) {
                 if ($item['product_id'] === $product->id) {
                     $item['quantity'] += $quantity;
+                    $item['vendor_code'] = $product->vendor_code;
                     $isProductExists = true;
                     break;
                 }
@@ -125,6 +127,7 @@ class CartController extends Controller
                     'product_id' => $product->id,
                     'quantity' => $quantity,
                     'price' => $product->price,
+                    'vendor_code' => $product->vendor_code,
                 ];
             }
             Cart::setCookieCartItems($cartItems);
@@ -138,7 +141,7 @@ class CartController extends Controller
         $user = $request->user();
 
         if ($user) {
-            CartItem::where(['user_id' => $user->id, 'product_id' => $product->id])->update(['quantity' => $quantity]);
+            CartItem::where(['user_id' => $user->id, 'product_id' => $product->id])->update(['quantity' => $quantity], ['vendor_code' => $product->vendor_code]);
         } else {
             $cartItems = Cart::getCookieCartItems();
             foreach ($cartItems as &$item) {

@@ -1,7 +1,7 @@
 <script setup>
 import UserLayout from './Layouts/UserLayout.vue';
 import axios from 'axios';
-import { usePage } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import { ref, computed, onMounted, watch } from 'vue'
 import {
     Combobox,
@@ -125,8 +125,11 @@ if (auth.user) {
     middle_name.value = auth.user.middle_name;
 }
 
+const remove = (product) =>
+    router.delete(route('cart.delete', product), { preserveState: true, replace: true });
 
 
+    
 let sendOrder = async () => {
     if (!validate()) {
         if (auth.user)
@@ -150,7 +153,7 @@ let sendOrder = async () => {
     formOrder.append('shipping_city', selected.value.title);
     formOrder.append('shipping_warehouse', selectedWarehouse.value.title);
     formOrder.append('products', JSON.stringify(usePage().props.cart.data.items));
-
+    console.log(usePage().props.cart.data.items)
     const userId = auth.user ? usePage().props.auth.user.id : 0;
     const emailToSend = auth.user ? usePage().props.auth.user.email : email.value;
     formOrder.append('email', emailToSend);
@@ -227,6 +230,10 @@ let sendOrder = async () => {
                     console.log("liqpay.close", data);
                 });
             }
+        }
+        else {
+            window.location.href = '/dashboard';
+
         }
     }
     catch (err) {
@@ -565,6 +572,15 @@ defineExpose({
                                 <label for="novapay"
                                     class="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">NovaPay
                                     (додаткова комісія)</label>
+                            </div>
+                        </li>
+                        <li class="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                            <div class="flex items-center ps-3">
+                                <input id="later" type="radio" value="later" name="list-radio" v-model="liqPay"
+                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                <label for="later"
+                                    class="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Пізніше
+                                    у персональному кабінеті</label>
                             </div>
                         </li>
                     </ul>
