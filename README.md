@@ -41,8 +41,8 @@ A modern, full-stack e-commerce web application built with **Laravel** (back-end
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/laravel-vue-ecommerce-ai.git
-cd laravel-vue-ecommerce-ai
+git clone https://github.com/enterseld/My_new_shop.git
+cd My_new_shop
 ```
 2. Set Up Backend (Laravel)
 ```bash
